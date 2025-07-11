@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3CB371 0%, #228B22 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -21,22 +21,116 @@
             padding: 20px;
         }
 
+        .main-container {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .sidebar.visible {
+            display: block;
+        }
+
+        .sidebar h3 {
+            color: #3CB371;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            border-bottom: 2px solid #3CB371;
+            padding-bottom: 10px;
+        }
+
+        .device-tree {
+            list-style: none;
+        }
+
+        .device-item {
+            background: rgba(60, 179, 113, 0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #3CB371;
+        }
+
+        .device-item:hover {
+            background: rgba(60, 179, 113, 0.2);
+            transform: translateX(5px);
+        }
+
+        .device-item.selected {
+            background: rgba(60, 179, 113, 0.3);
+            border-left-color: #228B22;
+        }
+
+        .device-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .device-type {
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 2px;
+        }
+
+        .device-ip {
+            color: #888;
+            font-size: 0.75em;
+            margin-top: 2px;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.7em;
+            cursor: pointer;
+            float: right;
+            margin-top: -2px;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
         .container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             overflow: hidden;
+            flex: 1;
         }
 
         .header {
-            background: linear-gradient(135deg, #00A651 0%, #007A3E 100%);
+            background: linear-gradient(135deg, #3CB371 0%, #228B22 100%);
             padding: 30px;
             color: white;
-            text-align: center;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
         }
 
         .header::before {
@@ -48,6 +142,29 @@
             bottom: 0;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
             opacity: 0.3;
+        }
+
+        .header-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo img {
+            max-width: 200px;
+            max-height: 80px;
+            height: auto;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
         }
 
         .header h1 {
@@ -63,10 +180,54 @@
             opacity: 0.9;
             position: relative;
             z-index: 1;
+            margin-bottom: 20px;
         }
 
-        .form-container {
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: none;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab:last-child {
+            border-right: none;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.95);
+            color: #3CB371;
+            font-weight: 600;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .tab-content {
+            display: none;
             padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .form-grid {
@@ -85,11 +246,69 @@
         }
 
         .form-group label {
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
             font-size: 0.95em;
+        }
+
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: #3CB371;
+            color: white;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: help;
+            transition: all 0.3s ease;
+        }
+
+        .info-icon:hover {
+            background: #228B22;
+            transform: scale(1.1);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: normal;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #333;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+            visibility: visible;
+            top: -35px;
         }
 
         .form-group input,
@@ -106,14 +325,14 @@
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #00A651;
-            box-shadow: 0 0 0 3px rgba(0, 166, 81, 0.1);
+            border-color: #3CB371;
+            box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
             transform: translateY(-2px);
         }
 
         .form-group input:hover,
         .form-group select:hover {
-            border-color: #00A651;
+            border-color: #3CB371;
         }
 
         .button-group {
@@ -138,13 +357,13 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #00A651 0%, #007A3E 100%);
+            background: linear-gradient(135deg, #3CB371 0%, #228B22 100%);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 166, 81, 0.3);
+            box-shadow: 0 10px 20px rgba(60, 179, 113, 0.3);
         }
 
         .btn-secondary {
@@ -155,6 +374,26 @@
         .btn-secondary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(23, 162, 184, 0.3);
         }
 
         .progress-bar {
@@ -168,7 +407,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #00A651, #007A3E);
+            background: linear-gradient(90deg, #3CB371, #228B22);
             width: 0%;
             transition: width 0.3s ease;
         }
@@ -211,7 +450,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #00A651;
+            border-top: 4px solid #3CB371;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -238,6 +477,88 @@
             font-size: 1.2em;
         }
 
+        .placeholder-content {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .placeholder-content h3 {
+            color: #00A651;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .placeholder-content p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #00A651;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(23, 162, 184, 0.3);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 300px;
+            }
+        }
+
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -255,185 +576,341 @@
                 flex-direction: column;
             }
 
+            .header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 20px;
+            }
+
             .header h1 {
                 font-size: 2em;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .tab {
+                margin-bottom: 5px;
+            }
+
+            .logo img {
+                max-width: 150px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Device Configuration Generator</h1>
-            <p class="subtitle">Generate CSV configuration files for industrial devices</p>
+    <div class="main-container">
+        <div class="sidebar" id="sidebar">
+            <h3>📁 Saved Devices</h3>
+            <ul class="device-tree" id="deviceTree">
+            </ul>
         </div>
 
-        <div class="form-container">
-            <div class="info-cards">
-                <div class="info-card">
-                    <h3>Equipment Config</h3>
-                    <p>Generate EQUIP.csv with device specifications</p>
+        <div class="container">
+            <div class="header">
+                <div class="header-content">
+                    <h1>Device Configuration Generator</h1>
+                    <p class="subtitle"></p>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('device-info')">Device Info</button>
+                        <button class="tab" onclick="showTab('variables')">Variables</button>
+                        <button class="tab" onclick="showTab('alarms')">Alarms</button>
+                        <button class="tab" onclick="showTab('trends')">Trends</button>
+                    </div>
                 </div>
-                <div class="info-card">
-                    <h3>Units Config</h3>
-                    <p>Generate UNITS.csv with network settings</p>
+
+                <div class="logo">
+                    <img src="schneider-logo.png" alt="">
                 </div>
             </div>
 
-            <form id="config-form" method="post" action="/submit/">
-                <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
-                <div class="form-section">
-                    <h3>Device Configuration</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="device_name">Device Name</label>
-                            <input type="text" id="device_name" name="device_name" required
-                                   placeholder="Fuga.PV1">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="device_type">Device Type</label>
-                            <select id="device_type" name="device_type" required>
-                                <option value="">Select device type</option>
-                                <option value="PV">Solar Panel (PV)</option>
-                                <option value="WindTurbine">Wind Turbine</option>
-                                <option value="FuelTurbine">Fuel Turbine</option>
-                                <option value="FuelCell">Fuel Cell</option>
-                                <option value="BESS">Battery Energy Storage</option>
-                                <option value="AdjustableDevice">Adjustable Device</option>
-                                <option value="NonAdjustableDevice">Non-Adjustable Device</option>
-                                <option value="PowerMeter">Power Meter</option>
-                                <option value="Breaker">Circuit Breaker</option>
-                                <option value="Transformer">Transformer</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="tag_prefix">Tag Prefix</label>
-                            <input type="text" id="tag_prefix" name="tag_prefix" required
-                                   placeholder="e.g. FugaPV1">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="io_device">I/O Device</label>
-                            <input type="text" id="io_device" name="io_device" required
-                                   placeholder="e.g. Inverter_PV1">
-                        </div>
+            <div class="tab-content active" id="device-info">
+                <div class="info-cards">
+                    <div class="info-card">
+                        <h3>Equipment Config</h3>
+                        <p>Generate EQUIP.csv with device specifications</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Units Config</h3>
+                        <p>Generate UNITS.csv with network settings</p>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h3>Network Configuration</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="device_ip">Device IP Address</label>
-                            <input type="text" id="device_ip" name="device_ip" required
-                                   placeholder="192.168.1.100" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-                        </div>
+                <form id="config-form" method="post" action="/submit/">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
-                        <div class="form-group">
-                            <label for="port_name">Port Name</label>
-                            <input type="text" id="port_name" name="port_name"
-                                   placeholder="e.g. P14_BOARD1_PRJ3">
-                        </div>
+                    <div class="form-section">
+                        <h3>Device Configuration</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="device_name">
+                                    Device Name
+                                    <div class="info-icon" data-tooltip="Enter the unique identifier for your device (e.g., Fuga.PV1, Solar_Panel_01)">i</div>
+                                </label>
+                                <input type="text" id="device_name" name="device_name" required
+                                       placeholder="Fuga.PV1">
+                            </div>
 
-                        <div class="form-group">
-                            <label for="unit_number">Unit Number</label>
-                            <input type="number" id="unit_number" name="unit_number" required
-                                   min="1" max="999" placeholder="218">
-                        </div>
+                            <div class="form-group">
+                                <label for="device_type">
+                                    Device Type
+                                    <div class="info-icon" data-tooltip="Select the type of device you're configuring based on its primary function">i</div>
+                                </label>
+                                <select id="device_type" name="device_type" required>
+                                    <option value="">Select device type</option>
+                                    <option value="PV">Solar Panel (PV)</option>
+                                    <option value="WindTurbine">Wind Turbine</option>
+                                    <option value="FuelTurbine">Fuel Turbine</option>
+                                    <option value="FuelCell">Fuel Cell</option>
+                                    <option value="BESS">Battery Energy Storage</option>
+                                    <option value="AdjustableDevice">Adjustable Device</option>
+                                    <option value="NonAdjustableDevice">Non-Adjustable Device</option>
+                                    <option value="PowerMeter">Power Meter</option>
+                                    <option value="Breaker">Circuit Breaker</option>
+                                    <option value="Transformer">Transformer</option>
+                                </select>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="protocol">Protocol</label>
-                            <select id="protocol" name="protocol" required>
-                                <option value="IEC61850N">IEC61850N</option>
-                                <option value="Modbus">Modbus</option>
-                                <option value="DNP3">DNP3</option>
-                                <option value="OPC">OPC</option>
-                            </select>
+                            <div class="form-group">
+                                <label for="tag_prefix">
+                                    Tag Prefix
+                                    <div class="info-icon" data-tooltip="Prefix used for all data tags from this device (e.g., FugaPV1, SolarPnl01)">i</div>
+                                </label>
+                                <input type="text" id="tag_prefix" name="tag_prefix" required
+                                       placeholder="e.g. FugaPV1">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="io_device">
+                                    I/O Device
+                                    <div class="info-icon" data-tooltip="The hardware interface device name (e.g., Inverter_PV1, Controller_01)">i</div>
+                                </label>
+                                <input type="text" id="io_device" name="io_device" required
+                                       placeholder="e.g. Inverter_PV1">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
+                    <div class="form-section">
+                        <h3>Network Configuration</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="device_ip">
+                                    Device IP Address
+                                    <div class="info-icon" data-tooltip="IP address of the device on the network (format: xxx.xxx.xxx.xxx)">i</div>
+                                </label>
+                                <input type="text" id="device_ip" name="device_ip" required
+                                       placeholder="192.168.1.100" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+                            </div>
 
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
-                        Reset
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        Generate CSV Files
-                    </button>
-                </div>
-            </form>
+                            <div class="form-group">
+                                <label for="port_name">
+                                    Port Name
+                                    <div class="info-icon" data-tooltip="Communication port identifier (e.g., P14_BOARD1_PRJ3, COM1, ETH0)">i</div>
+                                </label>
+                                <input type="text" id="port_name" name="port_name"
+                                       placeholder="e.g. P14_BOARD1_PRJ3">
+                            </div>
 
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Generating configuration files...</p>
+                            <div class="form-group">
+                                <label for="unit_number">
+                                    Unit Number
+                                    <div class="info-icon" data-tooltip="Unique numeric identifier for the device (1-999)">i</div>
+                                </label>
+                                <input type="number" id="unit_number" name="unit_number" required
+                                       min="1" max="999" placeholder="218">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="protocol">
+                                    Protocol
+                                    <div class="info-icon" data-tooltip="Communication protocol used by the device">i</div>
+                                </label>
+                                <select id="protocol" name="protocol" required>
+                                    <option value="IEC61850N">IEC61850N</option>
+                                    <option value="Modbus">Modbus</option>
+                                    <option value="DNP3">DNP3</option>
+                                    <option value="OPC">OPC</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+
+                    <div class="button-group">
+                        <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()">
+                        <label for="csvFile" class="file-input-label">
+                            Load CSV
+                        </label>
+
+                        <button type="button" class="btn btn-success" onclick="saveDevice()">
+                            Save Device
+                        </button>
+
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            Reset
+                        </button>
+
+                        <button type="submit" class="btn btn-primary">
+                            Generate CSV Files
+                        </button>
+                    </div>
+                </form>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Generating configuration files...</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="variables">
+                <div class="placeholder-content">
+                    <div class="feature-icon"></div>
+                    <h3>Variables Management</h3>
+                    <p>Configure and monitor device variables, data points, and real-time measurements. Set up analog and digital inputs, outputs, and calculated values for comprehensive device monitoring.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="alarms">
+                <div class="placeholder-content">
+                    <div class="feature-icon"></div>
+                    <h3>Alarm Configuration</h3>
+                    <p>Set up alarm conditions, thresholds, and notification settings. Configure priority levels, acknowledgment requirements, and alarm actions to ensure system safety and reliability.</p>
+                </div>
+            </div>
+
+            <div class="tab-content" id="trends">
+                <div class="placeholder-content">
+                    <div class="feature-icon"></div>
+                    <h3>Trend Analysis</h3>
+                    <p>Configure historical data logging, trend charts, and performance analytics. Set up data collection intervals, storage parameters, and visualization options for long-term monitoring.</p>
+                </div>
             </div>
         </div>
     </div>
 
+    <div class="notification" id="notification"></div>
+
     <script>
-        const form = document.getElementById('config-form');
-        const progressFill = document.querySelector('.progress-fill');
-        const loading = document.getElementById('loading');
-        const inputs = form.querySelectorAll('input[required], select[required]');
+        let savedDevices = JSON.parse(localStorage.getItem('savedDevices') || '[]');
+
+        function showTab(tabId) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showTooltip(element) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = element.dataset.tooltip;
+
+            element.style.position = 'relative';
+            element.appendChild(tooltip);
+
+            setTimeout(() => {
+                tooltip.classList.add('show');
+            }, 10);
+        }
+
+        function hideTooltip(element) {
+            const tooltip = element.querySelector('.tooltip');
+            if (tooltip) {
+                tooltip.classList.remove('show');
+                setTimeout(() => {
+                    if (tooltip.parentNode) {
+                        tooltip.parentNode.removeChild(tooltip);
+                    }
+                }, 300);
+            }
+        }
 
         function updateProgress() {
+            const form = document.getElementById('config-form');
+            const progressFill = document.querySelector('.progress-fill');
+            const inputs = form.querySelectorAll('input[required], select[required]');
+
             const totalFields = inputs.length;
             const filledFields = Array.from(inputs).filter(input => input.value.trim() !== '').length;
             const progress = (filledFields / totalFields) * 100;
             progressFill.style.width = progress + '%';
         }
 
-        inputs.forEach(input => {
-            input.addEventListener('input', updateProgress);
-            input.addEventListener('change', updateProgress);
-        });
-
-        form.addEventListener('submit', function(e) {
-            loading.classList.add('active');
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
 
             setTimeout(() => {
-                loading.classList.remove('active');
-            }, 2000);
-        });
-
-        function resetForm() {
-            form.reset();
-            updateProgress();
+                notification.classList.remove('show');
+            }, 3000);
         }
 
-        document.getElementById('device_type').addEventListener('change', function() {
-            const deviceType = this.value;
-            const deviceName = document.getElementById('device_name');
-            const tagPrefix = document.getElementById('tag_prefix');
-            const ioDevice = document.getElementById('io_device');
+        function loadCSV() {
+    const file = document.getElementById('csvFile').files[0];
+    if (!file) return;
 
-            if (deviceType) {
-                deviceName.value = `Fuga.${deviceType}1`;
-                tagPrefix.value = `Fuga${deviceType}1`;
-                ioDevice.value = `Inverter_${deviceType}1`;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const text = e.target.result;
+            const lines = text.split('\n');
+
+            if (lines.length < 2) {
+                showNotification('CSV file must have at least 2 lines (header + data)', 'error');
+                return;
             }
-        });
 
-        document.getElementById('device_ip').addEventListener('input', function() {
-            const ip = this.value;
-            const ipPattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const data = lines[1].split(',').map(d => d.trim().replace(/"/g, ''));
 
-            if (ip && !ipPattern.test(ip)) {
-                this.style.borderColor = '#dc3545';
-            } else {
-                this.style.borderColor = '#00A651';
-            }
-        });
+            const fieldMapping = {
+                'device_name': ['device_name', 'name', 'device'],
+                'device_type': ['device_type', 'type'],
+                'tag_prefix': ['tag_prefix', 'prefix', 'tag'],
+                'io_device': ['io_device', 'io', 'device_io'],
+                'device_ip': ['device_ip', 'ip', 'ip_address'],
+                'port_name': ['port_name', 'port'],
+                'unit_number': ['unit_number', 'unit', 'number'],
+                'protocol': ['protocol']
+            };
 
-        updateProgress();
-    </script>
-</body>
-</html>
+            Object.keys(fieldMapping).forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    const possibleHeaders = fieldMapping[fieldId];
+                    for (let header of possibleHeaders) {
+                        const index = headers.findIndex(h => h.toLowerCase().includes(header.toLowerCase()));
+                        if (index !== -1 && data[index]) {
+                            field.value = data[index];
+                            break;
+                        }
+                    }
+                }
+            });
 
+            updateProgress();
+            showNotification('CSV file loaded successfully.', 'success');
+
+        } catch (error) {
+            console.error(error);
+            showNotification('Failed to load CSV file.', 'error');
+        }
+    };
+
+    reader.readAsText(file);
+}
