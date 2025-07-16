@@ -38,7 +38,7 @@
             padding: 20px;
             max-height: 80vh;
             overflow-y: auto;
-            display: none;
+            transition: all 0.3s ease;
         }
 
         .sidebar.visible {
@@ -51,6 +51,22 @@
             font-size: 1.2em;
             border-bottom: 2px solid #3CB371;
             padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .device-counter {
+            background: #3CB371;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
         }
 
         .device-tree {
@@ -65,6 +81,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-left: 4px solid #3CB371;
+            position: relative;
         }
 
         .device-item:hover {
@@ -95,20 +112,66 @@
             margin-top: 2px;
         }
 
-        .delete-btn {
-            background: #dc3545;
+        .device-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .device-btn {
+            background: #3CB371;
             color: white;
             border: none;
             border-radius: 4px;
             padding: 4px 8px;
             font-size: 0.7em;
             cursor: pointer;
-            float: right;
-            margin-top: -2px;
+            transition: all 0.3s ease;
         }
 
-        .delete-btn:hover {
+        .device-btn:hover {
+            background: #228B22;
+            transform: scale(1.05);
+        }
+
+        .device-btn.delete {
+            background: #dc3545;
+        }
+
+        .device-btn.delete:hover {
             background: #c82333;
+        }
+
+        .device-btn.edit {
+            background: #ffc107;
+        }
+
+        .device-btn.edit:hover {
+            background: #e0a800;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .empty-state h4 {
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 0.9em;
+            line-height: 1.4;
         }
 
         .container {
@@ -548,14 +611,53 @@
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
         }
 
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3CB371;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: #228B22;
+            transform: scale(1.1);
+        }
+
         @media (max-width: 1200px) {
-            .main-container {
-                flex-direction: column;
+            .sidebar-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .sidebar {
+                position: fixed;
+                top: 0;
+                left: -320px;
+                height: 100vh;
+                z-index: 1000;
+                border-radius: 0 20px 20px 0;
+                max-height: 100vh;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.visible {
+                left: 0;
+            }
+
+            .main-container {
+                flex-direction: column;
                 width: 100%;
-                max-height: 300px;
             }
         }
 
@@ -603,10 +705,20 @@
     </style>
 </head>
 <body>
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+    </button>
+
     <div class="main-container">
         <div class="sidebar" id="sidebar">
-            <h3>📁 Saved Devices</h3>
+            <h3>
+                Saved Devices
+                <span class="device-counter" id="deviceCounter">0</span>
+            </h3>
             <ul class="device-tree" id="deviceTree">
+                <div class="empty-state">
+                    <h4>No devices saved</h4>
+                    <p>Add your first device to see it here</p>
+                </div>
             </ul>
         </div>
 
@@ -614,7 +726,7 @@
             <div class="header">
                 <div class="header-content">
                     <h1>Device Configuration Generator</h1>
-                    <p class="subtitle"></p>
+                    <p class="subtitle">Generate CSV configuration files for industrial devices</p>
 
                     <div class="tabs">
                         <button class="tab active" onclick="showTab('device-info')">Device Info</button>
@@ -625,7 +737,7 @@
                 </div>
 
                 <div class="logo">
-                    <img src="schneider-logo.png" alt="">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMjAwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8dGV4dCB4PSIxMCIgeT0iMzAiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1mYW1pbHk9IkFyaWFsIj5TY2huZWlkZXI8L3RleHQ+CjxsaW5lIHgxPSIxMCIgeDI9IjE5MCIgeTE9IjM4IiB5Mj0iMzgiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPgo8dGV4dCB4PSIxMCIgeT0iNTgiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZm9udC1mYW1pbHk9IkFyaWFsIj5FbGVjdHJpYzwvdGV4dD4KPC9zdmc+Cg==" alt="Schneider Electric Logo">
                 </div>
             </div>
 
@@ -641,9 +753,7 @@
                     </div>
                 </div>
 
-                <form id="config-form" method="post" action="/submit/">
-                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
+                <form id="config-form">
                     <div class="form-section">
                         <h3>Device Configuration</h3>
                         <div class="form-grid">
@@ -667,12 +777,10 @@
                                     <option value="WindTurbine">Wind Turbine</option>
                                     <option value="FuelTurbine">Fuel Turbine</option>
                                     <option value="FuelCell">Fuel Cell</option>
-                                    <option value="BESS">Battery Energy Storage</option>
+                                    <option value="BESS">BESS</option>
                                     <option value="AdjustableDevice">Adjustable Device</option>
-                                    <option value="NonAdjustableDevice">Non-Adjustable Device</option>
                                     <option value="PowerMeter">Power Meter</option>
-                                    <option value="Breaker">Circuit Breaker</option>
-                                    <option value="Transformer">Transformer</option>
+                                    <option value="NonAdjustableDevice">Non-Adjustable Device</option>
                                 </select>
                             </div>
 
@@ -734,8 +842,6 @@
                                 <select id="protocol" name="protocol" required>
                                     <option value="IEC61850N">IEC61850N</option>
                                     <option value="Modbus">Modbus</option>
-                                    <option value="DNP3">DNP3</option>
-                                    <option value="OPC">OPC</option>
                                 </select>
                             </div>
                         </div>
@@ -759,7 +865,7 @@
                             Reset
                         </button>
 
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" onclick="generateCSV()">
                             Generate CSV Files
                         </button>
                     </div>
@@ -777,140 +883,498 @@
                     <h3>Variables Management</h3>
                     <p>Configure and monitor device variables, data points, and real-time measurements. Set up analog and digital inputs, outputs, and calculated values for comprehensive device monitoring.</p>
                 </div>
-            </div>
+            <div class="tabs">
+            <button class="tab active" onclick="showTab('configuration')">Configuration</button>
+            <button class="tab" onclick="showTab('variables')">Variables</button>
+            <button class="tab" onclick="showTab('devices')">Devices</button>
+        </div>
 
-            <div class="tab-content" id="alarms">
-                <div class="placeholder-content">
-                    <div class="feature-icon"></div>
-                    <h3>Alarm Configuration</h3>
-                    <p>Set up alarm conditions, thresholds, and notification settings. Configure priority levels, acknowledgment requirements, and alarm actions to ensure system safety and reliability.</p>
+        <div class="tab-content active" id="configuration">
+            <form id="deviceForm">
+                <div class="form-section">
+                    <h3>Device Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="device_name">
+                                Device Name
+                                <div class="info-icon" data-tooltip="Enter the unique identifier for your device (e.g., Fuga.PV1, Solar_Panel_01)">i</div>
+                            </label>
+                            <input type="text" id="device_name" name="device_name" required
+                                   placeholder="Fuga.PV1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="device_type">
+                                Device Type
+                                <div class="info-icon" data-tooltip="Select the type of device you're configuring based on its primary function">i</div>
+                            </label>
+                            <select id="device_type" name="device_type" required>
+                                <option value="">Select device type</option>
+                                <option value="PV">Solar Panel (PV)</option>
+                                <option value="WindTurbine">Wind Turbine</option>
+                                <option value="FuelTurbine">Fuel Turbine</option>
+                                <option value="FuelCell">Fuel Cell</option>
+                                <option value="BESS">Battery Energy Storage</option>
+                                <option value="AdjustableDevice">Adjustable Device</option>
+                                <option value="NonAdjustableDevice">Non-Adjustable Device</option>
+                                <option value="PowerMeter">Power Meter</option>
+                                <option value="Breaker">Circuit Breaker</option>
+                                <option value="Transformer">Transformer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tag_prefix">
+                                Tag Prefix
+                                <div class="info-icon" data-tooltip="Prefix used for all data tags from this device (e.g., FugaPV1, SolarPnl01)">i</div>
+                            </label>
+                            <input type="text" id="tag_prefix" name="tag_prefix" required
+                                   placeholder="e.g. FugaPV1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="io_device">
+                                I/O Device
+                                <div class="info-icon" data-tooltip="The hardware interface device name (e.g., Inverter_PV1, Controller_01)">i</div>
+                            </label>
+                            <input type="text" id="io_device" name="io_device" required
+                                   placeholder="e.g. Inverter_PV1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Network Configuration</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="device_ip">
+                                Device IP Address
+                                <div class="info-icon" data-tooltip="IP address of the device on the network (format: xxx.xxx.xxx.xxx)">i</div>
+                            </label>
+                            <input type="text" id="device_ip" name="device_ip" required
+                                   placeholder="192.168.1.100" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="port_name">
+                                Port Name
+                                <div class="info-icon" data-tooltip="Communication port identifier (e.g., P14_BOARD1_PRJ3, COM1, ETH0)">i</div>
+                            </label>
+                            <input type="text" id="port_name" name="port_name"
+                                   placeholder="e.g. P14_BOARD1_PRJ3">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="unit_number">
+                                Unit Number
+                                <div class="info-icon" data-tooltip="Unique numeric identifier for the device (1-999)">i</div>
+                            </label>
+                            <input type="number" id="unit_number" name="unit_number" required
+                                   min="1" max="999" placeholder="218">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="protocol">
+                                Protocol
+                                <div class="info-icon" data-tooltip="Communication protocol used by the device">i</div>
+                            </label>
+                            <select id="protocol" name="protocol" required>
+                                <option value="IEC61850N">IEC61850N</option>
+                                <option value="Modbus">Modbus</option>
+                                <option value="DNP3">DNP3</option>
+                                <option value="OPC">OPC</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+
+                <div class="button-group">
+                    <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()">
+                    <label for="csvFile" class="file-input-label">
+                        Load CSV
+                    </label>
+
+                    <button type="button" class="btn btn-success" onclick="saveDevice()">
+                        Save Device
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        Reset
+                    </button>
+
+                    <button type="button" class="btn btn-primary" onclick="generateCSV()">
+                        Generate CSV Files
+                    </button>
+                </div>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating configuration files...</p>
+            </div>
+        </div>
+
+        <div class="tab-content" id="variables">
+            <div class="form-section">
+                <h3>Variable Configuration</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="variable_name">Variable Name</label>
+                        <input type="text" id="variable_name" placeholder="e.g. ActivePower">
+                    </div>
+                    <div class="form-group">
+                        <label for="variable_type">Variable Type</label>
+                        <select id="variable_type">
+                            <option value="analog">Analog</option>
+                            <option value="digital">Digital</option>
+                            <option value="calculated">Calculated</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="data_type">Data Type</label>
+                        <select id="data_type">
+                            <option value="float">Float</option>
+                            <option value="int">Integer</option>
+                            <option value="bool">Boolean</option>
+                            <option value="string">String</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">Unit</label>
+                        <input type="text" id="unit" placeholder="e.g. kW, V, A">
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="addVariable()">
+                        Add Variable
+                    </button>
                 </div>
             </div>
 
-            <div class="tab-content" id="trends">
-                <div class="placeholder-content">
-                    <div class="feature-icon"></div>
-                    <h3>Trend Analysis</h3>
-                    <p>Configure historical data logging, trend charts, and performance analytics. Set up data collection intervals, storage parameters, and visualization options for long-term monitoring.</p>
-                </div>
+            <table class="variable-table">
+                <thead>
+                    <tr>
+                        <th>Variable Name</th>
+                        <th>Type</th>
+                        <th>Data Type</th>
+                        <th>Unit</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="variableTableBody">
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-content" id="devices">
+            <div class="form-section">
+                <h3>Device Management</h3>
+                <p>Manage all configured devices and their settings</p>
+            </div>
+
+            <div class="device-list" id="deviceList">
+
             </div>
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
-
     <script>
-        let savedDevices = JSON.parse(localStorage.getItem('savedDevices') || '[]');
 
-        function showTab(tabId) {
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => content.classList.remove('active'));
+        let devices = [];
+        let variables = [];
+        let currentDevice = null;
 
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => tab.classList.remove('active'));
 
-            document.getElementById(tabId).classList.add('active');
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDevicesFromStorage();
+            loadVariablesFromStorage();
+            updateProgress();
+            updateDeviceList();
+        });
+
+
+        function showTab(tabName) {
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+
+            document.getElementById(tabName).classList.add('active');
+
+
             event.target.classList.add('active');
         }
 
-        function showTooltip(element) {
-            const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            tooltip.textContent = element.dataset.tooltip;
-
-            element.style.position = 'relative';
-            element.appendChild(tooltip);
-
-            setTimeout(() => {
-                tooltip.classList.add('show');
-            }, 10);
-        }
-
-        function hideTooltip(element) {
-            const tooltip = element.querySelector('.tooltip');
-            if (tooltip) {
-                tooltip.classList.remove('show');
-                setTimeout(() => {
-                    if (tooltip.parentNode) {
-                        tooltip.parentNode.removeChild(tooltip);
-                    }
-                }, 300);
-            }
-        }
 
         function updateProgress() {
-            const form = document.getElementById('config-form');
-            const progressFill = document.querySelector('.progress-fill');
+            const form = document.getElementById('deviceForm');
             const inputs = form.querySelectorAll('input[required], select[required]');
+            let filledInputs = 0;
 
-            const totalFields = inputs.length;
-            const filledFields = Array.from(inputs).filter(input => input.value.trim() !== '').length;
-            const progress = (filledFields / totalFields) * 100;
-            progressFill.style.width = progress + '%';
-        }
-
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function loadCSV() {
-    const file = document.getElementById('csvFile').files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const text = e.target.result;
-            const lines = text.split('\n');
-
-            if (lines.length < 2) {
-                showNotification('CSV file must have at least 2 lines (header + data)', 'error');
-                return;
-            }
-
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            const data = lines[1].split(',').map(d => d.trim().replace(/"/g, ''));
-
-            const fieldMapping = {
-                'device_name': ['device_name', 'name', 'device'],
-                'device_type': ['device_type', 'type'],
-                'tag_prefix': ['tag_prefix', 'prefix', 'tag'],
-                'io_device': ['io_device', 'io', 'device_io'],
-                'device_ip': ['device_ip', 'ip', 'ip_address'],
-                'port_name': ['port_name', 'port'],
-                'unit_number': ['unit_number', 'unit', 'number'],
-                'protocol': ['protocol']
-            };
-
-            Object.keys(fieldMapping).forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    const possibleHeaders = fieldMapping[fieldId];
-                    for (let header of possibleHeaders) {
-                        const index = headers.findIndex(h => h.toLowerCase().includes(header.toLowerCase()));
-                        if (index !== -1 && data[index]) {
-                            field.value = data[index];
-                            break;
-                        }
-                    }
+            inputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    filledInputs++;
                 }
             });
 
-            updateProgress();
-            showNotification('CSV file loaded successfully.', 'success');
-
-        } catch (error) {
-            console.error(error);
-            showNotification('Failed to load CSV file.', 'error');
+            const progress = (filledInputs / inputs.length) * 100;
+            document.querySelector('.progress-fill').style.width = progress + '%';
         }
-    };
 
-    reader.readAsText(file);
-}
+        document.getElementById('deviceForm').addEventListener('input', updateProgress);
+        document.getElementById('deviceForm').addEventListener('change', updateProgress);
+
+
+        function saveDevice() {
+            const form = document.getElementById('deviceForm');
+            const formData = new FormData(form);
+            const device = {};
+
+            for (let [key, value] of formData.entries()) {
+                device[key] = value;
+            }
+
+
+            device.created_at = new Date().toISOString();
+            device.id = Date.now().toString();
+
+            devices.push(device);
+            saveDevicesToStorage();
+            updateDeviceList();
+            showAlert('Device saved successfully!', 'success');
+            resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById('deviceForm').reset();
+            updateProgress();
+        }
+
+        function loadCSV() {
+            const file = document.getElementById('csvFile').files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split('\n');
+                const headers = lines[0].split(',');
+
+                if (lines.length > 1) {
+                    const data = lines[1].split(',');
+                    const form = document.getElementById('deviceForm');
+
+                    headers.forEach((header, index) => {
+                        const input = form.querySelector(`[name="${header.trim()}"]`);
+                        if (input && data[index]) {
+                            input.value = data[index].trim();
+                        }
+                    });
+
+                    updateProgress();
+                    showAlert('CSV loaded successfully!', 'success');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function generateCSV() {
+            if (devices.length === 0) {
+                showAlert('No devices to export!', 'error');
+                return;
+            }
+
+            showLoading();
+
+            setTimeout(() => {
+                const headers = ['device_name', 'device_type', 'tag_prefix', 'io_device', 'device_ip', 'port_name', 'unit_number', 'protocol'];
+                let csv = headers.join(',') + '\n';
+
+                devices.forEach(device => {
+                    const row = headers.map(header => device[header] || '').join(',');
+                    csv += row + '\n';
+                });
+
+                downloadCSV(csv, 'device_configuration.csv');
+
+
+                if (variables.length > 0) {
+                    const varHeaders = ['variable_name', 'variable_type', 'data_type', 'unit'];
+                    let varCsv = varHeaders.join(',') + '\n';
+
+                    variables.forEach(variable => {
+                        const row = varHeaders.map(header => variable[header] || '').join(',');
+                        varCsv += row + '\n';
+                    });
+
+                    downloadCSV(varCsv, 'variable_configuration.csv');
+                }
+
+                hideLoading();
+                showAlert('CSV files generated successfully!', 'success');
+            }, 2000);
+        }
+
+
+        function addVariable() {
+            const name = document.getElementById('variable_name').value;
+            const type = document.getElementById('variable_type').value;
+            const dataType = document.getElementById('data_type').value;
+            const unit = document.getElementById('unit').value;
+
+            if (!name) {
+                showAlert('Please enter a variable name!', 'error');
+                return;
+            }
+
+            const variable = {
+                id: Date.now().toString(),
+                variable_name: name,
+                variable_type: type,
+                data_type: dataType,
+                unit: unit
+            };
+
+            variables.push(variable);
+            saveVariablesToStorage();
+            updateVariableTable();
+            clearVariableForm();
+            showAlert('Variable added successfully!', 'success');
+        }
+
+        function removeVariable(id) {
+            variables = variables.filter(v => v.id !== id);
+            saveVariablesToStorage();
+            updateVariableTable();
+            showAlert('Variable removed successfully!', 'success');
+        }
+
+        function clearVariableForm() {
+            document.getElementById('variable_name').value = '';
+            document.getElementById('variable_type').value = 'analog';
+            document.getElementById('data_type').value = 'float';
+            document.getElementById('unit').value = '';
+        }
+
+        function updateVariableTable() {
+            const tbody = document.getElementById('variableTableBody');
+            tbody.innerHTML = '';
+
+            variables.forEach(variable => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${variable.variable_name}</td>
+                    <td>${variable.variable_type}</td>
+                    <td>${variable.data_type}</td>
+                    <td>${variable.unit || '-'}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="removeVariable('${variable.id}')">🗑️ Remove</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+
+        function updateDeviceList() {
+            const deviceList = document.getElementById('deviceList');
+            deviceList.innerHTML = '';
+
+            if (devices.length === 0) {
+                deviceList.innerHTML = '<div class="placeholder-content"><p>No devices configured yet. Go to Configuration tab to add devices.</p></div>';
+                return;
+            }
+
+            devices.forEach(device => {
+                const deviceItem = document.createElement('div');
+                deviceItem.className = 'device-item';
+                deviceItem.innerHTML = `
+                    <div class="device-header">
+                        <span class="device-name">${device.device_name}</span>
+                        <span class="device-type">${device.device_type}</span>
+                    </div>
+                    <div class="device-details">
+                        <div class="device-detail"><strong>IP:</strong> ${device.device_ip}</div>
+                        <div class="device-detail"><strong>Protocol:</strong> ${device.protocol}</div>
+                        <div class="device-detail"><strong>Unit:</strong> ${device.unit_number}</div>
+                        <div class="device-detail"><strong>Tag Prefix:</strong> ${device.tag_prefix}</div>
+                    </div>
+                `;
+                deviceList.appendChild(deviceItem);
+            });
+        }
+
+
+        function saveDevicesToStorage() {
+
+        }
+
+        function loadDevicesFromStorage() {
+
+        }
+
+        function saveVariablesToStorage() {
+
+        }
+
+        function loadVariablesFromStorage() {
+
+        }
+
+
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+
+            const container = document.querySelector('.tab-content.active');
+            container.insertBefore(alert, container.firstChild);
+
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+
+        document.getElementById('device_ip').addEventListener('blur', function() {
+            const ip = this.value;
+            const ipPattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+            if (ip && !ipPattern.test(ip)) {
+                showAlert('Please enter a valid IP address!', 'error');
+                this.focus();
+            }
+        });
+    </script>
+</body>
+</html>
+
