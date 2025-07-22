@@ -59,12 +59,67 @@
       margin: 0;
     }
 
+    .protocol-selection {
+      background: #e8f5e8;
+      border: 3px solid #3dcd68;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .protocol-selection h2 {
+      color: #2d7a3d;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+    }
+
+    .protocol-buttons {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .protocol-btn {
+      flex: 1;
+      max-width: 200px;
+      background: white;
+      border: 3px solid #3dcd68;
+      border-radius: 12px;
+      padding: 24px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #3dcd68;
+    }
+
+    .protocol-btn:hover {
+      background: #3dcd68;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(40, 167, 69, 0.25);
+    }
+
+    .protocol-btn.active {
+      background: #3dcd68;
+      color: white;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+    }
+
     .form-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
 
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
 
     .form-group {
       position: relative;
@@ -124,13 +179,11 @@
       border: 8px solid transparent;
     }
 
-
     .tooltip.tooltip-bottom-right::after {
       top: -16px;
       left: 20px;
       border-bottom-color: #333;
     }
-
 
     .tooltip.tooltip-bottom-left::after {
       top: -16px;
@@ -138,13 +191,11 @@
       border-bottom-color: #333;
     }
 
-
     .tooltip.tooltip-top-right::after {
       bottom: -16px;
       left: 20px;
       border-top-color: #333;
     }
-
 
     .tooltip.tooltip-top-left::after {
       bottom: -16px;
@@ -152,13 +203,11 @@
       border-top-color: #333;
     }
 
-
     .tooltip.tooltip-right::after {
       top: 20px;
       left: -16px;
       border-right-color: #333;
     }
-
 
     .tooltip.tooltip-left::after {
       top: 20px;
@@ -172,13 +221,146 @@
       visibility: visible;
     }
 
+    .hidden {
+      display: none !important;
+    }
+
+    .file-input-label {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #6c757d;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .file-input-label:hover {
+      background: #5a6268;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #1e7e34;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      margin: 24px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3dcd68, #28a745);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #3dcd68;
+      box-shadow: 0 0 0 3px rgba(61, 205, 104, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3dcd68;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
       .config-cards {
         flex-direction: column;
       }
 
-      .form-grid-2 {
+      .protocol-buttons {
+        flex-direction: column;
+      }
+
+      .form-grid-2, .form-grid-3 {
         grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
       }
 
       .tooltip {
@@ -220,6 +402,20 @@
       </div>
 
       <div class="tab-content active" id="device-info">
+        <!-- Protocol Selection Section -->
+        <div class="protocol-selection">
+          <h2>Select Communication Protocol</h2>
+          <p>Choose the communication protocol that will be used for this device configuration</p>
+          <div class="protocol-buttons">
+            <button class="protocol-btn active" onclick="selectProtocol('modbus')">
+              <div>Modbus</div>
+            </button>
+            <button class="protocol-btn" onclick="selectProtocol('iec')">
+              <div>IEC</div>
+            </button>
+          </div>
+        </div>
+
         <form id="deviceForm">
           <div class="config-cards">
             <div class="config-card" onclick="generateEquipmentConfig()">
@@ -241,11 +437,11 @@
                   <div class="info-icon" onclick="toggleTooltip(event, this)">
                     i
                     <div class="tooltip">
-                      Enter a unique device name. Use only letters, numbers, and underscores. Example: Solar_Panel_01, Wind_Turbine_A1
+                      Enter a unique device name. Use only letters, numbers, and underscores. Example: PV_Panel_01, Wind_Turbine_A1
                     </div>
                   </div>
                 </label>
-                <input type="text" name="device_name" id="device_name" required placeholder="e.g. Solar_Panel_01" />
+                <input type="text" name="device_name" id="device_name" required placeholder="e.g. PV_Panel_01" />
               </div>
 
               <div class="form-group">
@@ -260,7 +456,7 @@
                 </label>
                 <select name="device_type" id="device_type" required>
                   <option value="">Select device type</option>
-                  <option value="PV">Solar Panel</option>
+                  <option value="PV">PV Panel</option>
                   <option value="WindTurbine">Wind Turbine</option>
                   <option value="FuelTurbine">Fuel Turbine</option>
                   <option value="FuelCell">Fuel Cell</option>
@@ -296,8 +492,9 @@
             </div>
           </div>
 
-          <div class="config-section">
-            <h3>Network Configuration</h3>
+
+          <div class="config-section" id="modbus-config">
+            <h3>Modbus Network Configuration</h3>
             <div class="form-grid-2">
               <div class="form-group">
                 <label for="device_ip">
@@ -344,14 +541,97 @@
                   <div class="info-icon" onclick="toggleTooltip(event, this)">
                     i
                     <div class="tooltip">
-                      Communication protocol used to connect to the device. IEC61850N for modern devices, Modbus for legacy systems.
+                      Communication protocol used to connect to the device. Modbus TCP/IP for Ethernet communications.
                     </div>
                   </div>
                 </label>
                 <select name="protocol" id="protocol" required>
-                  <option value="IEC61850N">IEC61850N</option>
-                  <option value="Modbus">Modbus</option>
+                  <option value="Modbus">Modbus TCP/IP</option>
                 </select>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="config-section hidden" id="iec-config">
+            <h3>IEC 61850 Network Configuration</h3>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="iec_device_ip">
+                  Device IP Address
+                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                    <div class="tooltip">
+                      IP address of the IEC 61850 device. Must be in IPv4 format (e.g. 192.168.1.100). Ensure unique addressing on the substation network.
+                    </div>
+                  </div>
+                </label>
+                <input type="text" name="iec_device_ip" id="iec_device_ip" placeholder="e.g. 192.168.1.100" />
+              </div>
+
+              <div class="form-group">
+                <label for="iec_port">
+                  IEC Port
+                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                    <div class="tooltip">
+                      TCP port for IEC 61850 communication. Standard port is 102 for MMS services. Can be customized if needed.
+                    </div>
+                  </div>
+                </label>
+                <input type="number" name="iec_port" id="iec_port" placeholder="102" value="102" min="1" max="65535" />
+              </div>
+
+              <div class="form-group">
+                <label for="ied_name">
+                  IED Name
+                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                    <div class="tooltip">
+                      Intelligent Electronic Device name as defined in the SCL configuration. Must match the IED name in the substation configuration file.
+                    </div>
+                  </div>
+                </label>
+                <input type="text" name="ied_name" id="ied_name" placeholder="e.g. PROT_RELAY_01" />
+              </div>
+
+              <div class="form-group">
+                <label for="access_point">
+                  Access Point
+                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                    <div class="tooltip">
+                      Access Point name for the IED communication interface. Typically defined in the IED configuration (e.g. S1, AP1, ETH1).
+                    </div>
+                  </div>
+                </label>
+                <input type="text" name="access_point" id="access_point" placeholder="e.g. S1" />
+              </div>
+
+              <div class="form-group">
+                <label for="logical_device">
+                  Logical Device
+                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                    <div class="tooltip">
+                      Logical Device name within the IED. Represents a logical grouping of functions (e.g. LD0, PROT, CTRL).
+                    </div>
+                  </div>
+                </label>
+                <input type="text" name="logical_device" id="logical_device" placeholder="e.g. LD0" />
+              </div>
+
+              <div class="form-group">
+                <label for="report_control">
+                  Report Control Block
+                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                    <div class="tooltip">
+                      Name of the Report Control Block (RCB) for data reporting. Used for unbuffered or buffered reporting of data changes and events.
+                    </div>
+                  </div>
+                </label>
+                <input type="text" name="report_control" id="report_control" placeholder="e.g. brcb01" />
               </div>
             </div>
           </div>
@@ -362,12 +642,17 @@
 
           <div class="button-group">
             <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()" />
-            <label for="csvFile" class="file-input-label">Load CSV</label>
+            <label for="csvFile" class="file-input-label" id="fileInputLabel">Load CSV</label>
+
+            <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" />
+            <label for="cidFile" class="file-input-label hidden" id="cidInputLabel">Load CID</label>
+
             <button type="button" class="btn btn-success" onclick="saveDevice()">Save Device</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
             <button type="button" class="btn btn-primary" onclick="generateCSV()">Generate CSV Files</button>
           </div>
         </form>
+
         <div class="loading" id="loading">
           <div class="spinner"></div>
           <p>Generating configuration files...</p>
@@ -469,123 +754,310 @@
   </div>
 
   <script src="{% static 'webapp/js/script.js' %}"></script>
-  <script>
-    function toggleTooltip(event, element) {
-      event.stopPropagation();
+<script>
+  let selectedProtocol = 'modbus';
+
+  function selectProtocol(protocol) {
+    selectedProtocol = protocol;
 
 
-      document.querySelectorAll('.info-icon.active').forEach(icon => {
-        if (icon !== element) {
-          icon.classList.remove('active');
-        }
-      });
-
-
-      element.classList.toggle('active');
-
-
-      if (element.classList.contains('active')) {
-        positionTooltip(element);
-      }
-    }
-
-    function positionTooltip(iconElement) {
-      const tooltip = iconElement.querySelector('.tooltip');
-      const rect = iconElement.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-      const tooltipWidth = 300;
-      const tooltipHeight = 80;
-      const margin = 15;
-
-
-      tooltip.className = 'tooltip';
-
-      let left, top;
-      let positionClass = '';
-
-
-      if (rect.bottom + tooltipHeight + margin < viewportHeight &&
-          rect.left + tooltipWidth + margin < viewportWidth) {
-        left = rect.left;
-        top = rect.bottom + margin;
-        positionClass = 'tooltip-bottom-right';
-      }
-
-      else if (rect.bottom + tooltipHeight + margin < viewportHeight &&
-               rect.right - tooltipWidth - margin > 0) {
-        left = rect.right - tooltipWidth;
-        top = rect.bottom + margin;
-        positionClass = 'tooltip-bottom-left';
-      }
-
-      else if (rect.top - tooltipHeight - margin > 0 &&
-               rect.left + tooltipWidth + margin < viewportWidth) {
-        left = rect.left;
-        top = rect.top - tooltipHeight - margin;
-        positionClass = 'tooltip-top-right';
-      }
-
-      else if (rect.top - tooltipHeight - margin > 0 &&
-               rect.right - tooltipWidth - margin > 0) {
-        left = rect.right - tooltipWidth;
-        top = rect.top - tooltipHeight - margin;
-        positionClass = 'tooltip-top-left';
-      }
-      else if (rect.right + tooltipWidth + margin < viewportWidth) {
-        left = rect.right + margin;
-        top = Math.max(margin, rect.top - tooltipHeight/2);
-
-        if (top + tooltipHeight > viewportHeight - margin) {
-          top = viewportHeight - tooltipHeight - margin;
-        }
-        positionClass = 'tooltip-right';
-      }
-
-      else if (rect.left - tooltipWidth - margin > 0) {
-        left = rect.left - tooltipWidth - margin;
-        top = Math.max(margin, rect.top - tooltipHeight/2);
-        // Make sure it doesn't go below viewport
-        if (top + tooltipHeight > viewportHeight - margin) {
-          top = viewportHeight - tooltipHeight - margin;
-        }
-        positionClass = 'tooltip-left';
-      }
-
-      else {
-        left = (viewportWidth - tooltipWidth) / 2;
-        top = (viewportHeight - tooltipHeight) / 2;
-        positionClass = 'tooltip-bottom-right';
-      }
-
-      tooltip.style.left = left + 'px';
-      tooltip.style.top = top + 'px';
-      tooltip.classList.add(positionClass);
-    }
-
-
-    document.addEventListener('click', function(event) {
-      if (!event.target.closest('.info-icon')) {
-        document.querySelectorAll('.info-icon.active').forEach(icon => {
-          icon.classList.remove('active');
-        });
-      }
+    document.querySelectorAll('.protocol-btn').forEach(btn => {
+      btn.classList.remove('active');
     });
+    event.target.closest('.protocol-btn').classList.add('active');
 
 
-    window.addEventListener('resize', function() {
-      document.querySelectorAll('.info-icon.active').forEach(icon => {
-        positionTooltip(icon);
-      });
-    });
+    const modbusConfig = document.getElementById('modbus-config');
+    const iecConfig = document.getElementById('iec-config');
+    const csvLabel = document.getElementById('fileInputLabel');
+    const csvFile = document.getElementById('csvFile');
+    const cidLabel = document.getElementById('cidInputLabel');
+    const cidFile = document.getElementById('cidFile');
 
-    function generateEquipmentConfig() {
-      console.log('Generating Equipment Config...');
+    if (protocol === 'modbus') {
+      modbusConfig.classList.remove('hidden');
+      iecConfig.classList.add('hidden');
+      csvLabel.classList.remove('hidden');
+      csvFile.classList.remove('hidden');
+      cidLabel.classList.add('hidden');
+      cidFile.classList.add('hidden');
+
+
+      document.getElementById('protocol').innerHTML = '<option value="Modbus">Modbus TCP/IP</option>';
+    } else if (protocol === 'iec') {
+      modbusConfig.classList.add('hidden');
+      iecConfig.classList.remove('hidden');
+      csvLabel.classList.add('hidden');
+      csvFile.classList.add('hidden');
+      cidLabel.classList.remove('hidden');
+      cidFile.classList.remove('hidden');
+
+
+      document.getElementById('protocol').innerHTML = '<option value="IEC61850">IEC 61850</option>';
     }
 
-    function generateUnitsConfig() {
-      console.log('Generating Units Config...');
+
+    resetForm();
+  }
+
+  function loadCID() {
+    const file = document.getElementById('cidFile').files[0];
+    if (file) {
+      console.log('Loading CID file:', file.name);
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const content = e.target.result;
+
+          parseCIDFile(content);
+        } catch (error) {
+          console.error('Error parsing CID file:', error);
+          alert('Error parsing CID file. Please check the file format.');
+        }
+      };
+      reader.readAsText(file);
     }
-  </script>
-</body>
-</html>
+  }
+
+  function parseCIDFile(content) {
+
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(content, 'text/xml');
+
+
+    const parserError = xmlDoc.getElementsByTagName('parsererror');
+    if (parserError.length > 0) {
+      throw new Error('Invalid XML format');
+    }
+
+
+    const ieds = xmlDoc.getElementsByTagName('IED');
+    if (ieds.length > 0) {
+      const ied = ieds[0];
+      const iedName = ied.getAttribute('name');
+      if (iedName) {
+        document.getElementById('ied_name').value = iedName;
+      }
+
+
+      const accessPoints = ied.getElementsByTagName('AccessPoint');
+      if (accessPoints.length > 0) {
+        const ap = accessPoints[0];
+        const apName = ap.getAttribute('name');
+        if (apName) {
+          document.getElementById('access_point').value = apName;
+        }
+
+
+        const addresses = ap.getElementsByTagName('Address');
+        if (addresses.length > 0) {
+          const pTypes = addresses[0].getElementsByTagName('P');
+          for (let i = 0; i < pTypes.length; i++) {
+            if (pTypes[i].getAttribute('type') === 'IP') {
+              document.getElementById('iec_device_ip').value = pTypes[i].textContent;
+            }
+            if (pTypes[i].getAttribute('type') === 'OSI-AP-Title') {
+              document.getElementById('osi_ap_title').value = pTypes[i].textContent;
+            }
+            if (pTypes[i].getAttribute('type') === 'OSI-AE-Qualifier') {
+              document.getElementById('osi_ae_qualifier').value = pTypes[i].textContent;
+            }
+          }
+        }
+      }
+
+
+      const logicalDevices = ied.getElementsByTagName('LDevice');
+      if (logicalDevices.length > 0) {
+        const ldName = logicalDevices[0].getAttribute('inst');
+        if (ldName) {
+          document.getElementById('logical_device').value = ldName;
+        }
+
+        const logicalNodes = logicalDevices[0].getElementsByTagName('LN');
+        const lnOptions = [];
+        for (let i = 0; i < logicalNodes.length; i++) {
+          const lnClass = logicalNodes[i].getAttribute('lnClass');
+          const lnInst = logicalNodes[i].getAttribute('inst') || '';
+          const lnPrefix = logicalNodes[i].getAttribute('prefix') || '';
+          const lnName = lnPrefix + lnClass + lnInst;
+          lnOptions.push(`<option value="${lnName}">${lnName}</option>`);
+        }
+
+        if (lnOptions.length > 0) {
+          document.getElementById('logical_node').innerHTML = '<option value="">Select Logical Node</option>' + lnOptions.join('');
+        }
+      }
+
+
+      const dataSets = xmlDoc.getElementsByTagName('DataSet');
+      if (dataSets.length > 0) {
+        const dsOptions = [];
+        for (let i = 0; i < dataSets.length; i++) {
+          const dsName = dataSets[i].getAttribute('name');
+          if (dsName) {
+            dsOptions.push(`<option value="${dsName}">${dsName}</option>`);
+          }
+        }
+
+        if (dsOptions.length > 0) {
+          document.getElementById('data_set').innerHTML = '<option value="">Select Data Set</option>' + dsOptions.join('');
+        }
+      }
+
+
+      const reportControls = xmlDoc.getElementsByTagName('ReportControl');
+      if (reportControls.length > 0) {
+        const rcOptions = [];
+        for (let i = 0; i < reportControls.length; i++) {
+          const rcName = reportControls[i].getAttribute('name');
+          if (rcName) {
+            rcOptions.push(`<option value="${rcName}">${rcName}</option>`);
+          }
+        }
+
+        if (rcOptions.length > 0) {
+          document.getElementById('report_control').innerHTML = '<option value="">Select Report Control</option>' + rcOptions.join('');
+        }
+      }
+    }
+
+    console.log('CID file parsed successfully');
+    alert('CID file loaded successfully!');
+  }
+
+  function resetForm() {
+
+    document.getElementById('device_name').value = '';
+
+
+    if (document.getElementById('modbus_device_ip')) {
+      document.getElementById('modbus_device_ip').value = '';
+    }
+    if (document.getElementById('port')) {
+      document.getElementById('port').value = '502';
+    }
+    if (document.getElementById('slave_id')) {
+      document.getElementById('slave_id').value = '1';
+    }
+    if (document.getElementById('csvFile')) {
+      document.getElementById('csvFile').value = '';
+    }
+
+
+    if (document.getElementById('ied_name')) {
+      document.getElementById('ied_name').value = '';
+    }
+    if (document.getElementById('access_point')) {
+      document.getElementById('access_point').value = '';
+    }
+    if (document.getElementById('iec_device_ip')) {
+      document.getElementById('iec_device_ip').value = '';
+    }
+    if (document.getElementById('logical_device')) {
+      document.getElementById('logical_device').value = '';
+    }
+    if (document.getElementById('logical_node')) {
+      document.getElementById('logical_node').innerHTML = '<option value="">Select Logical Node</option>';
+    }
+    if (document.getElementById('data_set')) {
+      document.getElementById('data_set').innerHTML = '<option value="">Select Data Set</option>';
+    }
+    if (document.getElementById('report_control')) {
+      document.getElementById('report_control').innerHTML = '<option value="">Select Report Control</option>';
+    }
+    if (document.getElementById('osi_ap_title')) {
+      document.getElementById('osi_ap_title').value = '';
+    }
+    if (document.getElementById('osi_ae_qualifier')) {
+      document.getElementById('osi_ae_qualifier').value = '';
+    }
+    if (document.getElementById('cidFile')) {
+      document.getElementById('cidFile').value = '';
+    }
+  }
+
+  function validateForm() {
+    if (selectedProtocol === 'modbus') {
+      return validateModbusForm();
+    } else if (selectedProtocol === 'iec') {
+      return validateIECForm();
+    }
+    return false;
+  }
+
+  function validateModbusForm() {
+    const deviceName = document.getElementById('device_name').value.trim();
+    const deviceIP = document.getElementById('modbus_device_ip').value.trim();
+    const port = document.getElementById('port').value.trim();
+    const slaveId = document.getElementById('slave_id').value.trim();
+
+    if (!deviceName) {
+      alert('Please enter device name');
+      return false;
+    }
+
+    if (!deviceIP) {
+      alert('Please enter device IP address');
+      return false;
+    }
+
+    if (!port || isNaN(port) || port < 1 || port > 65535) {
+      alert('Please enter valid port number (1-65535)');
+      return false;
+    }
+
+    if (!slaveId || isNaN(slaveId) || slaveId < 1 || slaveId > 255) {
+      alert('Please enter valid slave ID (1-255)');
+      return false;
+    }
+
+    return true;
+  }
+
+  function validateIECForm() {
+    const deviceName = document.getElementById('device_name').value.trim();
+    const iedName = document.getElementById('ied_name').value.trim();
+    const deviceIP = document.getElementById('iec_device_ip').value.trim();
+
+    if (!deviceName) {
+      alert('Please enter device name');
+      return false;
+    }
+
+    if (!iedName) {
+      alert('Please enter IED name');
+      return false;
+    }
+
+    if (!deviceIP) {
+      alert('Please enter device IP address');
+      return false;
+    }
+
+    return true;
+  }
+
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    selectProtocol('modbus');
+
+
+    const cidFileInput = document.getElementById('cidFile');
+    if (cidFileInput) {
+      cidFileInput.addEventListener('change', loadCID);
+    }
+  });
+
+
+  function submitForm() {
+    if (validateForm()) {
+
+      console.log('Form validated successfully for protocol:', selectedProtocol);
+      return true;
+    }
+    return false;
+  }
+</script>
