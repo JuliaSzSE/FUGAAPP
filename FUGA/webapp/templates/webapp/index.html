@@ -374,7 +374,7 @@
   <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
 
   <div class="logo-container">
-    <img src="{% static 'webapp/images/schneider-logo.png' %}" alt="Schneider Logo" />
+    <img src="{% static 'webapp/images/schneider-logo.png' %}"  />
   </div>
 
   <div class="main-container">
@@ -470,7 +470,7 @@
                   <div class="info-icon" onclick="toggleTooltip(event, this)">
                     i
                     <div class="tooltip">
-                      Prefix used for all tags of this device. Should be short and unique. Example: FugaPV1, WT_A1, BESS01
+                      Prefix used for all tags of this device. Should be short and unique. Example: FugaPV1, BESS01
                     </div>
                   </div>
                 </label>
@@ -483,7 +483,7 @@
                   <div class="info-icon" onclick="toggleTooltip(event, this)">
                     i
                     <div class="tooltip">
-                      Name of the physical I/O device or inverter to which the device is connected. Example: Inverter_PV1, ModbusGateway_01
+                      Name of the physical I/O device or inverter to which the device is connected. Example: Inverter_PV1
                     </div>
                   </div>
                 </label>
@@ -655,7 +655,7 @@
 
         <div class="loading" id="loading">
           <div class="spinner"></div>
-          <p>Generating configuration files...</p>
+          <p>Generating configuration files</p>
         </div>
       </div>
 
@@ -682,18 +682,17 @@
                 <div class="info-icon" onclick="toggleTooltip(event, this)">
                   i
                   <div class="tooltip">
-                    Variable type: Analog (continuous values), Digital (binary values 0/1), Calculated (computed based on other variables).
+                    Variable type: Analog (continuous values), Digital (binary values 0/1)
                   </div>
                 </div>
               </label>
               <select id="variable_type">
                 <option value="analog">Analog</option>
                 <option value="digital">Digital</option>
-                <option value="calculated">Calculated</option>
               </select>
             </div>
 
-            <div class="form-group">
+              <div class="form-group">
               <label for="data_type">
                 Data Type
                 <div class="info-icon" onclick="toggleTooltip(event, this)">
@@ -711,13 +710,15 @@
               </select>
             </div>
 
+
+
             <div class="form-group">
               <label for="unit">
                 Unit
                 <div class="info-icon" onclick="toggleTooltip(event, this)">
                   i
                   <div class="tooltip">
-                    Unit of measurement for the variable. Examples: kW, V, A, °C, %, Hz. Leave empty for dimensionless variables.
+                    Unit of measurement for the variable.
                   </div>
                 </div>
               </label>
@@ -740,6 +741,201 @@
             </tr>
           </thead>
           <tbody id="variableTableBody"></tbody>
+        </table>
+      </div>
+
+
+        <div class="tab-content" id="alarms">
+        <div class="form-section">
+          <h3>Alarms Configuration</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="alarm_name">
+                Alarm Name
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Name of the alarm.
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="alarm_name" placeholder="e.g. @(PowerFailure24V)" />
+            </div>
+
+            <div class="form-group">
+              <label for="alarm_type">
+                Alarm Type
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                  <div class="tooltip">
+                    Alarm type: Analog, Digital, Advenced.
+                  </div>
+                </div>
+              </label>
+              <select id="alarm_type">
+                <option value="analog">Analog</option>
+                <option value="digital">Digital</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+
+              <div class="form-group">
+              <label for="category">
+                Category
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Category: Low, Medium, High, Event
+                  </div>
+                </div>
+              </label>
+              <select id="data_type">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="event">Event</option>
+              </select>
+            </div>
+
+
+            <div class="form-group">
+              <label for="alarm_tag">
+                Alarm Tag
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Name of the tag.
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="alarm_tag" placeholder="e.g. User_Event" />
+            </div>
+
+              <div class="form-group">
+              <label for="equipment">
+                Equipment
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Equipment
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="equipment" placeholder="e.g.Virtual.System " />
+            </div>
+
+              <div class="form-group">
+              <label for="Item Name">
+                Item Name
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Item Name
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="item_name" placeholder="e.g. CommHealth " />
+            </div>
+          </div>
+          <div class="button-group">
+            <button class="btn btn-primary" onclick="addVariable()">Add Alarm</button>
+          </div>
+        </div>
+
+        <table class="alarm-table">
+          <thead>
+            <tr>
+              <th>Alarm Name</th>
+              <th>Category</th>
+              <th>Data Type</th>
+              <th>Alarm Tag</th>
+              <th>Equipment</th>
+              <th>Item Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="alarmTableBody"></tbody>
+        </table>
+      </div>
+
+
+        <div class="tab-content" id="trends">
+        <div class="form-section">
+          <h3>Trends Configuration</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="tag_description">
+                Tag Description
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Description of the tag.
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="tag_description" placeholder="e.g. Current A" />
+            </div>
+
+            <div class="form-group">
+              <label for="trend_types">
+                Trend Types
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                    i
+                  <div class="tooltip">
+                    Trend type: Periodic, Event, Periodic-Event
+                  </div>
+                </div>
+              </label>
+              <select id="alarm_type">
+                <option value="min">Event</option>
+                <option value="min">Periodic</option>
+                <option value="min">Periodic-Event</option>
+              </select>
+            </div>
+
+              <div class="form-group">
+              <label for="tag_name">
+                Tag Name
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Name of the tag.
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="tag_name" placeholder="e.g. MMXU1\A\phsA" />
+            </div>
+
+
+            <div class="form-group">
+              <label for="item_name">
+                Item Name
+                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  i
+                  <div class="tooltip">
+                    Name of the item.
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="item_name" placeholder="e.g. Ia" />
+            </div>
+          </div>
+            <div class="button-group">
+            <button class="btn btn-primary" onclick="addVariable()">Add Trend</button>
+          </div>
+        </div>
+
+        <table class="trend-table">
+          <thead>
+            <tr>
+              <th>Trend Description</th>
+              <th>Trend Types</th>
+              <th>Tag Name</th>
+              <th>Item Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="trendTableBody"></tbody>
         </table>
       </div>
 
