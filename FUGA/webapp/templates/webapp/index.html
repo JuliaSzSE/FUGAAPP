@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Device Configuration Generator - Schneider Electric</title>
+     <title>Device Configuration Generator - Schneider Electric</title>
   <link rel="stylesheet" href="{% static 'webapp/css/style.css' %}">
   <style>
     .config-section {
@@ -392,6 +392,17 @@
       <div class="header">
         <div class="header-content">
           <h1>Device Configuration Generator</h1>
+
+
+          <div style="margin: 10px 0;">
+            <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()" />
+            <label for="csvFile" class="file-input-label" id="fileInputLabel">Load CSV</label>
+
+
+            <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" style="margin-left: 10px;" />
+            <label for="cidFile" class="file-input-label hidden" id="cidInputLabel" style="margin-left: 10px;">Load CID</label>
+          </div>
+
           <div class="tabs">
             <button class="tab active" onclick="showTab('device-info', event)">Device Info</button>
             <button class="tab" onclick="showTab('variables', event)">Variables</button>
@@ -641,11 +652,9 @@
           </div>
 
           <div class="button-group">
-            <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()" />
-            <label for="csvFile" class="file-input-label" id="fileInputLabel">Load CSV</label>
 
-            <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" />
-            <label for="cidFile" class="file-input-label hidden" id="cidInputLabel">Load CID</label>
+              <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" style="margin-left: 10px;" />
+            <label for="cidFile" class="file-input-label hidden" id="cidInputLabel" style="margin-left: 10px;">Load CID</label>
 
             <button type="button" class="btn btn-success" onclick="saveDevice()">Save Device</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>

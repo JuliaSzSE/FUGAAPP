@@ -1,5 +1,5 @@
 
-  let selectedProtocol = 'modbus';
+ let selectedProtocol = 'modbus';
   let devices = [];
   let variables = [];
   let currentDevice = null;
@@ -52,19 +52,26 @@
 
     const modbusConfig = document.getElementById('modbus-config');
     const iecConfig = document.getElementById('iec-config');
+
+
     const csvLabel = document.getElementById('fileInputLabel');
     const csvFile = document.getElementById('csvFile');
+
+
     const cidLabel = document.getElementById('cidInputLabel');
     const cidFile = document.getElementById('cidFile');
 
     if (protocol === 'modbus') {
       if (modbusConfig) modbusConfig.classList.remove('hidden');
       if (iecConfig) iecConfig.classList.add('hidden');
+
+
       if (csvLabel) csvLabel.classList.remove('hidden');
       if (csvFile) csvFile.classList.remove('hidden');
+
+
       if (cidLabel) cidLabel.classList.add('hidden');
       if (cidFile) cidFile.classList.add('hidden');
-
 
       const protocolSelect = document.getElementById('protocol');
       if (protocolSelect) {
@@ -73,18 +80,20 @@
     } else if (protocol === 'iec') {
       if (modbusConfig) modbusConfig.classList.add('hidden');
       if (iecConfig) iecConfig.classList.remove('hidden');
-      if (csvLabel) csvLabel.classList.add('hidden');
-      if (csvFile) csvFile.classList.add('hidden');
+
+
+      if (csvLabel) csvLabel.classList.remove('hidden');
+      if (csvFile) csvFile.classList.remove('hidden');
+
+
       if (cidLabel) cidLabel.classList.remove('hidden');
       if (cidFile) cidFile.classList.remove('hidden');
-
 
       const protocolSelect = document.getElementById('protocol');
       if (protocolSelect) {
         protocolSelect.innerHTML = '<option value="IEC61850">IEC 61850</option>';
       }
     }
-
 
     resetForm();
   }
