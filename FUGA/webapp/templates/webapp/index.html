@@ -1,12 +1,47 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-     <title>Device Configuration Generator - Schneider Electric</title>
-  <link rel="stylesheet" href="{% static 'webapp/css/style.css' %}">
+  <title>Device Configuration Generator - Schneider Electric</title>
   <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .main-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #3dcd68;
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      flex: 1;
+      padding: 20px;
+      background: white;
+      margin: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header {
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #3dcd68;
+      margin-bottom: 20px;
+    }
+
     .config-section {
       background: #f8f9fa;
       border: 2px solid #e9ecef;
@@ -153,7 +188,7 @@
     }
 
     .tooltip {
-      position: fixed;
+      position: absolute;
       background: #333;
       color: white;
       padding: 12px 16px;
@@ -171,51 +206,22 @@
       pointer-events: none;
       text-align: left;
       border: 1px solid #555;
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
-    .tooltip::after {
+    .tooltip::before {
       content: '';
       position: absolute;
-      border: 8px solid transparent;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #333;
     }
 
-    .tooltip.tooltip-bottom-right::after {
-      top: -16px;
-      left: 20px;
-      border-bottom-color: #333;
-    }
-
-    .tooltip.tooltip-bottom-left::after {
-      top: -16px;
-      right: 20px;
-      border-bottom-color: #333;
-    }
-
-    .tooltip.tooltip-top-right::after {
-      bottom: -16px;
-      left: 20px;
-      border-top-color: #333;
-    }
-
-    .tooltip.tooltip-top-left::after {
-      bottom: -16px;
-      right: 20px;
-      border-top-color: #333;
-    }
-
-    .tooltip.tooltip-right::after {
-      top: 20px;
-      left: -16px;
-      border-right-color: #333;
-    }
-
-    .tooltip.tooltip-left::after {
-      top: 20px;
-      right: -16px;
-      border-left-color: #333;
-    }
-
-    .info-icon.active .tooltip,
     .info-icon:hover .tooltip {
       opacity: 1;
       visibility: visible;
@@ -228,15 +234,17 @@
     .file-input-label {
       display: inline-block;
       padding: 12px 24px;
-      background: #6c757d;
+      background: #007bff;
       color: white;
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      margin-right: 10px;
+      font-weight: 600;
     }
 
     .file-input-label:hover {
-      background: #5a6268;
+      background: #0056b3;
     }
 
     .file-input {
@@ -272,18 +280,19 @@
     }
 
     .btn-secondary {
-      background: #6c757d;
+      background: #007bff;
       color: white;
     }
 
     .btn-secondary:hover {
-      background: #5a6268;
+      background: #007bff;
     }
 
     .button-group {
       display: flex;
       gap: 16px;
       margin-top: 24px;
+      align-items: center;
     }
 
     .progress-bar {
@@ -331,6 +340,10 @@
       padding: 40px;
     }
 
+    .loading.show {
+      display: block;
+    }
+
     .spinner {
       border: 4px solid #f3f3f3;
       border-top: 4px solid #3dcd68;
@@ -344,6 +357,70 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e9ecef;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active, .tab:hover {
+      color: #3dcd68;
+      border-bottom-color: #3dcd68;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .alert-error {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .file-upload-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 2px solid #e9ecef;
+    }
+
+    .file-upload-section h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+      font-size: 1.1rem;
     }
 
     @media (max-width: 768px) {
@@ -362,30 +439,18 @@
       .button-group {
         flex-direction: column;
       }
-
-      .tooltip {
-        max-width: 280px;
-        min-width: 180px;
-      }
     }
   </style>
 </head>
 <body>
-  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">☰</button>
-
-  <div class="logo-container">
-    <img src="{% static 'webapp/images/schneider-logo.png' %}"  />
-  </div>
-
   <div class="main-container">
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar">
       <h3>Saved Devices <span class="device-counter" id="deviceCounter">0</span></h3>
-      <ul class="device-tree" id="deviceTree">
-        <div class="empty-state">
-          <h4>No devices saved</h4>
-          <p>Add your first device to see it here</p>
+      <div class="device-list" id="deviceList">
+        <div class="placeholder-content">
+          <p>No devices configured yet.</p>
         </div>
-      </ul>
+      </div>
     </div>
 
     <div class="container">
@@ -393,14 +458,12 @@
         <div class="header-content">
           <h1>Device Configuration Generator</h1>
 
-
-          <div style="margin: 10px 0;">
-            <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()" />
-            <label for="csvFile" class="file-input-label" id="fileInputLabel">Load CSV</label>
-
-
-            <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" style="margin-left: 10px;" />
-            <label for="cidFile" class="file-input-label hidden" id="cidInputLabel" style="margin-left: 10px;">Load CID</label>
+          <div class="file-upload-section">
+            <h3>File Upload</h3>
+            <div>
+              <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()" />
+              <label for="csvFile" class="file-input-label"> Load CSV</label>
+            </div>
           </div>
 
           <div class="tabs">
@@ -413,7 +476,6 @@
       </div>
 
       <div class="tab-content active" id="device-info">
-        <!-- Protocol Selection Section -->
         <div class="protocol-selection">
           <h2>Select Communication Protocol</h2>
           <p>Choose the communication protocol that will be used for this device configuration</p>
@@ -445,7 +507,7 @@
               <div class="form-group">
                 <label for="device_name">
                   Device Name
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Enter a unique device name. Use only letters, numbers, and underscores. Example: PV_Panel_01, Wind_Turbine_A1
@@ -458,7 +520,7 @@
               <div class="form-group">
                 <label for="device_type">
                   Device Type
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Select the device type from the list. This determines which variables and configurations will be available for this device.
@@ -478,7 +540,7 @@
               <div class="form-group">
                 <label for="tag_prefix">
                   Tag Prefix
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Prefix used for all tags of this device. Should be short and unique. Example: FugaPV1, BESS01
@@ -491,7 +553,7 @@
               <div class="form-group">
                 <label for="io_device">
                   I/O Device
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Name of the physical I/O device or inverter to which the device is connected. Example: Inverter_PV1
@@ -503,14 +565,13 @@
             </div>
           </div>
 
-
           <div class="config-section" id="modbus-config">
             <h3>Modbus Network Configuration</h3>
             <div class="form-grid-2">
               <div class="form-group">
                 <label for="device_ip">
                   Device IP Address
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       IP address of the device on the network. Must be in IPv4 format (e.g. 192.168.1.100). Make sure the address is unique on the network.
@@ -523,7 +584,7 @@
               <div class="form-group">
                 <label for="port_name">
                   Port Name
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Communication port name in the SCADA system. Optional field - leave empty if not using specific ports. Example: P14_BOARD1_PRJ3
@@ -536,7 +597,7 @@
               <div class="form-group">
                 <label for="unit_number">
                   Unit Number
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Unique unit number in the communication system (1-999). Used by communication protocols to identify the device.
@@ -549,7 +610,7 @@
               <div class="form-group">
                 <label for="protocol">
                   Protocol
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Communication protocol used to connect to the device. Modbus TCP/IP for Ethernet communications.
@@ -563,14 +624,13 @@
             </div>
           </div>
 
-
           <div class="config-section hidden" id="iec-config">
             <h3>IEC 61850 Network Configuration</h3>
             <div class="form-grid-2">
               <div class="form-group">
                 <label for="iec_device_ip">
                   Device IP Address
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       IP address of the IEC 61850 device. Must be in IPv4 format (e.g. 192.168.1.100). Ensure unique addressing on the substation network.
@@ -583,7 +643,7 @@
               <div class="form-group">
                 <label for="iec_port">
                   IEC Port
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       TCP port for IEC 61850 communication. Standard port is 102 for MMS services. Can be customized if needed.
@@ -596,7 +656,7 @@
               <div class="form-group">
                 <label for="ied_name">
                   IED Name
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Intelligent Electronic Device name as defined in the SCL configuration. Must match the IED name in the substation configuration file.
@@ -609,7 +669,7 @@
               <div class="form-group">
                 <label for="access_point">
                   Access Point
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Access Point name for the IED communication interface. Typically defined in the IED configuration (e.g. S1, AP1, ETH1).
@@ -622,7 +682,7 @@
               <div class="form-group">
                 <label for="logical_device">
                   Logical Device
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Logical Device name within the IED. Represents a logical grouping of functions (e.g. LD0, PROT, CTRL).
@@ -635,7 +695,7 @@
               <div class="form-group">
                 <label for="report_control">
                   Report Control Block
-                  <div class="info-icon" onclick="toggleTooltip(event, this)">
+                  <div class="info-icon">
                     i
                     <div class="tooltip">
                       Name of the Report Control Block (RCB) for data reporting. Used for unbuffered or buffered reporting of data changes and events.
@@ -652,9 +712,8 @@
           </div>
 
           <div class="button-group">
-
-              <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" style="margin-left: 10px;" />
-            <label for="cidFile" class="file-input-label hidden" id="cidInputLabel" style="margin-left: 10px;">Load CID</label>
+            <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" />
+            <label for="cidFile" class="file-input-label hidden" id="cidInputLabel">Load CID</label>
 
             <button type="button" class="btn btn-success" onclick="saveDevice()">Save Device</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
@@ -669,13 +728,13 @@
       </div>
 
       <div class="tab-content" id="variables">
-        <div class="form-section">
+        <div class="config-section">
           <h3>Variable Configuration</h3>
-          <div class="form-grid">
+          <div class="form-grid-2">
             <div class="form-group">
               <label for="variable_name">
                 Variable Name
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
                     Name of the process variable. Use descriptive names like ActivePower, Voltage, Temperature. No spaces or special characters.
@@ -688,7 +747,7 @@
             <div class="form-group">
               <label for="variable_type">
                 Variable Type
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
                     Variable type: Analog (continuous values), Digital (binary values 0/1)
@@ -701,10 +760,10 @@
               </select>
             </div>
 
-              <div class="form-group">
+            <div class="form-group">
               <label for="data_type">
                 Data Type
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
                     Data type: Float (floating point numbers), Integer (whole numbers), Boolean (true/false), String (text).
@@ -719,15 +778,13 @@
               </select>
             </div>
 
-
-
             <div class="form-group">
               <label for="unit">
                 Unit
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Unit of measurement for the variable.
+                    Unit of measurement for the variable. Examples: kW, V, A, °C, Hz, %
                   </div>
                 </div>
               </label>
@@ -739,32 +796,32 @@
           </div>
         </div>
 
-        <table class="variable-table">
+        <table class="variable-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
           <thead>
-            <tr>
-              <th>Variable Name</th>
-              <th>Type</th>
-              <th>Data Type</th>
-              <th>Unit</th>
-              <th>Actions</th>
+            <tr style="background: #f8f9fa;">
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Variable Name</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Type</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Data Type</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Unit</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
             </tr>
           </thead>
-          <tbody id="variableTableBody"></tbody>
+          <tbody id="variableTableBody">
+          </tbody>
         </table>
       </div>
 
-
-        <div class="tab-content" id="alarms">
-        <div class="form-section">
+      <div class="tab-content" id="alarms">
+        <div class="config-section">
           <h3>Alarms Configuration</h3>
-          <div class="form-grid">
+          <div class="form-grid-3">
             <div class="form-group">
               <label for="alarm_name">
                 Alarm Name
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Name of the alarm.
+                    Descriptive name for the alarm. Use clear naming convention like PowerFailure24V, HighTemperature, CommLoss
                   </div>
                 </div>
               </label>
@@ -774,10 +831,10 @@
             <div class="form-group">
               <label for="alarm_type">
                 Alarm Type
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
-                    i
+                <div class="info-icon">
+                  i
                   <div class="tooltip">
-                    Alarm type: Analog, Digital, Advenced.
+                    Alarm type: Analog (threshold-based), Digital (state-based), Advanced (complex logic)
                   </div>
                 </div>
               </label>
@@ -788,17 +845,17 @@
               </select>
             </div>
 
-              <div class="form-group">
+            <div class="form-group">
               <label for="category">
                 Category
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Category: Low, Medium, High, Event
+                    Priority level: Low (informational), Medium (warning), High (critical), Event (status change)
                   </div>
                 </div>
               </label>
-              <select id="data_type">
+              <select id="category">
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
@@ -806,79 +863,78 @@
               </select>
             </div>
 
-
             <div class="form-group">
               <label for="alarm_tag">
                 Alarm Tag
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Name of the tag.
+                    Tag name associated with the alarm. Links alarm to specific data point or signal.
                   </div>
                 </div>
               </label>
               <input type="text" id="alarm_tag" placeholder="e.g. User_Event" />
             </div>
 
-              <div class="form-group">
+            <div class="form-group">
               <label for="equipment">
                 Equipment
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Equipment
+                    Equipment hierarchy path. Defines where the alarm belongs in the system structure.
                   </div>
                 </div>
               </label>
-              <input type="text" id="equipment" placeholder="e.g.Virtual.System " />
+              <input type="text" id="equipment" placeholder="e.g. Virtual.System" />
             </div>
 
-              <div class="form-group">
-              <label for="Item Name">
+            <div class="form-group">
+              <label for="item_name_alarm">
                 Item Name
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Item Name
+                    Specific item or parameter name that triggers the alarm (e.g. CommHealth, Temperature, Voltage)
                   </div>
                 </div>
               </label>
-              <input type="text" id="item_name" placeholder="e.g. CommHealth " />
+              <input type="text" id="item_name_alarm" placeholder="e.g. CommHealth" />
             </div>
           </div>
           <div class="button-group">
-            <button class="btn btn-primary" onclick="addVariable()">Add Alarm</button>
+            <button class="btn btn-primary" onclick="addAlarm()">Add Alarm</button>
           </div>
         </div>
 
-        <table class="alarm-table">
+        <table class="alarm-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
           <thead>
-            <tr>
-              <th>Alarm Name</th>
-              <th>Category</th>
-              <th>Data Type</th>
-              <th>Alarm Tag</th>
-              <th>Equipment</th>
-              <th>Item Name</th>
-              <th>Actions</th>
+            <tr style="background: #f8f9fa;">
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Alarm Name</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Type</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Category</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Alarm Tag</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Equipment</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Item Name</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
             </tr>
           </thead>
-          <tbody id="alarmTableBody"></tbody>
+          <tbody id="alarmTableBody">
+          </tbody>
         </table>
       </div>
 
-
-        <div class="tab-content" id="trends">
-        <div class="form-section">
+      <div class="tab-content" id="trends">
+        <div class="config-section">
           <h3>Trends Configuration</h3>
-          <div class="form-grid">
+          <div class="form-grid-2">
             <div class="form-group">
               <label for="tag_description">
                 Tag Description
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Description of the tag.
+                    Descriptive text for the trend tag. Should clearly identify what is being trended (e.g. "Phase A Current", "Active Power Output").
                   </div>
                 </div>
               </label>
@@ -888,381 +944,710 @@
             <div class="form-group">
               <label for="trend_types">
                 Trend Types
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
-                    i
+                <div class="info-icon">
+                  i
                   <div class="tooltip">
-                    Trend type: Periodic, Event, Periodic-Event
+                    Trend collection type: Event (on change), Periodic (time-based), Periodic-Event (both time and change based)
                   </div>
                 </div>
               </label>
-              <select id="alarm_type">
-                <option value="min">Event</option>
-                <option value="min">Periodic</option>
-                <option value="min">Periodic-Event</option>
+              <select id="trend_types">
+                <option value="event">Event</option>
+                <option value="periodic">Periodic</option>
+                <option value="periodic-event">Periodic-Event</option>
               </select>
             </div>
 
-              <div class="form-group">
+            <div class="form-group">
               <label for="tag_name">
                 Tag Name
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Name of the tag.
+                    Full tag name path including logical node and data object (IEC 61850 format: MMXU1\A\phsA)
                   </div>
                 </div>
               </label>
               <input type="text" id="tag_name" placeholder="e.g. MMXU1\A\phsA" />
             </div>
 
-
             <div class="form-group">
-              <label for="item_name">
+              <label for="item_name_trend">
                 Item Name
-                <div class="info-icon" onclick="toggleTooltip(event, this)">
+                <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Name of the item.
+                    Short item identifier for the trending parameter (e.g. Ia, Vab, P, Q, F)
                   </div>
                 </div>
               </label>
-              <input type="text" id="item_name" placeholder="e.g. Ia" />
+              <input type="text" id="item_name_trend" placeholder="e.g. Ia" />
             </div>
           </div>
-            <div class="button-group">
-            <button class="btn btn-primary" onclick="addVariable()">Add Trend</button>
+          <div class="button-group">
+            <button class="btn btn-primary" onclick="addTrend()">Add Trend</button>
           </div>
         </div>
 
-        <table class="trend-table">
+        <table class="trend-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
           <thead>
-            <tr>
-              <th>Trend Description</th>
-              <th>Trend Types</th>
-              <th>Tag Name</th>
-              <th>Item Name</th>
-              <th>Actions</th>
+            <tr style="background: #f8f9fa;">
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Tag Description</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Trend Types</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Tag Name</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Item Name</th>
+              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
             </tr>
           </thead>
-          <tbody id="trendTableBody"></tbody>
+          <tbody id="trendTableBody">
+          </tbody>
         </table>
-      </div>
-
-      <div class="tab-content" id="devices">
-        <div class="form-section">
-          <h3>Device Management</h3>
-          <p>Manage all configured devices and their settings</p>
-          <div class="device-list" id="deviceList"></div>
-        </div>
       </div>
     </div>
   </div>
 
-  <script src="{% static 'webapp/js/script.js' %}"></script>
-<script>
-  let selectedProtocol = 'modbus';
+  <script>
+    let selectedProtocol = 'modbus';
+    let devices = [];
+    let variables = [];
+    let alarms = [];
+    let trends = [];
+    let currentDevice = null;
 
-  function selectProtocol(protocol) {
-    selectedProtocol = protocol;
+    document.addEventListener('DOMContentLoaded', function() {
+      selectProtocol('modbus');
+      loadDevicesFromStorage();
+      loadVariablesFromStorage();
+      updateProgress();
+      updateDeviceList();
 
-
-    document.querySelectorAll('.protocol-btn').forEach(btn => {
-      btn.classList.remove('active');
+      const cidFileInput = document.getElementById('cidFile');
+      if (cidFileInput) {
+        cidFileInput.addEventListener('change', loadCID);
+      }
     });
-    event.target.closest('.protocol-btn').classList.add('active');
 
+    function showTab(tabName, event) {
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
 
-    const modbusConfig = document.getElementById('modbus-config');
-    const iecConfig = document.getElementById('iec-config');
-    const csvLabel = document.getElementById('fileInputLabel');
-    const csvFile = document.getElementById('csvFile');
-    const cidLabel = document.getElementById('cidInputLabel');
-    const cidFile = document.getElementById('cidFile');
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
 
-    if (protocol === 'modbus') {
-      modbusConfig.classList.remove('hidden');
-      iecConfig.classList.add('hidden');
-      csvLabel.classList.remove('hidden');
-      csvFile.classList.remove('hidden');
-      cidLabel.classList.add('hidden');
-      cidFile.classList.add('hidden');
+      document.getElementById(tabName).classList.add('active');
 
-
-      document.getElementById('protocol').innerHTML = '<option value="Modbus">Modbus TCP/IP</option>';
-    } else if (protocol === 'iec') {
-      modbusConfig.classList.add('hidden');
-      iecConfig.classList.remove('hidden');
-      csvLabel.classList.add('hidden');
-      csvFile.classList.add('hidden');
-      cidLabel.classList.remove('hidden');
-      cidFile.classList.remove('hidden');
-
-
-      document.getElementById('protocol').innerHTML = '<option value="IEC61850">IEC 61850</option>';
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
     }
 
+    function selectProtocol(protocol) {
+      selectedProtocol = protocol;
 
-    resetForm();
-  }
+      document.querySelectorAll('.protocol-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      if (event && event.target) {
+        event.target.closest('.protocol-btn').classList.add('active');
+      }
 
-  function loadCID() {
-    const file = document.getElementById('cidFile').files[0];
-    if (file) {
-      console.log('Loading CID file:', file.name);
+      const modbusConfig = document.getElementById('modbus-config');
+      const iecConfig = document.getElementById('iec-config');
+      const cidLabel = document.getElementById('cidInputLabel');
+      const cidFile = document.getElementById('cidFile');
+
+      if (protocol === 'modbus') {
+        if (modbusConfig) modbusConfig.classList.remove('hidden');
+        if (iecConfig) iecConfig.classList.add('hidden');
+
+        if (cidLabel) cidLabel.classList.add('hidden');
+        if (cidFile) cidFile.classList.add('hidden');
+
+        const protocolSelect = document.getElementById('protocol');
+        if (protocolSelect) {
+          protocolSelect.innerHTML = '<option value="Modbus">Modbus TCP/IP</option>';
+        }
+      } else if (protocol === 'iec') {
+        if (modbusConfig) modbusConfig.classList.add('hidden');
+        if (iecConfig) iecConfig.classList.remove('hidden');
+
+        if (cidLabel) cidLabel.classList.remove('hidden');
+        if (cidFile) cidFile.classList.remove('hidden');
+
+        const protocolSelect = document.getElementById('protocol');
+        if (protocolSelect) {
+          protocolSelect.innerHTML = '<option value="IEC61850">IEC 61850</option>';
+        }
+      }
+
+      resetForm();
+    }
+
+    function loadCSV() {
+      const file = document.getElementById('csvFile').files[0];
+      if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        try {
-          const content = e.target.result;
+        const csv = e.target.result;
+        const lines = csv.split('\n');
+        const headers = lines[0].split(',');
 
-          parseCIDFile(content);
-        } catch (error) {
-          console.error('Error parsing CID file:', error);
-          alert('Error parsing CID file. Please check the file format.');
+        if (lines.length > 1) {
+          const data = lines[1].split(',');
+          const form = document.getElementById('deviceForm');
+
+          headers.forEach((header, index) => {
+            const input = form.querySelector(`[name="${header.trim()}"]`);
+            if (input && data[index]) {
+              input.value = data[index].trim();
+            }
+          });
+
+          updateProgress();
+          showAlert('CSV loaded successfully!', 'success');
         }
       };
       reader.readAsText(file);
     }
-  }
 
-  function parseCIDFile(content) {
-
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(content, 'text/xml');
-
-
-    const parserError = xmlDoc.getElementsByTagName('parsererror');
-    if (parserError.length > 0) {
-      throw new Error('Invalid XML format');
+    function loadCID() {
+      const file = document.getElementById('cidFile').files[0];
+      if (file) {
+        console.log('Loading CID file:', file.name);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const content = e.target.result;
+            parseCIDFile(content);
+          } catch (error) {
+            console.error('Error parsing CID file:', error);
+            showAlert('Error parsing CID file. Please check the file format.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      }
     }
 
+    function parseCIDFile(content) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(content, 'text/xml');
 
-    const ieds = xmlDoc.getElementsByTagName('IED');
-    if (ieds.length > 0) {
-      const ied = ieds[0];
-      const iedName = ied.getAttribute('name');
-      if (iedName) {
-        document.getElementById('ied_name').value = iedName;
+      const parserError = xmlDoc.getElementsByTagName('parsererror');
+      if (parserError.length > 0) {
+        throw new Error('Invalid XML format');
       }
 
-
-      const accessPoints = ied.getElementsByTagName('AccessPoint');
-      if (accessPoints.length > 0) {
-        const ap = accessPoints[0];
-        const apName = ap.getAttribute('name');
-        if (apName) {
-          document.getElementById('access_point').value = apName;
+      const ieds = xmlDoc.getElementsByTagName('IED');
+      if (ieds.length > 0) {
+        const ied = ieds[0];
+        const iedName = ied.getAttribute('name');
+        if (iedName) {
+          const iedInput = document.getElementById('ied_name');
+          if (iedInput) iedInput.value = iedName;
         }
 
+        const accessPoints = ied.getElementsByTagName('AccessPoint');
+        if (accessPoints.length > 0) {
+          const ap = accessPoints[0];
+          const apName = ap.getAttribute('name');
+          if (apName) {
+            const apInput = document.getElementById('access_point');
+            if (apInput) apInput.value = apName;
+          }
 
-        const addresses = ap.getElementsByTagName('Address');
-        if (addresses.length > 0) {
-          const pTypes = addresses[0].getElementsByTagName('P');
-          for (let i = 0; i < pTypes.length; i++) {
-            if (pTypes[i].getAttribute('type') === 'IP') {
-              document.getElementById('iec_device_ip').value = pTypes[i].textContent;
-            }
-            if (pTypes[i].getAttribute('type') === 'OSI-AP-Title') {
-              document.getElementById('osi_ap_title').value = pTypes[i].textContent;
-            }
-            if (pTypes[i].getAttribute('type') === 'OSI-AE-Qualifier') {
-              document.getElementById('osi_ae_qualifier').value = pTypes[i].textContent;
+          const addresses = ap.getElementsByTagName('Address');
+          if (addresses.length > 0) {
+            const pTypes = addresses[0].getElementsByTagName('P');
+            for (let i = 0; i < pTypes.length; i++) {
+              if (pTypes[i].getAttribute('type') === 'IP') {
+                const ipInput = document.getElementById('iec_device_ip');
+                if (ipInput) ipInput.value = pTypes[i].textContent;
+              }
             }
           }
         }
-      }
 
-
-      const logicalDevices = ied.getElementsByTagName('LDevice');
-      if (logicalDevices.length > 0) {
-        const ldName = logicalDevices[0].getAttribute('inst');
-        if (ldName) {
-          document.getElementById('logical_device').value = ldName;
-        }
-
-        const logicalNodes = logicalDevices[0].getElementsByTagName('LN');
-        const lnOptions = [];
-        for (let i = 0; i < logicalNodes.length; i++) {
-          const lnClass = logicalNodes[i].getAttribute('lnClass');
-          const lnInst = logicalNodes[i].getAttribute('inst') || '';
-          const lnPrefix = logicalNodes[i].getAttribute('prefix') || '';
-          const lnName = lnPrefix + lnClass + lnInst;
-          lnOptions.push(`<option value="${lnName}">${lnName}</option>`);
-        }
-
-        if (lnOptions.length > 0) {
-          document.getElementById('logical_node').innerHTML = '<option value="">Select Logical Node</option>' + lnOptions.join('');
-        }
-      }
-
-
-      const dataSets = xmlDoc.getElementsByTagName('DataSet');
-      if (dataSets.length > 0) {
-        const dsOptions = [];
-        for (let i = 0; i < dataSets.length; i++) {
-          const dsName = dataSets[i].getAttribute('name');
-          if (dsName) {
-            dsOptions.push(`<option value="${dsName}">${dsName}</option>`);
+        const logicalDevices = ied.getElementsByTagName('LDevice');
+        if (logicalDevices.length > 0) {
+          const ldName = logicalDevices[0].getAttribute('inst');
+          if (ldName) {
+            const ldInput = document.getElementById('logical_device');
+            if (ldInput) ldInput.value = ldName;
           }
         }
 
-        if (dsOptions.length > 0) {
-          document.getElementById('data_set').innerHTML = '<option value="">Select Data Set</option>' + dsOptions.join('');
-        }
-      }
-
-
-      const reportControls = xmlDoc.getElementsByTagName('ReportControl');
-      if (reportControls.length > 0) {
-        const rcOptions = [];
-        for (let i = 0; i < reportControls.length; i++) {
-          const rcName = reportControls[i].getAttribute('name');
+        const reportControls = xmlDoc.getElementsByTagName('ReportControl');
+        if (reportControls.length > 0) {
+          const rcName = reportControls[0].getAttribute('name');
           if (rcName) {
-            rcOptions.push(`<option value="${rcName}">${rcName}</option>`);
+            const rcInput = document.getElementById('report_control');
+            if (rcInput) rcInput.value = rcName;
           }
         }
+      }
 
-        if (rcOptions.length > 0) {
-          document.getElementById('report_control').innerHTML = '<option value="">Select Report Control</option>' + rcOptions.join('');
+      console.log('CID file parsed successfully');
+      showAlert('CID file loaded successfully!', 'success');
+      updateProgress();
+    }
+
+    function resetForm() {
+      const form = document.getElementById('deviceForm');
+      if (form) {
+        form.reset();
+      }
+
+      const csvFile = document.getElementById('csvFile');
+      const cidFile = document.getElementById('cidFile');
+      if (csvFile) csvFile.value = '';
+      if (cidFile) cidFile.value = '';
+
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const form = document.getElementById('deviceForm');
+      if (!form) return;
+
+      const inputs = form.querySelectorAll('input[required], select[required]');
+      let filledInputs = 0;
+
+      inputs.forEach(input => {
+        if (input.value.trim() !== '') {
+          filledInputs++;
         }
+      });
+
+      const progress = (filledInputs / inputs.length) * 100;
+      const progressFill = document.querySelector('.progress-fill');
+      if (progressFill) {
+        progressFill.style.width = progress + '%';
       }
     }
 
-    console.log('CID file parsed successfully');
-    alert('CID file loaded successfully!');
-  }
-
-  function resetForm() {
-
-    document.getElementById('device_name').value = '';
-
-
-    if (document.getElementById('modbus_device_ip')) {
-      document.getElementById('modbus_device_ip').value = '';
-    }
-    if (document.getElementById('port')) {
-      document.getElementById('port').value = '502';
-    }
-    if (document.getElementById('slave_id')) {
-      document.getElementById('slave_id').value = '1';
-    }
-    if (document.getElementById('csvFile')) {
-      document.getElementById('csvFile').value = '';
+    const deviceForm = document.getElementById('deviceForm');
+    if (deviceForm) {
+      deviceForm.addEventListener('input', updateProgress);
+      deviceForm.addEventListener('change', updateProgress);
     }
 
+    function saveDevice() {
+      if (!validateForm()) return;
 
-    if (document.getElementById('ied_name')) {
-      document.getElementById('ied_name').value = '';
-    }
-    if (document.getElementById('access_point')) {
-      document.getElementById('access_point').value = '';
-    }
-    if (document.getElementById('iec_device_ip')) {
-      document.getElementById('iec_device_ip').value = '';
-    }
-    if (document.getElementById('logical_device')) {
-      document.getElementById('logical_device').value = '';
-    }
-    if (document.getElementById('logical_node')) {
-      document.getElementById('logical_node').innerHTML = '<option value="">Select Logical Node</option>';
-    }
-    if (document.getElementById('data_set')) {
-      document.getElementById('data_set').innerHTML = '<option value="">Select Data Set</option>';
-    }
-    if (document.getElementById('report_control')) {
-      document.getElementById('report_control').innerHTML = '<option value="">Select Report Control</option>';
-    }
-    if (document.getElementById('osi_ap_title')) {
-      document.getElementById('osi_ap_title').value = '';
-    }
-    if (document.getElementById('osi_ae_qualifier')) {
-      document.getElementById('osi_ae_qualifier').value = '';
-    }
-    if (document.getElementById('cidFile')) {
-      document.getElementById('cidFile').value = '';
-    }
-  }
+      const form = document.getElementById('deviceForm');
+      const formData = new FormData(form);
+      const device = {};
 
-  function validateForm() {
-    if (selectedProtocol === 'modbus') {
-      return validateModbusForm();
-    } else if (selectedProtocol === 'iec') {
-      return validateIECForm();
+      for (let [key, value] of formData.entries()) {
+        device[key] = value;
+      }
+
+      device.created_at = new Date().toISOString();
+      device.id = Date.now().toString();
+      device.protocol_type = selectedProtocol;
+
+      devices.push(device);
+      saveDevicesToStorage();
+      updateDeviceList();
+      showAlert('Device saved successfully!', 'success');
+      resetForm();
     }
-    return false;
-  }
 
-  function validateModbusForm() {
-    const deviceName = document.getElementById('device_name').value.trim();
-    const deviceIP = document.getElementById('modbus_device_ip').value.trim();
-    const port = document.getElementById('port').value.trim();
-    const slaveId = document.getElementById('slave_id').value.trim();
-
-    if (!deviceName) {
-      alert('Please enter device name');
+    function validateForm() {
+      if (selectedProtocol === 'modbus') {
+        return validateModbusForm();
+      } else if (selectedProtocol === 'iec') {
+        return validateIECForm();
+      }
       return false;
     }
 
-    if (!deviceIP) {
-      alert('Please enter device IP address');
-      return false;
-    }
+    function validateModbusForm() {
+      const deviceName = document.getElementById('device_name');
+      const deviceIP = document.getElementById('device_ip');
+      const unitNumber = document.getElementById('unit_number');
 
-    if (!port || isNaN(port) || port < 1 || port > 65535) {
-      alert('Please enter valid port number (1-65535)');
-      return false;
-    }
+      if (!deviceName || !deviceName.value.trim()) {
+        showAlert('Please enter device name', 'error');
+        return false;
+      }
 
-    if (!slaveId || isNaN(slaveId) || slaveId < 1 || slaveId > 255) {
-      alert('Please enter valid slave ID (1-255)');
-      return false;
-    }
+      if (!deviceIP || !deviceIP.value.trim()) {
+        showAlert('Please enter device IP address', 'error');
+        return false;
+      }
 
-    return true;
-  }
+      if (!unitNumber || !unitNumber.value.trim() || isNaN(unitNumber.value) || unitNumber.value < 1 || unitNumber.value > 999) {
+        showAlert('Please enter valid unit number (1-999)', 'error');
+        return false;
+      }
 
-  function validateIECForm() {
-    const deviceName = document.getElementById('device_name').value.trim();
-    const iedName = document.getElementById('ied_name').value.trim();
-    const deviceIP = document.getElementById('iec_device_ip').value.trim();
-
-    if (!deviceName) {
-      alert('Please enter device name');
-      return false;
-    }
-
-    if (!iedName) {
-      alert('Please enter IED name');
-      return false;
-    }
-
-    if (!deviceIP) {
-      alert('Please enter device IP address');
-      return false;
-    }
-
-    return true;
-  }
-
-
-  document.addEventListener('DOMContentLoaded', function() {
-
-    selectProtocol('modbus');
-
-
-    const cidFileInput = document.getElementById('cidFile');
-    if (cidFileInput) {
-      cidFileInput.addEventListener('change', loadCID);
-    }
-  });
-
-
-  function submitForm() {
-    if (validateForm()) {
-
-      console.log('Form validated successfully for protocol:', selectedProtocol);
       return true;
     }
-    return false;
-  }
-</script>
+
+    function validateIECForm() {
+      const deviceName = document.getElementById('device_name');
+      const iedName = document.getElementById('ied_name');
+      const deviceIP = document.getElementById('iec_device_ip');
+
+      if (!deviceName || !deviceName.value.trim()) {
+        showAlert('Please enter device name', 'error');
+        return false;
+      }
+
+      if (!iedName || !iedName.value.trim()) {
+        showAlert('Please enter IED name', 'error');
+        return false;
+      }
+
+      if (!deviceIP || !deviceIP.value.trim()) {
+        showAlert('Please enter device IP address', 'error');
+        return false;
+      }
+
+      return true;
+    }
+
+    function generateCSV() {
+      if (devices.length === 0) {
+        showAlert('No devices to export!', 'error');
+        return;
+      }
+
+      showLoading();
+
+      setTimeout(() => {
+        const headers = ['device_name', 'device_type', 'tag_prefix', 'io_device', 'device_ip', 'port_name', 'unit_number', 'protocol'];
+        let csv = headers.join(',') + '\n';
+
+        devices.forEach(device => {
+          const row = headers.map(header => device[header] || '').join(',');
+          csv += row + '\n';
+        });
+
+        downloadCSV(csv, 'device_configuration.csv');
+
+        if (variables.length > 0) {
+          const varHeaders = ['variable_name', 'variable_type', 'data_type', 'unit'];
+          let varCsv = varHeaders.join(',') + '\n';
+
+          variables.forEach(variable => {
+            const row = varHeaders.map(header => variable[header] || '').join(',');
+            varCsv += row + '\n';
+          });
+
+          downloadCSV(varCsv, 'variable_configuration.csv');
+        }
+
+        hideLoading();
+        showAlert('CSV files generated successfully!', 'success');
+      }, 2000);
+    }
+
+    function downloadCSV(csv, filename) {
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+
+    function updateDeviceList() {
+      const deviceList = document.getElementById('deviceList');
+      if (!deviceList) return;
+
+      deviceList.innerHTML = '';
+
+      if (devices.length === 0) {
+        deviceList.innerHTML = '<div class="placeholder-content"><p>No devices configured yet.</p></div>';
+        return;
+      }
+
+      devices.forEach(device => {
+        const deviceItem = document.createElement('div');
+        deviceItem.className = 'device-item';
+        deviceItem.innerHTML = `
+          <div class="device-header">
+            <span class="device-name">${device.device_name || 'Unnamed Device'}</span>
+            <span class="device-type">${device.device_type || device.protocol_type || 'Unknown'}</span>
+          </div>
+          <div class="device-details">
+            <div class="device-detail"><strong>IP:</strong> ${device.device_ip || device.iec_device_ip || 'N/A'}</div>
+            <div class="device-detail"><strong>Protocol:</strong> ${device.protocol || device.protocol_type || 'Unknown'}</div>
+            <div class="device-detail"><strong>Unit:</strong> ${device.unit_number || 'N/A'}</div>
+            <div class="device-detail"><strong>Tag Prefix:</strong> ${device.tag_prefix || 'N/A'}</div>
+          </div>
+        `;
+        deviceList.appendChild(deviceItem);
+      });
+
+      const counter = document.getElementById('deviceCounter');
+      if (counter) {
+        counter.textContent = devices.length;
+      }
+    }
+
+    // Variables functions
+    function addVariable() {
+      const name = document.getElementById('variable_name').value;
+      const type = document.getElementById('variable_type').value;
+      const dataType = document.getElementById('data_type').value;
+      const unit = document.getElementById('unit').value;
+
+      if (!name.trim()) {
+        showAlert('Please enter variable name', 'error');
+        return;
+      }
+
+      const variable = {
+        id: Date.now().toString(),
+        variable_name: name,
+        variable_type: type,
+        data_type: dataType,
+        unit: unit
+      };
+
+      variables.push(variable);
+      updateVariableTable();
+      clearVariableForm();
+      showAlert('Variable added successfully!', 'success');
+    }
+
+    function updateVariableTable() {
+      const tbody = document.getElementById('variableTableBody');
+      tbody.innerHTML = '';
+
+      variables.forEach(variable => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.variable_name}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.variable_type}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.data_type}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.unit}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">
+            <button class="btn btn-danger" onclick="removeVariable('${variable.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function removeVariable(id) {
+      variables = variables.filter(v => v.id !== id);
+      updateVariableTable();
+      showAlert('Variable removed successfully!', 'success');
+    }
+
+    function clearVariableForm() {
+      document.getElementById('variable_name').value = '';
+      document.getElementById('variable_type').value = 'analog';
+      document.getElementById('data_type').value = 'float';
+      document.getElementById('unit').value = '';
+    }
+
+    // Alarms functions
+    function addAlarm() {
+      const name = document.getElementById('alarm_name').value;
+      const type = document.getElementById('alarm_type').value;
+      const category = document.getElementById('category').value;
+      const tag = document.getElementById('alarm_tag').value;
+      const equipment = document.getElementById('equipment').value;
+      const itemName = document.getElementById('item_name_alarm').value;
+
+      if (!name.trim()) {
+        showAlert('Please enter alarm name', 'error');
+        return;
+      }
+
+      const alarm = {
+        id: Date.now().toString(),
+        alarm_name: name,
+        alarm_type: type,
+        category: category,
+        alarm_tag: tag,
+        equipment: equipment,
+        item_name: itemName
+      };
+
+      alarms.push(alarm);
+      updateAlarmTable();
+      clearAlarmForm();
+      showAlert('Alarm added successfully!', 'success');
+    }
+
+    function updateAlarmTable() {
+      const tbody = document.getElementById('alarmTableBody');
+      tbody.innerHTML = '';
+
+      alarms.forEach(alarm => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.alarm_name}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.alarm_type}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.category}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.alarm_tag}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.equipment}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.item_name}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">
+            <button class="btn btn-danger" onclick="removeAlarm('${alarm.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function removeAlarm(id) {
+      alarms = alarms.filter(a => a.id !== id);
+      updateAlarmTable();
+      showAlert('Alarm removed successfully!', 'success');
+    }
+
+    function clearAlarmForm() {
+      document.getElementById('alarm_name').value = '';
+      document.getElementById('alarm_type').value = 'analog';
+      document.getElementById('category').value = 'low';
+      document.getElementById('alarm_tag').value = '';
+      document.getElementById('equipment').value = '';
+      document.getElementById('item_name_alarm').value = '';
+    }
+
+
+    function addTrend() {
+      const description = document.getElementById('tag_description').value;
+      const type = document.getElementById('trend_types').value;
+      const tagName = document.getElementById('tag_name').value;
+      const itemName = document.getElementById('item_name_trend').value;
+
+      if (!description.trim()) {
+        showAlert('Please enter tag description', 'error');
+        return;
+      }
+
+      const trend = {
+        id: Date.now().toString(),
+        tag_description: description,
+        trend_types: type,
+        tag_name: tagName,
+        item_name: itemName
+      };
+
+      trends.push(trend);
+      updateTrendTable();
+      clearTrendForm();
+      showAlert('Trend added successfully!', 'success');
+    }
+
+    function updateTrendTable() {
+      const tbody = document.getElementById('trendTableBody');
+      tbody.innerHTML = '';
+
+      trends.forEach(trend => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.tag_description}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.trend_types}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.tag_name}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.item_name}</td>
+          <td style="padding: 12px; border: 1px solid #dee2e6;">
+            <button class="btn btn-danger" onclick="removeTrend('${trend.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function removeTrend(id) {
+      trends = trends.filter(t => t.id !== id);
+      updateTrendTable();
+      showAlert('Trend removed successfully!', 'success');
+    }
+
+    function clearTrendForm() {
+      document.getElementById('tag_description').value = '';
+      document.getElementById('trend_types').value = 'event';
+      document.getElementById('tag_name').value = '';
+      document.getElementById('item_name_trend').value = '';
+    }
+
+    function saveDevicesToStorage() {
+      console.log('Saving devices to storage:', devices);
+    }
+
+    function loadDevicesFromStorage() {
+      console.log('Loading devices from storage');
+    }
+
+    function saveVariablesToStorage() {
+      console.log('Saving variables to storage:', variables);
+    }
+
+    function loadVariablesFromStorage() {
+      console.log('Loading variables from storage');
+    }
+
+    function showLoading() {
+      const loading = document.getElementById('loading');
+      if (loading) loading.classList.add('show');
+    }
+
+    function hideLoading() {
+      const loading = document.getElementById('loading');
+      if (loading) loading.classList.remove('show');
+    }
+
+    function showAlert(message, type) {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+
+      const container = document.querySelector('.tab-content.active') || document.body;
+      container.insertBefore(alert, container.firstChild);
+
+      setTimeout(() => {
+        alert.remove();
+      }, 3000);
+    }
+
+    function generateEquipmentConfig() {
+      showAlert('Equipment config generation would be implemented here', 'success');
+    }
+
+    function generateUnitsConfig() {
+      showAlert('Units config generation would be implemented here', 'success');
+    }
+
+    const deviceIPInput = document.getElementById('device_ip');
+    const iecIPInput = document.getElementById('iec_device_ip');
+
+    function validateIPAddress(input) {
+      if (!input) return;
+
+      input.addEventListener('blur', function () {
+        const ip = this.value;
+        const ipPattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+        if (ip && !ipPattern.test(ip)) {
+          showAlert('Please enter a valid IP address!', 'error');
+          this.focus();
+        }
+      });
+    }
+
+    validateIPAddress(deviceIPInput);
+    validateIPAddress(iecIPInput);
+
+    function submitForm() {
+      if (validateForm()) {
+        saveDevice();
+        return true;
+      }
+      return false;
+    }
+  </script>
+</body>
+</html>
