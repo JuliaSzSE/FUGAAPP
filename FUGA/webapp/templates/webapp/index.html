@@ -261,6 +261,12 @@
       transition: all 0.3s ease;
     }
 
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
     .btn-primary {
       background: #007bff;
       color: white;
@@ -286,6 +292,15 @@
 
     .btn-secondary:hover {
       background: #007bff;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
     }
 
     .button-group {
@@ -325,6 +340,13 @@
       outline: none;
       border-color: #3dcd68;
       box-shadow: 0 0 0 3px rgba(61, 205, 104, 0.1);
+    }
+
+    input:disabled, select:disabled, textarea:disabled {
+      background-color: #f8f9fa;
+      color: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.6;
     }
 
     label {
@@ -423,6 +445,142 @@
       font-size: 1.1rem;
     }
 
+    .file-upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .data-table th {
+      background: #f8f9fa;
+      padding: 12px;
+      border: 1px solid #dee2e6;
+      text-align: left;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .data-table td {
+      padding: 12px;
+      border: 1px solid #dee2e6;
+    }
+
+    .editable-cell {
+      background: transparent;
+      border: none;
+      width: 100%;
+      padding: 4px;
+      font-size: 14px;
+    }
+
+    .editable-cell:focus {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+    }
+
+    .table-container {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+    }
+
+    .modbus-variant-selection {
+      background: #e8f4fd;
+      border: 2px solid #007bff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .modbus-variant-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .modbus-variant-btn {
+      flex: 1;
+      max-width: 150px;
+      background: white;
+      border: 2px solid #007bff;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #007bff;
+      text-align: center;
+    }
+
+    .modbus-variant-btn:hover {
+      background: #007bff;
+      color: white;
+    }
+
+    .modbus-variant-btn.active {
+      background: #007bff;
+      color: white;
+    }
+
+    .advanced-options-toggle {
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .advanced-options-toggle:hover {
+      background: #e9ecef;
+    }
+
+    .checkbox-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .advanced-options-toggle label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #495057;
+    }
+
+    .advanced-options-content {
+      transition: all 0.3s ease;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .advanced-options-content.enabled {
+      opacity: 1;
+      pointer-events: all;
+    }
+
     @media (max-width: 768px) {
       .config-cards {
         flex-direction: column;
@@ -438,6 +596,10 @@
 
       .button-group {
         flex-direction: column;
+      }
+
+      .file-upload-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -460,9 +622,23 @@
 
           <div class="file-upload-section">
             <h3>File Upload</h3>
-            <div>
-              <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="loadCSV()" />
-              <label for="csvFile" class="file-input-label"> Load CSV</label>
+            <div class="file-upload-grid">
+              <div>
+                <input type="file" id="csvFile" class="file-input" accept=".csv" />
+                <label for="csvFile" class="file-input-label">Load CSV</label>
+              </div>
+              <div>
+                <input type="file" id="variablesCsvFile" class="file-input" accept=".csv" />
+                <label for="variablesCsvFile" class="file-input-label">Load Variables CSV</label>
+              </div>
+              <div>
+                <input type="file" id="alarmsCsvFile" class="file-input" accept=".csv" />
+                <label for="alarmsCsvFile" class="file-input-label">Load Alarms CSV</label>
+              </div>
+              <div>
+                <input type="file" id="trendsCsvFile" class="file-input" accept=".csv" />
+                <label for="trendsCsvFile" class="file-input-label">Load Trends CSV</label>
+              </div>
             </div>
           </div>
 
@@ -484,7 +660,7 @@
               <div>Modbus</div>
             </button>
             <button class="protocol-btn" onclick="selectProtocol('iec')">
-              <div>IEC</div>
+              <div>IEC 61850</div>
             </button>
           </div>
         </div>
@@ -510,7 +686,7 @@
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      Enter a unique device name. Use only letters, numbers, and underscores. Example: PV_Panel_01, Wind_Turbine_A1
+                      Enter a unique device name. Use only letters, numbers, and underscores. Example: PV_Panel_01, Wind_Turbine_07
                     </div>
                   </div>
                 </label>
@@ -567,60 +743,245 @@
 
           <div class="config-section" id="modbus-config">
             <h3>Modbus Network Configuration</h3>
-            <div class="form-grid-2">
-              <div class="form-group">
-                <label for="device_ip">
-                  Device IP Address
-                  <div class="info-icon">
-                    i
-                    <div class="tooltip">
-                      IP address of the device on the network. Must be in IPv4 format (e.g. 192.168.1.100). Make sure the address is unique on the network.
+
+            <div class="modbus-variant-selection">
+              <h4 style="margin: 0 0 10px 0; color: #007bff;">Select Modbus Variant</h4>
+              <p style="margin: 0 0 16px 0; color: #666; font-size: 0.9rem;">Choose between TCP/IP or RTU communication</p>
+              <div class="modbus-variant-buttons">
+                <button type="button" class="modbus-variant-btn active" onclick="selectModbusVariant('tcp')">
+                  TCP/IP
+                </button>
+                <button type="button" class="modbus-variant-btn" onclick="selectModbusVariant('rtu')">
+                  RTU
+                </button>
+              </div>
+            </div>
+
+            <div id="modbus-tcp-config">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="device_ip">
+                    Device IP Address
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        IP address of the device on the network. Must be in IPv4 format (e.g. 192.168.1.100). Make sure the address is unique on the network.
+                      </div>
                     </div>
-                  </div>
-                </label>
-                <input type="text" name="device_ip" id="device_ip" required placeholder="e.g. 192.168.1.100" />
+                  </label>
+                  <input type="text" name="device_ip" id="device_ip" required placeholder="e.g. 192.168.1.100" />
+                </div>
+
+                <div class="form-group">
+                  <label for="modbus_port">
+                    Modbus TCP Port
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        TCP port for Modbus communication. Standard port is 502.
+                      </div>
+                    </div>
+                  </label>
+                  <select name="modbus_port" id="modbus_port" required>
+                    <option value="502">502</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="port_name">
+                    Port Name
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Communication port name in the SCADA system. Example: P14_BOARD1_PRJ3
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="port_name" id="port_name" placeholder="e.g. P14_BOARD1_PRJ3" />
+                </div>
+
+                <div class="form-group">
+                  <label for="memory_tcp">
+                    MEMORY
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        TRUE/FALSE
+                      </div>
+                    </div>
+                  </label>
+                  <select id="memory_tcp" name="memory">
+                    <option value="TRUE">TRUE</option>
+                    <option value="FALSE">FALSE</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="modbus-rtu-config" class="hidden">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="gateway_address">
+                    Gateway Address
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Gateway address of the device on the network.
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="gateway_address" id="gateway_address" placeholder="e.g. 192.168.1.100" />
+                </div>
+
+                <div class="form-group">
+                  <label for="slave_id">
+                    Slave ID
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                         Modbus RTU slave address (1-247). Each device on the serial bus must have a unique slave ID.
+                      </div>
+                    </div>
+                  </label>
+                  <input type="number" name="slave_id" id="slave_id" placeholder="7" min="1" max="247" />
+                </div>
+
+                <div class="form-group">
+                  <label for="port_name_rtu">
+                    Port Name
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Communication port name in the SCADA system. Example: P14_BOARD1_PRJ3
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="port_name_rtu" id="port_name_rtu" placeholder="e.g. P14_BOARD1_PRJ3" />
+                </div>
+
+                <div class="form-group">
+                  <label for="memory_rtu">
+                    MEMORY
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        TRUE/FALSE
+                      </div>
+                    </div>
+                  </label>
+                  <select id="memory_rtu" name="memory_rtu">
+                    <option value="TRUE">TRUE</option>
+                    <option value="FALSE">FALSE</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="serial_port">
+                    Serial Port
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Serial communication port (e.g. COM1, COM2, /dev/ttyS0). This is the physical port on the computer or gateway.
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="serial_port" id="serial_port" placeholder="e.g. COM1" />
+                </div>
               </div>
 
-              <div class="form-group">
-                <label for="port_name">
-                  Port Name
-                  <div class="info-icon">
-                    i
-                    <div class="tooltip">
-                      Communication port name in the SCADA system. Optional field - leave empty if not using specific ports. Example: P14_BOARD1_PRJ3
-                    </div>
-                  </div>
-                </label>
-                <input type="text" name="port_name" id="port_name" placeholder="e.g. P14_BOARD1_PRJ3" />
+              <div class="advanced-options-toggle" onclick="toggleAdvancedOptions()">
+                <div class="checkbox-container">
+                  <input type="checkbox" id="advancedOptionsCheckbox">
+                </div>
+                <label for="advancedOptionsCheckbox">Advanced Options</label>
               </div>
 
-              <div class="form-group">
-                <label for="unit_number">
-                  Unit Number
-                  <div class="info-icon">
-                    i
-                    <div class="tooltip">
-                      Unique unit number in the communication system (1-999). Used by communication protocols to identify the device.
-                    </div>
+              <div id="advancedOptionsContent" class="advanced-options-content">
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="baud_rate">
+                      Baud Rate
+                      <div class="info-icon">
+                        i
+                        <div class="tooltip">
+                          Serial communication speed in bits per second. Common values: 9600, 19200, 38400, 57600, 115200.
+                        </div>
+                      </div>
+                    </label>
+                    <select name="baud_rate" id="baud_rate" disabled>
+                      <option value="9600">9600</option>
+                      <option value="19200">19200</option>
+                      <option value="38400" selected>38400</option>
+                      <option value="57600">57600</option>
+                      <option value="115200">115200</option>
+                    </select>
                   </div>
-                </label>
-                <input type="number" name="unit_number" id="unit_number" required min="1" max="999" placeholder="e.g. 218" />
-              </div>
 
-              <div class="form-group">
-                <label for="protocol">
-                  Protocol
-                  <div class="info-icon">
-                    i
-                    <div class="tooltip">
-                      Communication protocol used to connect to the device. Modbus TCP/IP for Ethernet communications.
-                    </div>
+                  <div class="form-group">
+                    <label for="data_bits">
+                      Data Bits
+                      <div class="info-icon">
+                        i
+                        <div class="tooltip">
+                          Number of data bits per character. Standard is 8 bits.
+                        </div>
+                      </div>
+                    </label>
+                    <select name="data_bits" id="data_bits" disabled>
+                      <option value="7">7</option>
+                      <option value="8" selected>8</option>
+                    </select>
                   </div>
-                </label>
-                <select name="protocol" id="protocol" required>
-                  <option value="Modbus">Modbus TCP/IP</option>
-                </select>
+
+                                    <div class="form-group">
+                    <label for="parity">
+                      Parity
+                      <div class="info-icon">
+                        i
+                        <div class="tooltip">
+                          Error checking method. None = no parity, Even = even parity, Odd = odd parity.
+                        </div>
+                      </div>
+                    </label>
+                    <select name="parity" id="parity" disabled>
+                      <option value="None" selected>None</option>
+                      <option value="Even">Even</option>
+                      <option value="Odd">Odd</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="stop_bits">
+                      Stop Bits
+                      <div class="info-icon">
+                        i
+                        <div class="tooltip">
+                          Number of stop bits. Standard is 1 stop bit.
+                        </div>
+                      </div>
+                    </label>
+                    <select name="stop_bits" id="stop_bits" disabled>
+                      <option value="1" selected>1</option>
+                      <option value="2">2</option>
+                    </select>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <div class="form-group">
+              <label for="protocol">
+                Protocol
+                <div class="info-icon">
+                  i
+                  <div class="tooltip">
+                    Communication protocol used to connect to the device.
+                  </div>
+                </div>
+              </label>
+              <select name="protocol" id="protocol" required>
+                <option value="Modbus TCP">Modbus TCP/IP</option>
+              </select>
             </div>
           </div>
 
@@ -712,12 +1073,12 @@
           </div>
 
           <div class="button-group">
-            <input type="file" id="cidFile" class="file-input hidden" accept=".cid" onchange="loadCID()" />
+            <input type="file" id="cidFile" class="file-input hidden" accept=".cid" />
             <label for="cidFile" class="file-input-label hidden" id="cidInputLabel">Load CID</label>
 
-            <button type="button" class="btn btn-success" onclick="saveDevice()">Save Device</button>
+            <button type="button" class="btn btn-success" id="saveDeviceBtn" onclick="saveDevice()">Save Device</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-            <button type="button" class="btn btn-primary" onclick="generateCSV()">Generate CSV Files</button>
+            <button type="button" class="btn btn-primary" id="generateCSVBtn" onclick="generateCSV()">Generate CSV Files</button>
           </div>
         </form>
 
@@ -792,23 +1153,25 @@
             </div>
           </div>
           <div class="button-group">
-            <button class="btn btn-primary" onclick="addVariable()">Add Variable</button>
+            <button class="btn btn-primary" id="addVariableBtn" onclick="addVariable()">Add Variable</button>
           </div>
         </div>
 
-        <table class="variable-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <thead>
-            <tr style="background: #f8f9fa;">
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Variable Name</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Type</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Data Type</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Unit</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="variableTableBody">
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Variable Name</th>
+                <th>Type</th>
+                <th>Data Type</th>
+                <th>Unit</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="variableTableBody">
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="tab-content" id="alarms">
@@ -821,11 +1184,11 @@
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Descriptive name for the alarm. Use clear naming convention like PowerFailure24V, HighTemperature, CommLoss
+                    Name for the alarm. Use clear naming convention like PowerFailure24V, HighTemperature, CommLoss
                   </div>
                 </div>
               </label>
-              <input type="text" id="alarm_name" placeholder="e.g. @(PowerFailure24V)" />
+              <input type="text" id="alarm_name" placeholder="e.g. PowerFailure24V" />
             </div>
 
             <div class="form-group">
@@ -834,7 +1197,7 @@
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Alarm type: Analog (threshold-based), Digital (state-based), Advanced (complex logic)
+                    Alarm type: Analog, Digital, Advanced
                   </div>
                 </div>
               </label>
@@ -895,7 +1258,7 @@
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Specific item or parameter name that triggers the alarm (e.g. CommHealth, Temperature, Voltage)
+                    Specific item name that triggers the alarm (e.g. CommHealth, Temperature, Voltage)
                   </div>
                 </div>
               </label>
@@ -903,25 +1266,27 @@
             </div>
           </div>
           <div class="button-group">
-            <button class="btn btn-primary" onclick="addAlarm()">Add Alarm</button>
+            <button class="btn btn-primary" id="addAlarmBtn" onclick="addAlarm()">Add Alarm</button>
           </div>
         </div>
 
-        <table class="alarm-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <thead>
-            <tr style="background: #f8f9fa;">
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Alarm Name</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Type</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Category</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Alarm Tag</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Equipment</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Item Name</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="alarmTableBody">
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Alarm Name</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Alarm Tag</th>
+                <th>Equipment</th>
+                <th>Item Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="alarmTableBody">
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div class="tab-content" id="trends">
@@ -934,7 +1299,7 @@
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Descriptive text for the trend tag. Should clearly identify what is being trended (e.g. "Phase A Current", "Active Power Output").
+                    Text for the trend tag. Should clearly identify what is being trended (e.g. "Phase A Current", "Active Power Output").
                   </div>
                 </div>
               </label>
@@ -985,669 +1350,2025 @@
             </div>
           </div>
           <div class="button-group">
-            <button class="btn btn-primary" onclick="addTrend()">Add Trend</button>
+            <button class="btn btn-primary" id="addTrendBtn" onclick="addTrend()">Add Trend</button>
           </div>
         </div>
 
-        <table class="trend-table" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <thead>
-            <tr style="background: #f8f9fa;">
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Tag Description</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Trend Types</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Tag Name</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Item Name</th>
-              <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="trendTableBody">
-          </tbody>
-        </table>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Tag Description</th>
+                <th>Trend Types</th>
+                <th>Tag Name</th>
+                <th>Item Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="trendTableBody">
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
-  <script>
-    let selectedProtocol = 'modbus';
-    let devices = [];
-    let variables = [];
-    let alarms = [];
-    let trends = [];
-    let currentDevice = null;
 
-    document.addEventListener('DOMContentLoaded', function() {
-      selectProtocol('modbus');
-      loadDevicesFromStorage();
-      loadVariablesFromStorage();
-      updateProgress();
-      updateDeviceList();
+<script>
 
-      const cidFileInput = document.getElementById('cidFile');
-      if (cidFileInput) {
-        cidFileInput.addEventListener('change', loadCID);
-      }
+let currentProtocol = 'modbus';
+let currentModbusVariant = 'tcp';
+let devices = [];
+let variables = [];
+let alarms = [];
+let trends = [];
+let currentDevice = null;
+let validationErrors = {};
+
+const validationRules = {
+    device_name: {
+        required: true,
+        minLength: 2,
+        maxLength: 50,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_-]*$/,
+        message: 'Device name must start with letter or underscore, 2-50 characters, alphanumeric, underscore, or dash only'
+    },
+    device_type: {
+        required: true,
+        message: 'Please select a device type'
+    },
+    tag_prefix: {
+        required: true,
+        minLength: 1,
+        maxLength: 10,
+        pattern: /^[A-Z_][A-Z0-9_]*$/,
+        message: 'Tag prefix must start with uppercase letter or underscore, contain only uppercase letters, numbers, and underscores'
+    },
+    io_device: {
+        required: true,
+        message: 'Please select an I/O device'
+    },
+    device_ip: {
+        required: true,
+        pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+        message: 'Please enter a valid IP address (e.g., 192.168.1.100)'
+    },
+    modbus_port: {
+        required: true,
+        min: 1,
+        max: 65535,
+        message: 'Port must be between 1 and 65535'
+    },
+    port_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 20,
+        message: 'Port name is required (1-20 characters)'
+    },
+    unit_number: {
+        required: true,
+        min: 1,
+        max: 247,
+        message: 'Unit number must be between 1 and 247'
+    },
+    gateway_address: {
+        required: true,
+        pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+        message: 'Please enter a valid gateway IP address'
+    },
+    slave_id: {
+        required: true,
+        min: 1,
+        max: 247,
+        message: 'Slave ID must be between 1 and 247'
+    },
+    serial_port: {
+        required: true,
+        pattern: /^COM\d+$|^\/dev\/tty[A-Za-z0-9]+$/,
+        message: 'Enter valid serial port (e.g., COM1, /dev/ttyUSB0)'
+    },
+    baud_rate: {
+        required: false,
+        enum: ['9600', '19200', '38400', '57600', '115200'],
+        message: 'Please select a valid baud rate'
+    },
+    iec_device_ip: {
+        required: true,
+        pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+        message: 'Please enter a valid IEC device IP address'
+    },
+    iec_port: {
+        required: true,
+        min: 1,
+        max: 65535,
+        message: 'IEC port must be between 1 and 65535'
+    },
+    ied_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'IED name must start with letter or underscore, contain only letters, numbers, and underscores'
+    },
+    access_point: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        message: 'Access point is required (1-32 characters)'
+    },
+    logical_device: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        message: 'Logical device is required (1-64 characters)'
+    },
+    port_name_rtu: {
+        required: true,
+        minLength: 1,
+        maxLength: 20,
+        message: 'Port name is required (1-20 characters)'
+    },
+    variable_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 50,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Variable name must start with letter or underscore, contain only letters, numbers, and underscores'
+    },
+    variable_type: {
+        required: true,
+        message: 'Please select a variable type'
+    },
+    data_type: {
+        required: true,
+        message: 'Please select a data type'
+    },
+    unit: {
+        required: true,
+        minLength: 1,
+        maxLength: 20,
+        message: 'Unit is required (1-20 characters)'
+    },
+    alarm_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 50,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_\s]*$/,
+        message: 'Alarm name must start with letter or underscore, contain only letters, numbers, underscores, and spaces'
+    },
+    alarm_type: {
+        required: true,
+        message: 'Please select an alarm type'
+    },
+    category: {
+        required: true,
+        message: 'Please select a category'
+    },
+    alarm_tag: {
+        required: true,
+        minLength: 1,
+        maxLength: 30,
+        message: 'Alarm tag is required (1-30 characters)'
+    },
+    equipment: {
+        required: true,
+        minLength: 1,
+        maxLength: 30,
+        message: 'Equipment is required (1-30 characters)'
+    },
+    item_name_alarm: {
+        required: true,
+        minLength: 1,
+        maxLength: 30,
+        message: 'Item name is required (1-30 characters)'
+    },
+    tag_description: {
+        required: true,
+        minLength: 3,
+        maxLength: 100,
+        message: 'Tag description must be 3-100 characters long'
+    },
+    trend_types: {
+        required: true,
+        message: 'Please select a trend type'
+    },
+    tag_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 50,
+        message: 'Tag name is required (1-50 characters)'
+    },
+    item_name_trend: {
+        required: true,
+        minLength: 1,
+        maxLength: 30,
+        message: 'Item name is required (1-30 characters)'
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    updateDeviceCounter();
+    loadDevicesFromStorage();
+    loadVariablesFromStorage();
+    loadAlarmsFromStorage();
+    loadTrendsFromStorage();
+    setupValidation();
+
+    document.getElementById('csvFile').addEventListener('change', loadCSV);
+    document.getElementById('variablesCsvFile').addEventListener('change', loadVariablesCSV);
+    document.getElementById('alarmsCsvFile').addEventListener('change', loadAlarmsCSV);
+    document.getElementById('trendsCsvFile').addEventListener('change', loadTrendsCSV);
+    document.getElementById('cidFile').addEventListener('change', loadCID);
+});
+
+function setupValidation() {
+    const form = document.getElementById('deviceForm');
+    if (!form) return;
+
+    const fields = form.querySelectorAll('input, select');
+    fields.forEach(field => {
+        field.addEventListener('input', function() {
+            validateField(this);
+            updateFormButtons();
+            updateProgressBar();
+        });
+
+        field.addEventListener('change', function() {
+            validateField(this);
+            updateFormButtons();
+            updateProgressBar();
+        });
+
+        field.addEventListener('blur', function() {
+            validateField(this);
+            updateFormButtons();
+        });
+
+        field.addEventListener('focus', function() {
+            clearFieldError(this);
+        });
     });
 
-    function showTab(tabName, event) {
-      document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
+    setupSubFormValidation();
+    updateFormButtons();
+}
 
-      document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-      });
+function setupSubFormValidation() {
+    const variableFields = ['variable_name', 'variable_type', 'data_type', 'unit'];
+    variableFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('change', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('blur', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('focus', function() {
+                clearFieldError(this);
+            });
+        }
+    });
 
-      document.getElementById(tabName).classList.add('active');
+    const alarmFields = ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'];
+    alarmFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('change', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('blur', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('focus', function() {
+                clearFieldError(this);
+            });
+        }
+    });
 
-      if (event && event.target) {
-        event.target.classList.add('active');
-      }
+    const trendFields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+    trendFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('change', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('blur', function() {
+                validateField(this);
+                updateFormButtons();
+            });
+            field.addEventListener('focus', function() {
+                clearFieldError(this);
+            });
+        }
+    });
+}
+
+function validateField(field) {
+    const fieldName = field.name || field.id;
+    const value = field.value.trim();
+    const rules = validationRules[fieldName];
+
+    if (!rules) return true;
+
+    if (!isFieldVisible(field) && !isSubFormField(fieldName)) {
+        delete validationErrors[fieldName];
+        clearFieldError(field);
+        return true;
     }
 
-    function selectProtocol(protocol) {
-      selectedProtocol = protocol;
+    let isValid = true;
+    let errorMessage = '';
 
-      document.querySelectorAll('.protocol-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      if (event && event.target) {
-        event.target.closest('.protocol-btn').classList.add('active');
-      }
+    if (rules.required && !value) {
+        isValid = false;
+        errorMessage = `${getFieldLabel(field)} is required`;
+    }
 
-      const modbusConfig = document.getElementById('modbus-config');
-      const iecConfig = document.getElementById('iec-config');
-      const cidLabel = document.getElementById('cidInputLabel');
-      const cidFile = document.getElementById('cidFile');
+    if (value) {
+        if (rules.minLength && value.length < rules.minLength) {
+            isValid = false;
+            errorMessage = `${getFieldLabel(field)} must be at least ${rules.minLength} characters`;
+        }
 
-      if (protocol === 'modbus') {
+        if (rules.maxLength && value.length > rules.maxLength) {
+            isValid = false;
+            errorMessage = `${getFieldLabel(field)} must not exceed ${rules.maxLength} characters`;
+        }
+
+        if (rules.pattern && !rules.pattern.test(value)) {
+            isValid = false;
+            errorMessage = rules.message || `${getFieldLabel(field)} format is invalid`;
+        }
+
+        if (rules.min !== undefined || rules.max !== undefined) {
+            const numValue = parseInt(value);
+            if (isNaN(numValue)) {
+                isValid = false;
+                errorMessage = `${getFieldLabel(field)} must be a valid number`;
+            } else {
+                if (rules.min !== undefined && numValue < rules.min) {
+                    isValid = false;
+                    errorMessage = `${getFieldLabel(field)} must be at least ${rules.min}`;
+                }
+                if (rules.max !== undefined && numValue > rules.max) {
+                    isValid = false;
+                    errorMessage = `${getFieldLabel(field)} must not exceed ${rules.max}`;
+                }
+            }
+        }
+
+        if (rules.enum && !rules.enum.includes(value)) {
+            isValid = false;
+            errorMessage = rules.message || `${getFieldLabel(field)} has invalid value`;
+        }
+    }
+
+    if (fieldName.startsWith('baud_rate') || fieldName.startsWith('data_bits') ||
+        fieldName.startsWith('parity') || fieldName.startsWith('stop_bits')) {
+        const advancedEnabled = document.getElementById('advancedOptionsCheckbox')?.checked;
+        if (!advancedEnabled) {
+            delete validationErrors[fieldName];
+            clearFieldError(field);
+            return true;
+        }
+    }
+
+    if (!isValid) {
+        validationErrors[fieldName] = errorMessage;
+        showFieldError(field, errorMessage);
+    } else {
+        delete validationErrors[fieldName];
+        clearFieldError(field);
+    }
+
+    return isValid;
+}
+
+function isSubFormField(fieldName) {
+    const subFormFields = [
+        'variable_name', 'variable_type', 'data_type', 'unit',
+        'alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm',
+        'tag_description', 'trend_types', 'tag_name', 'item_name_trend'
+    ];
+    return subFormFields.includes(fieldName);
+}
+
+function isFieldVisible(field) {
+    if (field.offsetParent === null) return false;
+
+    const fieldName = field.name || field.id;
+
+    if (currentProtocol === 'modbus') {
+        if (fieldName.startsWith('iec_')) return false;
+
+        if (currentModbusVariant === 'tcp') {
+            if (['gateway_address', 'slave_id', 'port_name_rtu', 'memory_rtu', 'serial_port',
+                 'baud_rate', 'data_bits', 'parity', 'stop_bits'].includes(fieldName)) {
+                return false;
+            }
+        } else {
+            if (['device_ip', 'modbus_port', 'port_name', 'memory_tcp', 'unit_number'].includes(fieldName)) {
+                return false;
+            }
+        }
+    } else if (currentProtocol === 'iec') {
+        if (['device_ip', 'modbus_port', 'port_name', 'unit_number', 'memory_tcp',
+             'gateway_address', 'slave_id', 'port_name_rtu', 'memory_rtu', 'serial_port',
+             'baud_rate', 'data_bits', 'parity', 'stop_bits'].includes(fieldName)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function getFieldLabel(field) {
+    const labels = {
+        device_name: 'Device Name',
+        device_type: 'Device Type',
+        tag_prefix: 'Tag Prefix',
+        io_device: 'I/O Device',
+        device_ip: 'Device IP Address',
+        modbus_port: 'Modbus Port',
+        port_name: 'Port Name',
+        unit_number: 'Unit Number',
+        gateway_address: 'Gateway Address',
+        slave_id: 'Slave ID',
+        port_name_rtu: 'Port Name',
+        serial_port: 'Serial Port',
+        baud_rate: 'Baud Rate',
+        iec_device_ip: 'IEC Device IP',
+        iec_port: 'IEC Port',
+        ied_name: 'IED Name',
+        access_point: 'Access Point',
+        logical_device: 'Logical Device',
+        variable_name: 'Variable Name',
+        variable_type: 'Variable Type',
+        data_type: 'Data Type',
+        unit: 'Unit',
+        alarm_name: 'Alarm Name',
+        alarm_type: 'Alarm Type',
+        category: 'Category',
+        alarm_tag: 'Alarm Tag',
+        equipment: 'Equipment',
+        item_name_alarm: 'Item Name',
+        tag_description: 'Tag Description',
+        trend_types: 'Trend Type',
+        tag_name: 'Tag Name',
+        item_name_trend: 'Item Name'
+    };
+
+    return labels[field.name || field.id] || (field.name || field.id).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function showFieldError(field, message) {
+    field.classList.add('field-error');
+
+    const existingError = field.parentNode.querySelector('.error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    errorDiv.style.cssText = `
+        color: #dc3545;
+        font-size: 0.8rem;
+        margin-top: 4px;
+        display: flex;
+        align-items: center;
+        animation: slideDown 0.3s ease;
+    `;
+
+    const icon = document.createElement('span');
+    icon.innerHTML = '⚠️';
+    icon.style.marginRight = '4px';
+    errorDiv.insertBefore(icon, errorDiv.firstChild);
+
+    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+
+    field.style.cssText = `
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        background-color: rgba(220, 53, 69, 0.05) !important;
+    `;
+}
+
+function clearFieldError(field) {
+    field.classList.remove('field-error');
+
+    const errorMessage = field.parentNode.querySelector('.error-message');
+    if (errorMessage) {
+        errorMessage.remove();
+    }
+
+    field.style.cssText = '';
+}
+
+function isVariableFormComplete() {
+    const requiredFields = ['variable_name', 'variable_type', 'data_type', 'unit'];
+
+    const allFieldsFilled = requiredFields.every(fieldName => {
+        const field = document.getElementById(fieldName);
+        return field && field.value.trim() !== '';
+    });
+
+    const hasVariableErrors = requiredFields.some(fieldName =>
+        validationErrors.hasOwnProperty(fieldName)
+    );
+
+    return allFieldsFilled && !hasVariableErrors;
+}
+
+function isAlarmFormComplete() {
+    const requiredFields = ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'];
+
+    const allFieldsFilled = requiredFields.every(fieldName => {
+        const field = document.getElementById(fieldName);
+        return field && field.value.trim() !== '';
+    });
+
+    const hasAlarmErrors = requiredFields.some(fieldName =>
+        validationErrors.hasOwnProperty(fieldName)
+    );
+
+    return allFieldsFilled && !hasAlarmErrors;
+}
+
+function isTrendFormComplete() {
+    const requiredFields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+
+    const allFieldsFilled = requiredFields.every(fieldName => {
+        const field = document.getElementById(fieldName);
+        return field && field.value.trim() !== '';
+    });
+
+    const hasTrendErrors = requiredFields.some(fieldName =>
+        validationErrors.hasOwnProperty(fieldName)
+    );
+
+    return allFieldsFilled && !hasTrendErrors;
+}
+
+// FIXED: Updated main form validation functions
+function getMainFormRequiredFields() {
+    const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'unit_number');
+        } else if (currentModbusVariant === 'rtu') {
+            requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port');
+
+            // Add advanced options if they are enabled
+            const advancedEnabled = document.getElementById('advancedOptionsCheckbox')?.checked;
+            if (advancedEnabled) {
+                requiredFields.push('baud_rate', 'data_bits', 'parity', 'stop_bits');
+            }
+        }
+    } else if (currentProtocol === 'iec') {
+        requiredFields.push('iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device');
+    }
+
+    return requiredFields;
+}
+
+function isMainFormComplete() {
+    const requiredFields = getMainFormRequiredFields();
+
+    return requiredFields.every(fieldName => {
+        const field = document.getElementById(fieldName);
+        if (!field) {
+            console.warn(`Field ${fieldName} not found`);
+            return false;
+        }
+
+        // Check if field is visible and has a value
+        const isVisible = isFieldVisible(field);
+        const hasValue = field.value && field.value.trim() !== '';
+
+        // For hidden fields, consider them as completed
+        if (!isVisible) {
+            return true;
+        }
+
+        return hasValue;
+    });
+}
+
+function hasMainFormValidationErrors() {
+    const mainFormFields = getMainFormRequiredFields();
+
+    return mainFormFields.some(fieldName => {
+        const field = document.getElementById(fieldName);
+        if (!field || !isFieldVisible(field)) {
+            return false;
+        }
+        return validationErrors.hasOwnProperty(fieldName);
+    });
+}
+
+// FIXED: Updated updateFormButtons function
+function updateFormButtons() {
+    const saveButton = document.querySelector('button[onclick="saveDevice()"]');
+    const generateButton = document.querySelector('button[onclick="generateCSV()"]');
+    const addVariableButton = document.querySelector('button[onclick="addVariable()"]');
+    const addAlarmButton = document.querySelector('button[onclick="addAlarm()"]');
+    const addTrendButton = document.querySelector('button[onclick="addTrend()"]');
+
+    const isFormComplete = isMainFormComplete();
+    const hasMainFormErrors = hasMainFormValidationErrors();
+
+    console.log('Form validation check:', {
+        isFormComplete,
+        hasMainFormErrors,
+        currentProtocol,
+        currentModbusVariant,
+        requiredFields: getMainFormRequiredFields()
+    });
+
+    if (saveButton) {
+        if (!isFormComplete || hasMainFormErrors) {
+            saveButton.disabled = true;
+            saveButton.style.cssText = `
+                background-color: #6c757d !important;
+                border-color: #6c757d !important;
+                cursor: not-allowed !important;
+                opacity: 0.6 !important;
+            `;
+
+            if (hasMainFormErrors) {
+                saveButton.title = 'Please fix validation errors';
+            } else {
+                const missingFields = getMainFormRequiredFields().filter(fieldName => {
+                    const field = document.getElementById(fieldName);
+                    return field && isFieldVisible(field) && (!field.value || field.value.trim() === '');
+                });
+                saveButton.title = `Please complete: ${missingFields.join(', ')}`;
+            }
+        } else {
+            saveButton.disabled = false;
+            saveButton.style.cssText = `
+                background-color: #28a745 !important;
+                border-color: #28a745 !important;
+                cursor: pointer !important;
+                opacity: 1 !important;
+            `;
+            saveButton.title = 'Save device configuration';
+        }
+    }
+
+    if (generateButton) {
+        if (devices.length === 0) {
+            generateButton.disabled = true;
+            generateButton.style.cssText = `
+                background-color: #6c757d !important;
+                border-color: #6c757d !important;
+                cursor: not-allowed !important;
+                opacity: 0.6 !important;
+            `;
+            generateButton.title = 'Save at least one device to generate CSV';
+        } else {
+            generateButton.disabled = false;
+            generateButton.style.cssText = '';
+            generateButton.title = 'Generate CSV files';
+        }
+    }
+
+    if (addVariableButton) {
+        const isComplete = isVariableFormComplete();
+
+        if (!isComplete) {
+            addVariableButton.disabled = true;
+            addVariableButton.style.cssText = `
+                background-color: #6c757d !important;
+                cursor: not-allowed !important;
+                opacity: 0.6 !important;
+            `;
+            addVariableButton.title = 'Please complete all variable fields';
+        } else {
+            addVariableButton.disabled = false;
+            addVariableButton.style.cssText = '';
+            addVariableButton.title = 'Add variable';
+        }
+    }
+
+    if (addAlarmButton) {
+        const isComplete = isAlarmFormComplete();
+
+        if (!isComplete) {
+            addAlarmButton.disabled = true;
+            addAlarmButton.style.cssText = `
+                background-color: #6c757d !important;
+                cursor: not-allowed !important;
+                opacity: 0.6 !important;
+            `;
+            addAlarmButton.title = 'Please complete all alarm fields';
+        } else {
+            addAlarmButton.disabled = false;
+            addAlarmButton.style.cssText = '';
+            addAlarmButton.title = 'Add alarm';
+        }
+    }
+
+    if (addTrendButton) {
+        const isComplete = isTrendFormComplete();
+
+        if (!isComplete) {
+            addTrendButton.disabled = true;
+            addTrendButton.style.cssText = `
+                background-color: #6c757d !important;
+                cursor: not-allowed !important;
+                opacity: 0.6 !important;
+            `;
+            addTrendButton.title = 'Please complete all trend fields';
+        } else {
+            addTrendButton.disabled = false;
+            addTrendButton.style.cssText = '';
+            addTrendButton.title = 'Add trend';
+        }
+    }
+}
+
+function initializeForm() {
+    selectProtocol('modbus');
+    selectModbusVariant('tcp');
+
+    const advancedCheckbox = document.getElementById('advancedOptionsCheckbox');
+    if (advancedCheckbox) {
+        advancedCheckbox.checked = false;
+        toggleAdvancedOptions();
+    }
+}
+
+function showTab(tabName, event) {
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => tab.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
+
+    const targetContent = document.getElementById(tabName);
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
+}
+
+function selectProtocol(protocol) {
+    currentProtocol = protocol;
+
+    const protocolButtons = document.querySelectorAll('.protocol-btn');
+    protocolButtons.forEach(btn => btn.classList.remove('active'));
+
+    protocolButtons.forEach(btn => {
+        if ((protocol === 'modbus' && btn.textContent.trim().includes('Modbus')) ||
+            (protocol === 'iec' && btn.textContent.trim().includes('IEC'))) {
+            btn.classList.add('active');
+        }
+    });
+
+    const modbusConfig = document.getElementById('modbus-config');
+    const iecConfig = document.getElementById('iec-config');
+    const cidInputLabel = document.getElementById('cidInputLabel');
+    const cidFile = document.getElementById('cidFile');
+
+    if (protocol === 'modbus') {
         if (modbusConfig) modbusConfig.classList.remove('hidden');
         if (iecConfig) iecConfig.classList.add('hidden');
-
-        if (cidLabel) cidLabel.classList.add('hidden');
+        if (cidInputLabel) cidInputLabel.classList.add('hidden');
         if (cidFile) cidFile.classList.add('hidden');
 
         const protocolSelect = document.getElementById('protocol');
         if (protocolSelect) {
-          protocolSelect.innerHTML = '<option value="Modbus">Modbus TCP/IP</option>';
+            if (currentModbusVariant === 'tcp') {
+                protocolSelect.innerHTML = '<option value="Modbus TCP">Modbus TCP/IP</option>';
+            } else {
+                protocolSelect.innerHTML = '<option value="Modbus RTU">Modbus RTU</option>';
+            }
         }
-      } else if (protocol === 'iec') {
+    } else if (protocol === 'iec') {
         if (modbusConfig) modbusConfig.classList.add('hidden');
         if (iecConfig) iecConfig.classList.remove('hidden');
-
-        if (cidLabel) cidLabel.classList.remove('hidden');
+        if (cidInputLabel) cidInputLabel.classList.remove('hidden');
         if (cidFile) cidFile.classList.remove('hidden');
 
         const protocolSelect = document.getElementById('protocol');
         if (protocolSelect) {
-          protocolSelect.innerHTML = '<option value="IEC61850">IEC 61850</option>';
+            protocolSelect.innerHTML = '<option value="IEC61850">IEC 61850</option>';
         }
-      }
-
-      resetForm();
     }
 
-    function loadCSV() {
-      const file = document.getElementById('csvFile').files[0];
-      if (!file) return;
+    clearProtocolErrors();
+    updateFormButtons();
+    updateProgressBar();
+}
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const csv = e.target.result;
-        const lines = csv.split('\n');
-        const headers = lines[0].split(',');
+function clearProtocolErrors() {
+    const protocolFields = [
+        'device_ip', 'modbus_port', 'port_name', 'unit_number',
+        'gateway_address', 'slave_id', 'port_name_rtu', 'serial_port',
+        'iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device'
+    ];
 
-        if (lines.length > 1) {
-          const data = lines[1].split(',');
-          const form = document.getElementById('deviceForm');
-
-          headers.forEach((header, index) => {
-            const input = form.querySelector(`[name="${header.trim()}"]`);
-            if (input && data[index]) {
-              input.value = data[index].trim();
-            }
-          });
-
-          updateProgress();
-          showAlert('CSV loaded successfully!', 'success');
+    protocolFields.forEach(fieldName => {
+        delete validationErrors[fieldName];
+        const field = document.getElementById(fieldName);
+        if (field) {
+            clearFieldError(field);
         }
-      };
-      reader.readAsText(file);
-    }
+    });
+}
 
-    function loadCID() {
-      const file = document.getElementById('cidFile').files[0];
-      if (file) {
-        console.log('Loading CID file:', file.name);
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          try {
-            const content = e.target.result;
-            parseCIDFile(content);
-          } catch (error) {
-            console.error('Error parsing CID file:', error);
-            showAlert('Error parsing CID file. Please check the file format.', 'error');
-          }
-        };
-        reader.readAsText(file);
-      }
-    }
+function selectModbusVariant(variant) {
+    currentModbusVariant = variant;
 
-    function parseCIDFile(content) {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(content, 'text/xml');
+    const variantButtons = document.querySelectorAll('.modbus-variant-btn');
+    variantButtons.forEach(btn => btn.classList.remove('active'));
 
-      const parserError = xmlDoc.getElementsByTagName('parsererror');
-      if (parserError.length > 0) {
-        throw new Error('Invalid XML format');
-      }
-
-      const ieds = xmlDoc.getElementsByTagName('IED');
-      if (ieds.length > 0) {
-        const ied = ieds[0];
-        const iedName = ied.getAttribute('name');
-        if (iedName) {
-          const iedInput = document.getElementById('ied_name');
-          if (iedInput) iedInput.value = iedName;
+    variantButtons.forEach(btn => {
+        if ((variant === 'tcp' && btn.textContent.trim() === 'TCP/IP') ||
+            (variant === 'rtu' && btn.textContent.trim() === 'RTU')) {
+            btn.classList.add('active');
         }
+    });
 
-        const accessPoints = ied.getElementsByTagName('AccessPoint');
-        if (accessPoints.length > 0) {
-          const ap = accessPoints[0];
-          const apName = ap.getAttribute('name');
-          if (apName) {
-            const apInput = document.getElementById('access_point');
-            if (apInput) apInput.value = apName;
-          }
+    const tcpConfig = document.getElementById('modbus-tcp-config');
+    const rtuConfig = document.getElementById('modbus-rtu-config');
 
-          const addresses = ap.getElementsByTagName('Address');
-          if (addresses.length > 0) {
-            const pTypes = addresses[0].getElementsByTagName('P');
-            for (let i = 0; i < pTypes.length; i++) {
-              if (pTypes[i].getAttribute('type') === 'IP') {
-                const ipInput = document.getElementById('iec_device_ip');
-                if (ipInput) ipInput.value = pTypes[i].textContent;
-              }
-            }
-          }
+    if (variant === 'tcp') {
+        if (tcpConfig) tcpConfig.classList.remove('hidden');
+        if (rtuConfig) rtuConfig.classList.add('hidden');
+
+        const protocolSelect = document.getElementById('protocol');
+        if (protocolSelect) {
+            protocolSelect.innerHTML = '<option value="Modbus TCP">Modbus TCP/IP</option>';
         }
+    } else if (variant === 'rtu') {
+        if (tcpConfig) tcpConfig.classList.add('hidden');
+        if (rtuConfig) rtuConfig.classList.remove('hidden');
 
-        const logicalDevices = ied.getElementsByTagName('LDevice');
-        if (logicalDevices.length > 0) {
-          const ldName = logicalDevices[0].getAttribute('inst');
-          if (ldName) {
-            const ldInput = document.getElementById('logical_device');
-            if (ldInput) ldInput.value = ldName;
-          }
+        const protocolSelect = document.getElementById('protocol');
+        if (protocolSelect) {
+            protocolSelect.innerHTML = '<option value="Modbus RTU">Modbus RTU</option>';
         }
-
-        const reportControls = xmlDoc.getElementsByTagName('ReportControl');
-        if (reportControls.length > 0) {
-          const rcName = reportControls[0].getAttribute('name');
-          if (rcName) {
-            const rcInput = document.getElementById('report_control');
-            if (rcInput) rcInput.value = rcName;
-          }
-        }
-      }
-
-      console.log('CID file parsed successfully');
-      showAlert('CID file loaded successfully!', 'success');
-      updateProgress();
     }
 
-    function resetForm() {
-      const form = document.getElementById('deviceForm');
-      if (form) {
-        form.reset();
-      }
+    clearProtocolErrors();
+    updateFormButtons();
+    updateProgressBar();
+}
 
-      const csvFile = document.getElementById('csvFile');
-      const cidFile = document.getElementById('cidFile');
-      if (csvFile) csvFile.value = '';
-      if (cidFile) cidFile.value = '';
+function toggleAdvancedOptions() {
+    const checkbox = document.getElementById('advancedOptionsCheckbox');
+    const content = document.getElementById('advancedOptionsContent');
+    const baudRate = document.getElementById('baud_rate');
+    const dataBits = document.getElementById('data_bits');
+    const parity = document.getElementById('parity');
+    const stopBits = document.getElementById('stop_bits');
 
-      updateProgress();
-    }
+    if (checkbox && checkbox.checked) {
+        if (content) content.classList.add('enabled');
+        if (baudRate) baudRate.disabled = false;
+        if (dataBits) dataBits.disabled = false;
+        if (parity) parity.disabled = false;
+        if (stopBits) stopBits.disabled = false;
+    } else {
+        if (content) content.classList.remove('enabled');
+        if (baudRate) baudRate.disabled = true;
+        if (dataBits) dataBits.disabled = true;
+        if (parity) parity.disabled = true;
+        if (stopBits) stopBits.disabled = true;
 
-    function updateProgress() {
-      const form = document.getElementById('deviceForm');
-      if (!form) return;
-
-      const inputs = form.querySelectorAll('input[required], select[required]');
-      let filledInputs = 0;
-
-      inputs.forEach(input => {
-        if (input.value.trim() !== '') {
-          filledInputs++;
-        }
-      });
-
-      const progress = (filledInputs / inputs.length) * 100;
-      const progressFill = document.querySelector('.progress-fill');
-      if (progressFill) {
-        progressFill.style.width = progress + '%';
-      }
-    }
-
-    const deviceForm = document.getElementById('deviceForm');
-    if (deviceForm) {
-      deviceForm.addEventListener('input', updateProgress);
-      deviceForm.addEventListener('change', updateProgress);
-    }
-
-    function saveDevice() {
-      if (!validateForm()) return;
-
-      const form = document.getElementById('deviceForm');
-      const formData = new FormData(form);
-      const device = {};
-
-      for (let [key, value] of formData.entries()) {
-        device[key] = value;
-      }
-
-      device.created_at = new Date().toISOString();
-      device.id = Date.now().toString();
-      device.protocol_type = selectedProtocol;
-
-      devices.push(device);
-      saveDevicesToStorage();
-      updateDeviceList();
-      showAlert('Device saved successfully!', 'success');
-      resetForm();
-    }
-
-    function validateForm() {
-      if (selectedProtocol === 'modbus') {
-        return validateModbusForm();
-      } else if (selectedProtocol === 'iec') {
-        return validateIECForm();
-      }
-      return false;
-    }
-
-    function validateModbusForm() {
-      const deviceName = document.getElementById('device_name');
-      const deviceIP = document.getElementById('device_ip');
-      const unitNumber = document.getElementById('unit_number');
-
-      if (!deviceName || !deviceName.value.trim()) {
-        showAlert('Please enter device name', 'error');
-        return false;
-      }
-
-      if (!deviceIP || !deviceIP.value.trim()) {
-        showAlert('Please enter device IP address', 'error');
-        return false;
-      }
-
-      if (!unitNumber || !unitNumber.value.trim() || isNaN(unitNumber.value) || unitNumber.value < 1 || unitNumber.value > 999) {
-        showAlert('Please enter valid unit number (1-999)', 'error');
-        return false;
-      }
-
-      return true;
-    }
-
-    function validateIECForm() {
-      const deviceName = document.getElementById('device_name');
-      const iedName = document.getElementById('ied_name');
-      const deviceIP = document.getElementById('iec_device_ip');
-
-      if (!deviceName || !deviceName.value.trim()) {
-        showAlert('Please enter device name', 'error');
-        return false;
-      }
-
-      if (!iedName || !iedName.value.trim()) {
-        showAlert('Please enter IED name', 'error');
-        return false;
-      }
-
-      if (!deviceIP || !deviceIP.value.trim()) {
-        showAlert('Please enter device IP address', 'error');
-        return false;
-      }
-
-      return true;
-    }
-
-    function generateCSV() {
-      if (devices.length === 0) {
-        showAlert('No devices to export!', 'error');
-        return;
-      }
-
-      showLoading();
-
-      setTimeout(() => {
-        const headers = ['device_name', 'device_type', 'tag_prefix', 'io_device', 'device_ip', 'port_name', 'unit_number', 'protocol'];
-        let csv = headers.join(',') + '\n';
-
-        devices.forEach(device => {
-          const row = headers.map(header => device[header] || '').join(',');
-          csv += row + '\n';
+        ['baud_rate', 'data_bits', 'parity', 'stop_bits'].forEach(fieldName => {
+            delete validationErrors[fieldName];
+            const field = document.getElementById(fieldName);
+            if (field) clearFieldError(field);
         });
+    }
 
-        downloadCSV(csv, 'device_configuration.csv');
+    updateFormButtons();
+}
 
-        if (variables.length > 0) {
-          const varHeaders = ['variable_name', 'variable_type', 'data_type', 'unit'];
-          let varCsv = varHeaders.join(',') + '\n';
+function updateProgressBar() {
+    const form = document.getElementById('deviceForm');
+    if (!form) return;
 
-          variables.forEach(variable => {
-            const row = varHeaders.map(header => variable[header] || '').join(',');
-            varCsv += row + '\n';
-          });
+    const requiredFields = form.querySelectorAll('input[required], select[required]');
+    let filledFields = 0;
+    let visibleRequiredFields = 0;
 
-          downloadCSV(varCsv, 'variable_configuration.csv');
+    requiredFields.forEach(field => {
+        if (isFieldVisible(field)) {
+            visibleRequiredFields++;
+            if (field.value.trim() !== '' && !validationErrors[field.name || field.id]) {
+                filledFields++;
+            }
         }
+    });
 
-        hideLoading();
-        showAlert('CSV files generated successfully!', 'success');
-      }, 2000);
+    const progress = visibleRequiredFields > 0 ? (filledFields / visibleRequiredFields) * 100 : 0;
+    const progressFill = document.querySelector('.progress-fill');
+    if (progressFill) {
+        progressFill.style.width = progress + '%';
+
+        if (Object.keys(validationErrors).length > 0) {
+            progressFill.style.backgroundColor = '#dc3545';
+        } else if (progress === 100) {
+            progressFill.style.backgroundColor = '#28a745';
+        } else {
+            progressFill.style.backgroundColor = '#007bff';
+        }
     }
 
-    function downloadCSV(csv, filename) {
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.click();
-      window.URL.revokeObjectURL(url);
+    const progressText = document.querySelector('.progress-text');
+    if (progressText) {
+        const errorCount = Object.keys(validationErrors).length;
+        if (errorCount > 0) {
+            progressText.textContent = `${errorCount} error${errorCount > 1 ? 's' : ''} to fix`;
+            progressText.style.color = '#dc3545';
+        } else if (progress === 100) {
+            progressText.textContent = 'Form complete - ready to save';
+            progressText.style.color = '#28a745';
+        } else {
+            progressText.textContent = `${Math.round(progress)}% complete`;
+            progressText.style.color = '#007bff';
+        }
+    }
+}
+
+function addVariable() {
+    if (!isVariableFormComplete()) {
+        showAlert('Please complete all variable fields before adding', 'error');
+        return;
     }
 
-    function updateDeviceList() {
-      const deviceList = document.getElementById('deviceList');
-      if (!deviceList) return;
+    const name = document.getElementById('variable_name');
+    const type = document.getElementById('variable_type');
+    const dataType = document.getElementById('data_type');
+    const unit = document.getElementById('unit');
 
-      deviceList.innerHTML = '';
+    if (variables.some(v => v.variable_name.toLowerCase() === name.value.trim().toLowerCase())) {
+        showAlert('Variable name already exists', 'error');
+        showFieldError(name, 'This variable name is already used');
+        return;
+    }
 
-      if (devices.length === 0) {
+    const variable = {
+        id: Date.now().toString(),
+        variable_name: name.value.trim(),
+        variable_type: type.value,
+        data_type: dataType.value,
+        unit: unit.value.trim()
+    };
+
+    variables.push(variable);
+    updateVariableTable();
+    clearVariableForm();
+    saveVariablesToStorage();
+    showAlert('Variable added successfully!', 'success');
+}
+
+function updateVariableTable() {
+    const tbody = document.getElementById('variableTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    variables.forEach(variable => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${variable.variable_name}</td>
+            <td>${variable.variable_type}</td>
+            <td>${variable.data_type}</td>
+            <td>${variable.unit}</td>
+            <td>
+                <button class="btn btn-danger" onclick="removeVariable('${variable.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function removeVariable(id) {
+    variables = variables.filter(v => v.id !== id);
+    updateVariableTable();
+    saveVariablesToStorage();
+    showAlert('Variable removed successfully!', 'success');
+}
+
+function clearVariableForm() {
+    const fields = ['variable_name', 'variable_type', 'data_type', 'unit'];
+
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            if (field.tagName === 'SELECT') {
+                field.selectedIndex = 0;
+            } else {
+                field.value = '';
+            }
+            clearFieldError(field);
+            delete validationErrors[fieldId];
+        }
+    });
+
+    updateFormButtons();
+}
+
+function addAlarm() {
+    if (!isAlarmFormComplete()) {
+        showAlert('Please complete all alarm fields before adding', 'error');
+        return;
+    }
+
+    const name = document.getElementById('alarm_name');
+    const type = document.getElementById('alarm_type');
+    const category = document.getElementById('category');
+    const tag = document.getElementById('alarm_tag');
+    const equipment = document.getElementById('equipment');
+    const itemName = document.getElementById('item_name_alarm');
+
+    if (alarms.some(a => a.alarm_name.toLowerCase() === name.value.trim().toLowerCase())) {
+        showAlert('Alarm name already exists', 'error');
+        showFieldError(name, 'This alarm name is already used');
+        return;
+    }
+
+    const alarm = {
+        id: Date.now().toString(),
+        alarm_name: name.value.trim(),
+        alarm_type: type.value,
+        category: category.value,
+        alarm_tag: tag.value.trim(),
+        equipment: equipment.value.trim(),
+        item_name: itemName.value.trim()
+    };
+
+    alarms.push(alarm);
+    updateAlarmTable();
+    clearAlarmForm();
+    saveAlarmsToStorage();
+    showAlert('Alarm added successfully!', 'success');
+}
+
+function updateAlarmTable() {
+    const tbody = document.getElementById('alarmTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    alarms.forEach(alarm => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${alarm.alarm_name}</td>
+            <td>${alarm.alarm_type}</td>
+            <td>${alarm.category}</td>
+            <td>${alarm.alarm_tag}</td>
+            <td>${alarm.equipment}</td>
+            <td>${alarm.item_name}</td>
+            <td>
+                <button class="btn btn-danger" onclick="removeAlarm('${alarm.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function removeAlarm(id) {
+    alarms = alarms.filter(a => a.id !== id);
+    updateAlarmTable();
+    saveAlarmsToStorage();
+    showAlert('Alarm removed successfully!', 'success');
+}
+
+function clearAlarmForm() {
+    const fields = ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'];
+
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            if (field.tagName === 'SELECT') {
+                field.selectedIndex = 0;
+            } else {
+                field.value = '';
+            }
+            clearFieldError(field);
+            delete validationErrors[fieldId];
+        }
+    });
+
+    updateFormButtons();
+}
+
+function addTrend() {
+    if (!isTrendFormComplete()) {
+        showAlert('Please complete all trend fields before adding', 'error');
+        return;
+    }
+
+    const description = document.getElementById('tag_description');
+    const type = document.getElementById('trend_types');
+    const tagName = document.getElementById('tag_name');
+    const itemName = document.getElementById('item_name_trend');
+
+    if (trends.some(t => t.tag_description.toLowerCase() === description.value.trim().toLowerCase())) {
+        showAlert('Tag description already exists', 'error');
+        showFieldError(description, 'This tag description is already used');
+        return;
+    }
+
+    const trend = {
+        id: Date.now().toString(),
+        tag_description: description.value.trim(),
+        trend_types: type.value,
+        tag_name: tagName.value.trim(),
+        item_name: itemName.value.trim()
+    };
+
+    trends.push(trend);
+    updateTrendTable();
+    clearTrendForm();
+    saveTrendsToStorage();
+    showAlert('Trend added successfully!', 'success');
+}
+
+function updateTrendTable() {
+    const tbody = document.getElementById('trendTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    trends.forEach(trend => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${trend.tag_description}</td>
+            <td>${trend.trend_types}</td>
+            <td>${trend.tag_name}</td>
+            <td>${trend.item_name}</td>
+            <td>
+                <button class="btn btn-danger" onclick="removeTrend('${trend.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+function removeTrend(id) {
+    trends = trends.filter(t => t.id !== id);
+    updateTrendTable();
+    saveTrendsToStorage();
+    showAlert('Trend removed successfully!', 'success');
+}
+
+function clearTrendForm() {
+    const fields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            if (field.tagName === 'SELECT') {
+                field.selectedIndex = 0;
+            } else {
+                field.value = '';
+            }
+            clearFieldError(field);
+            delete validationErrors[fieldId];
+        }
+    });
+
+    updateFormButtons();
+}
+
+function saveDevice() {
+    if (!performCompleteValidation()) {
+        showAlert('Please fix all validation errors before saving', 'error');
+        return;
+    }
+
+    const form = document.getElementById('deviceForm');
+    const formData = new FormData(form);
+
+    const deviceName = formData.get('device_name');
+    const existingDevice = devices.find(d => d.device_name.toLowerCase() === deviceName.toLowerCase() && (!currentDevice || d.id !== currentDevice.id));
+    if (existingDevice) {
+        const deviceNameField = document.getElementById('device_name');
+        showFieldError(deviceNameField, 'Device name already exists');
+        showAlert('Device name already exists. Please choose a different name.', 'error');
+        return;
+    }
+
+    const device = {
+        id: currentDevice ? currentDevice.id : Date.now().toString(),
+        protocol: currentProtocol,
+        modbusVariant: currentModbusVariant,
+        device_name: deviceName,
+        device_type: formData.get('device_type'),
+        tag_prefix: formData.get('tag_prefix'),
+        io_device: formData.get('io_device'),
+        variables: [...variables],
+        alarms: [...alarms],
+        trends: [...trends]
+    };
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            device.device_ip = formData.get('device_ip');
+            device.modbus_port = formData.get('modbus_port');
+            device.port_name = formData.get('port_name');
+            device.unit_number = formData.get('unit_number');
+            device.memory = formData.get('memory');
+        } else {
+            device.gateway_address = formData.get('gateway_address');
+            device.slave_id = formData.get('slave_id');
+            device.port_name_rtu = formData.get('port_name_rtu');
+            device.memory_rtu = formData.get('memory_rtu');
+            device.serial_port = formData.get('serial_port');
+
+            const advancedEnabled = document.getElementById('advancedOptionsCheckbox').checked;
+            if (advancedEnabled) {
+                device.baud_rate = formData.get('baud_rate');
+                device.data_bits = formData.get('data_bits');
+                device.parity = formData.get('parity');
+                device.stop_bits = formData.get('stop_bits');
+            }
+        }
+        device.protocol_name = formData.get('protocol');
+    } else if (currentProtocol === 'iec') {
+        device.iec_device_ip = formData.get('iec_device_ip');
+        device.iec_port = formData.get('iec_port');
+        device.ied_name = formData.get('ied_name');
+        device.access_point = formData.get('access_point');
+        device.logical_device = formData.get('logical_device');
+        device.report_control = formData.get('report_control');
+        device.protocol_name = 'IEC61850';
+    }
+
+    if (currentDevice) {
+        const index = devices.findIndex(d => d.id === currentDevice.id);
+        if (index !== -1) {
+            devices[index] = device;
+        }
+    } else {
+        devices.push(device);
+    }
+
+    saveDevicesToStorage();
+    updateDeviceList();
+    updateDeviceCounter();
+    showAlert('Device saved successfully!', 'success');
+
+    currentDevice = null;
+}
+
+function performCompleteValidation() {
+    const form = document.getElementById('deviceForm');
+    if (!form) return false;
+
+    let isValid = true;
+    validationErrors = {};
+
+    const fields = form.querySelectorAll('input, select');
+    fields.forEach(field => {
+        if (isFieldVisible(field)) {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        }
+    });
+
+    updateFormButtons();
+    updateProgressBar();
+
+    return isValid;
+}
+
+function resetForm() {
+    const form = document.getElementById('deviceForm');
+    if (form) form.reset();
+
+    validationErrors = {};
+    const fields = form.querySelectorAll('input, select');
+    fields.forEach(field => clearFieldError(field));
+
+    variables = [];
+    alarms = [];
+    trends = [];
+    currentDevice = null;
+
+    updateVariableTable();
+    updateAlarmTable();
+    updateTrendTable();
+
+    selectProtocol('modbus');
+    selectModbusVariant('tcp');
+
+    const advancedCheckbox = document.getElementById('advancedOptionsCheckbox');
+    if (advancedCheckbox) {
+        advancedCheckbox.checked = false;
+        toggleAdvancedOptions();
+    }
+
+    updateFormButtons();
+    updateProgressBar();
+    showAlert('Form reset successfully!', 'success');
+}
+
+function generateCSV() {
+    if (devices.length === 0) {
+        showAlert('No devices to export. Please save at least one device first.', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    setTimeout(() => {
+        try {
+            generateEquipmentCSV();
+            generateUnitsCSV();
+            generateVariablesCSV();
+            generateAlarmsCSV();
+            generateTrendsCSV();
+
+            showAlert('All CSV files generated successfully!', 'success');
+        } catch (error) {
+            console.error('Error generating CSV:', error);
+            showAlert('Error generating CSV files: ' + error.message, 'error');
+        } finally {
+            showLoading(false);
+        }
+    }, 1000);
+}
+
+function generateEquipmentConfig() {
+    if (devices.length === 0) {
+        showAlert('No devices configured. Please save at least one device first.', 'error');
+        return;
+    }
+    generateEquipmentCSV();
+}
+
+function generateUnitsConfig() {
+    if (devices.length === 0) {
+        showAlert('No devices configured. Please save at least one device first.', 'error');
+        return;
+    }
+    generateUnitsCSV();
+}
+
+function generateEquipmentCSV() {
+    const headers = ['ITEM_NAME', 'EQUIP_TYPE', 'COMMENT', 'CUSTOM01', 'CUSTOM02'];
+    const rows = [headers.join(',')];
+
+    devices.forEach(device => {
+        const row = [
+            device.device_name,
+            device.device_type,
+            `${device.device_type} - ${device.device_name}`,
+            device.tag_prefix,
+            device.io_device
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'EQUIP.csv');
+}
+
+function generateUnitsCSV() {
+    const headers = ['UNIT_NAME', 'UNIT_TYPE', 'PORT_NAME', 'IP_ADDRESS', 'PROTOCOL', 'MEMORY', 'UNIT_NUMBER'];
+    const rows = [headers.join(',')];
+
+    devices.forEach(device => {
+        if (device.protocol === 'modbus') {
+            const row = [
+                device.device_name,
+                'PLC',
+                device.modbusVariant === 'tcp' ? (device.port_name || '') : (device.port_name_rtu || ''),
+                device.modbusVariant === 'tcp' ? (device.device_ip || '') : (device.gateway_address || ''),
+                device.protocol_name || 'Modbus TCP',
+                device.modbusVariant === 'tcp' ? (device.memory || 'TRUE') : (device.memory_rtu || 'TRUE'),
+                device.modbusVariant === 'tcp' ? (device.unit_number || '1') : (device.slave_id || '1')
+            ];
+            rows.push(row.join(','));
+        } else if (device.protocol === 'iec') {
+            const row = [
+                device.device_name,
+                'IED',
+                device.ied_name || '',
+                device.iec_device_ip || '',
+                'IEC61850',
+                'TRUE',
+                device.iec_port || '102'
+            ];
+            rows.push(row.join(','));
+        }
+    });
+
+    downloadCSV(rows.join('\n'), 'UNITS.csv');
+}
+
+function generateVariablesCSV() {
+    if (variables.length === 0) {
+        showAlert('No variables configured', 'error');
+        return;
+    }
+
+    const headers = ['VARIABLE_NAME', 'VARIABLE_TYPE', 'DATA_TYPE', 'UNIT'];
+    const rows = [headers.join(',')];
+
+    variables.forEach(variable => {
+        const row = [
+            variable.variable_name,
+            variable.variable_type,
+            variable.data_type,
+            variable.unit
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'VARIABLES.csv');
+}
+
+function generateAlarmsCSV() {
+    if (alarms.length === 0) {
+        showAlert('No alarms configured', 'error');
+        return;
+    }
+
+    const headers = ['ALARM_NAME', 'ALARM_TYPE', 'CATEGORY', 'ALARM_TAG', 'EQUIPMENT', 'ITEM_NAME'];
+    const rows = [headers.join(',')];
+
+    alarms.forEach(alarm => {
+        const row = [
+            alarm.alarm_name,
+            alarm.alarm_type,
+            alarm.category,
+            alarm.alarm_tag,
+            alarm.equipment,
+            alarm.item_name
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'ALARMS.csv');
+}
+
+function generateTrendsCSV() {
+    if (trends.length === 0) {
+        showAlert('No trends configured', 'error');
+        return;
+    }
+
+    const headers = ['TAG_DESCRIPTION', 'TREND_TYPES', 'TAG_NAME', 'ITEM_NAME'];
+    const rows = [headers.join(',')];
+
+    trends.forEach(trend => {
+        const row = [
+            trend.tag_description,
+            trend.trend_types,
+            trend.tag_name,
+            trend.item_name
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'TRENDS.csv');
+}
+
+function loadCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('CSV file appears to be empty or invalid', 'error');
+                return;
+            }
+
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            if (headers.includes('ITEM_NAME') && headers.includes('EQUIP_TYPE')) {
+                loadEquipmentFromCSV(lines);
+            } else if (headers.includes('UNIT_NAME') && headers.includes('PROTOCOL')) {
+                loadUnitsFromCSV(lines);
+            } else {
+                showAlert('CSV format not recognized. Expected Equipment or Units format.', 'error');
+                return;
+            }
+
+            showAlert('CSV loaded successfully!', 'success');
+        } catch (error) {
+            showAlert('Error loading CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function loadVariablesCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('Variables CSV file appears to be empty', 'error');
+                return;
+            }
+
+            variables = [];
+            let errorCount = 0;
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const values = line.split(',').map(v => v.trim());
+
+                    if (values[0] && values[0].length > 0) {
+                        const variable = {
+                            id: Date.now().toString() + i,
+                            variable_name: values[0] || '',
+                            variable_type: values[1] || 'analog',
+                            data_type: values[2] || 'float',
+                            unit: values[3] || ''
+                        };
+                        variables.push(variable);
+                    } else {
+                        errorCount++;
+                    }
+                }
+            }
+
+            updateVariableTable();
+            saveVariablesToStorage();
+
+            if (errorCount > 0) {
+                showAlert(`Variables CSV loaded with ${errorCount} rows skipped due to missing names`, 'warning');
+            } else {
+                showAlert('Variables CSV loaded successfully!', 'success');
+            }
+        } catch (error) {
+            showAlert('Error loading Variables CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function loadAlarmsCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('Alarms CSV file appears to be empty', 'error');
+                return;
+            }
+
+            alarms = [];
+            let errorCount = 0;
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const values = line.split(',').map(v => v.trim());
+
+                    if (values[0] && values[0].length > 0) {
+                        const alarm = {
+                            id: Date.now().toString() + i,
+                            alarm_name: values[0] || '',
+                            alarm_type: values[1] || 'analog',
+                            category: values[2] || 'low',
+                            alarm_tag: values[3] || '',
+                            equipment: values[4] || '',
+                            item_name: values[5] || ''
+                        };
+                        alarms.push(alarm);
+                    } else {
+                        errorCount++;
+                    }
+                }
+            }
+
+            updateAlarmTable();
+            saveAlarmsToStorage();
+
+            if (errorCount > 0) {
+                showAlert(`Alarms CSV loaded with ${errorCount} rows skipped due to missing names`, 'warning');
+            } else {
+                showAlert('Alarms CSV loaded successfully!', 'success');
+            }
+        } catch (error) {
+            showAlert('Error loading Alarms CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function loadTrendsCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('Trends CSV file appears to be empty', 'error');
+                return;
+            }
+
+            trends = [];
+            let errorCount = 0;
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const values = line.split(',').map(v => v.trim());
+
+                    if (values[0] && values[0].length > 0) {
+                        const trend = {
+                            id: Date.now().toString() + i,
+                            tag_description: values[0] || '',
+                            trend_types: values[1] || 'event',
+                            tag_name: values[2] || '',
+                            item_name: values[3] || ''
+                        };
+                        trends.push(trend);
+                    } else {
+                        errorCount++;
+                    }
+                }
+            }
+
+            updateTrendTable();
+            saveTrendsToStorage();
+
+            if (errorCount > 0) {
+                showAlert(`Trends CSV loaded with ${errorCount} rows skipped due to missing descriptions`, 'warning');
+            } else {
+                showAlert('Trends CSV loaded successfully!', 'success');
+            }
+        } catch (error) {
+            showAlert('Error loading Trends CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function loadCID(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.cid')) {
+        showAlert('Please select a valid CID file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const cidContent = e.target.result;
+            if (!cidContent.includes('<?xml') || !cidContent.includes('<SCL')) {
+                showAlert('Invalid CID file format. Expected SCL XML format.', 'error');
+                return;
+            }
+
+            showAlert('CID file loaded successfully!', 'success');
+        } catch (error) {
+            showAlert('Error loading CID file: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function updateDeviceList() {
+    const deviceList = document.getElementById('deviceList');
+    if (!deviceList) return;
+
+    if (devices.length === 0) {
         deviceList.innerHTML = '<div class="placeholder-content"><p>No devices configured yet.</p></div>';
         return;
-      }
+    }
 
-      devices.forEach(device => {
-        const deviceItem = document.createElement('div');
-        deviceItem.className = 'device-item';
-        deviceItem.innerHTML = `
-          <div class="device-header">
-            <span class="device-name">${device.device_name || 'Unnamed Device'}</span>
-            <span class="device-type">${device.device_type || device.protocol_type || 'Unknown'}</span>
-          </div>
-          <div class="device-details">
-            <div class="device-detail"><strong>IP:</strong> ${device.device_ip || device.iec_device_ip || 'N/A'}</div>
-            <div class="device-detail"><strong>Protocol:</strong> ${device.protocol || device.protocol_type || 'Unknown'}</div>
-            <div class="device-detail"><strong>Unit:</strong> ${device.unit_number || 'N/A'}</div>
-            <div class="device-detail"><strong>Tag Prefix:</strong> ${device.tag_prefix || 'N/A'}</div>
-          </div>
+    let html = '';
+    devices.forEach(device => {
+        html += `
+            <div class="device-item" onclick="loadDevice('${device.id}')" style="
+                background: rgba(255,255,255,0.1);
+                margin: 10px 0;
+                padding: 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.background='rgba(255,255,255,0.2)'"
+               onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                <div style="font-weight: bold; margin-bottom: 4px;">${device.device_name}</div>
+                <div style="font-size: 0.9em; opacity: 0.8;">${device.device_type} - ${device.protocol.toUpperCase()}</div>
+                <button onclick="event.stopPropagation(); removeDevice('${device.id}')" style="
+                    background: #dc3545;
+                    color: white;
+                    border: none;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 0.8em;
+                    margin-top: 8px;
+                    cursor: pointer;
+                ">Remove</button>
+            </div>
         `;
-        deviceList.appendChild(deviceItem);
-      });
+    });
 
-      const counter = document.getElementById('deviceCounter');
-      if (counter) {
-        counter.textContent = devices.length;
-      }
-    }
+    deviceList.innerHTML = html;
+}
 
-    // Variables functions
-    function addVariable() {
-      const name = document.getElementById('variable_name').value;
-      const type = document.getElementById('variable_type').value;
-      const dataType = document.getElementById('data_type').value;
-      const unit = document.getElementById('unit').value;
+function loadDevice(deviceId) {
+    const device = devices.find(d => d.id === deviceId);
+    if (!device) return;
 
-      if (!name.trim()) {
-        showAlert('Please enter variable name', 'error');
-        return;
-      }
+    currentDevice = device;
 
-      const variable = {
-        id: Date.now().toString(),
-        variable_name: name,
-        variable_type: type,
-        data_type: dataType,
-        unit: unit
-      };
+    validationErrors = {};
+    const form = document.getElementById('deviceForm');
+    const fields = form.querySelectorAll('input, select');
+    fields.forEach(field => clearFieldError(field));
 
-      variables.push(variable);
-      updateVariableTable();
-      clearVariableForm();
-      showAlert('Variable added successfully!', 'success');
-    }
+    document.getElementById('device_name').value = device.device_name || '';
+    document.getElementById('device_type').value = device.device_type || '';
+    document.getElementById('tag_prefix').value = device.tag_prefix || '';
+    document.getElementById('io_device').value = device.io_device || '';
 
-    function updateVariableTable() {
-      const tbody = document.getElementById('variableTableBody');
-      tbody.innerHTML = '';
+    selectProtocol(device.protocol);
 
-      variables.forEach(variable => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.variable_name}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.variable_type}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.data_type}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${variable.unit}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">
-            <button class="btn btn-danger" onclick="removeVariable('${variable.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
+    if (device.protocol === 'modbus') {
+        selectModbusVariant(device.modbusVariant || 'tcp');
 
-    function removeVariable(id) {
-      variables = variables.filter(v => v.id !== id);
-      updateVariableTable();
-      showAlert('Variable removed successfully!', 'success');
-    }
+        if (device.modbusVariant === 'tcp') {
+            document.getElementById('device_ip').value = device.device_ip || '';
+            document.getElementById('modbus_port').value = device.modbus_port || '502';
+            document.getElementById('port_name').value = device.port_name || '';
+            document.getElementById('unit_number').value = device.unit_number || '';
+            document.getElementById('memory_tcp').value = device.memory || 'TRUE';
+        } else {
+            document.getElementById('gateway_address').value = device.gateway_address || '';
+            document.getElementById('slave_id').value = device.slave_id || '';
+            document.getElementById('port_name_rtu').value = device.port_name_rtu || '';
+            document.getElementById('memory_rtu').value = device.memory_rtu || 'TRUE';
+            document.getElementById('serial_port').value = device.serial_port || '';
 
-    function clearVariableForm() {
-      document.getElementById('variable_name').value = '';
-      document.getElementById('variable_type').value = 'analog';
-      document.getElementById('data_type').value = 'float';
-      document.getElementById('unit').value = '';
-    }
-
-    // Alarms functions
-    function addAlarm() {
-      const name = document.getElementById('alarm_name').value;
-      const type = document.getElementById('alarm_type').value;
-      const category = document.getElementById('category').value;
-      const tag = document.getElementById('alarm_tag').value;
-      const equipment = document.getElementById('equipment').value;
-      const itemName = document.getElementById('item_name_alarm').value;
-
-      if (!name.trim()) {
-        showAlert('Please enter alarm name', 'error');
-        return;
-      }
-
-      const alarm = {
-        id: Date.now().toString(),
-        alarm_name: name,
-        alarm_type: type,
-        category: category,
-        alarm_tag: tag,
-        equipment: equipment,
-        item_name: itemName
-      };
-
-      alarms.push(alarm);
-      updateAlarmTable();
-      clearAlarmForm();
-      showAlert('Alarm added successfully!', 'success');
-    }
-
-    function updateAlarmTable() {
-      const tbody = document.getElementById('alarmTableBody');
-      tbody.innerHTML = '';
-
-      alarms.forEach(alarm => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.alarm_name}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.alarm_type}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.category}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.alarm_tag}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.equipment}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${alarm.item_name}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">
-            <button class="btn btn-danger" onclick="removeAlarm('${alarm.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    function removeAlarm(id) {
-      alarms = alarms.filter(a => a.id !== id);
-      updateAlarmTable();
-      showAlert('Alarm removed successfully!', 'success');
-    }
-
-    function clearAlarmForm() {
-      document.getElementById('alarm_name').value = '';
-      document.getElementById('alarm_type').value = 'analog';
-      document.getElementById('category').value = 'low';
-      document.getElementById('alarm_tag').value = '';
-      document.getElementById('equipment').value = '';
-      document.getElementById('item_name_alarm').value = '';
-    }
-
-
-    function addTrend() {
-      const description = document.getElementById('tag_description').value;
-      const type = document.getElementById('trend_types').value;
-      const tagName = document.getElementById('tag_name').value;
-      const itemName = document.getElementById('item_name_trend').value;
-
-      if (!description.trim()) {
-        showAlert('Please enter tag description', 'error');
-        return;
-      }
-
-      const trend = {
-        id: Date.now().toString(),
-        tag_description: description,
-        trend_types: type,
-        tag_name: tagName,
-        item_name: itemName
-      };
-
-      trends.push(trend);
-      updateTrendTable();
-      clearTrendForm();
-      showAlert('Trend added successfully!', 'success');
-    }
-
-    function updateTrendTable() {
-      const tbody = document.getElementById('trendTableBody');
-      tbody.innerHTML = '';
-
-      trends.forEach(trend => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.tag_description}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.trend_types}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.tag_name}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">${trend.item_name}</td>
-          <td style="padding: 12px; border: 1px solid #dee2e6;">
-            <button class="btn btn-danger" onclick="removeTrend('${trend.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    function removeTrend(id) {
-      trends = trends.filter(t => t.id !== id);
-      updateTrendTable();
-      showAlert('Trend removed successfully!', 'success');
-    }
-
-    function clearTrendForm() {
-      document.getElementById('tag_description').value = '';
-      document.getElementById('trend_types').value = 'event';
-      document.getElementById('tag_name').value = '';
-      document.getElementById('item_name_trend').value = '';
-    }
-
-    function saveDevicesToStorage() {
-      console.log('Saving devices to storage:', devices);
-    }
-
-    function loadDevicesFromStorage() {
-      console.log('Loading devices from storage');
-    }
-
-    function saveVariablesToStorage() {
-      console.log('Saving variables to storage:', variables);
-    }
-
-    function loadVariablesFromStorage() {
-      console.log('Loading variables from storage');
-    }
-
-    function showLoading() {
-      const loading = document.getElementById('loading');
-      if (loading) loading.classList.add('show');
-    }
-
-    function hideLoading() {
-      const loading = document.getElementById('loading');
-      if (loading) loading.classList.remove('show');
-    }
-
-    function showAlert(message, type) {
-      const alert = document.createElement('div');
-      alert.className = `alert alert-${type}`;
-      alert.textContent = message;
-
-      const container = document.querySelector('.tab-content.active') || document.body;
-      container.insertBefore(alert, container.firstChild);
-
-      setTimeout(() => {
-        alert.remove();
-      }, 3000);
-    }
-
-    function generateEquipmentConfig() {
-      showAlert('Equipment config generation would be implemented here', 'success');
-    }
-
-    function generateUnitsConfig() {
-      showAlert('Units config generation would be implemented here', 'success');
-    }
-
-    const deviceIPInput = document.getElementById('device_ip');
-    const iecIPInput = document.getElementById('iec_device_ip');
-
-    function validateIPAddress(input) {
-      if (!input) return;
-
-      input.addEventListener('blur', function () {
-        const ip = this.value;
-        const ipPattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-
-        if (ip && !ipPattern.test(ip)) {
-          showAlert('Please enter a valid IP address!', 'error');
-          this.focus();
+            if (device.baud_rate) {
+                document.getElementById('advancedOptionsCheckbox').checked = true;
+                toggleAdvancedOptions();
+                document.getElementById('baud_rate').value = device.baud_rate;
+                document.getElementById('data_bits').value = device.data_bits || '8';
+                document.getElementById('parity').value = device.parity || 'None';
+                document.getElementById('stop_bits').value = device.stop_bits || '1';
+            }
         }
-      });
+    } else if (device.protocol === 'iec') {
+        document.getElementById('iec_device_ip').value = device.iec_device_ip || '';
+        document.getElementById('iec_port').value = device.iec_port || '102';
+        document.getElementById('ied_name').value = device.ied_name || '';
+        document.getElementById('access_point').value = device.access_point || '';
+        document.getElementById('logical_device').value = device.logical_device || '';
+        document.getElementById('report_control').value = device.report_control || '';
     }
 
-    validateIPAddress(deviceIPInput);
-    validateIPAddress(iecIPInput);
+    variables = device.variables || [];
+    alarms = device.alarms || [];
+    trends = device.trends || [];
 
-    function submitForm() {
-      if (validateForm()) {
-        saveDevice();
-        return true;
-      }
-      return false;
+    updateVariableTable();
+    updateAlarmTable();
+    updateTrendTable();
+    updateFormButtons();
+    updateProgressBar();
+
+    showAlert('Device loaded successfully!', 'success');
+}
+
+function removeDevice(deviceId) {
+    if (confirm('Are you sure you want to remove this device?')) {
+        devices = devices.filter(d => d.id !== deviceId);
+        saveDevicesToStorage();
+        updateDeviceList();
+        updateDeviceCounter();
+        updateFormButtons();
+        showAlert('Device removed successfully!', 'success');
     }
-  </script>
+}
+
+function updateDeviceCounter() {
+    const counter = document.getElementById('deviceCounter');
+    if (counter) {
+        counter.textContent = devices.length;
+    }
+}
+
+function saveDevicesToStorage() {
+    console.log('Devices saved:', devices);
+}
+
+function loadDevicesFromStorage() {
+    devices = [];
+    updateDeviceList();
+}
+
+function saveVariablesToStorage() {
+    console.log('Variables saved:', variables);
+}
+
+function loadVariablesFromStorage() {
+    variables = [];
+    updateVariableTable();
+}
+
+function saveAlarmsToStorage() {
+    console.log('Alarms saved:', alarms);
+}
+
+function loadAlarmsFromStorage() {
+    alarms = [];
+    updateAlarmTable();
+}
+
+function saveTrendsToStorage() {
+    console.log('Trends saved:', trends);
+}
+
+function loadTrendsFromStorage() {
+    trends = [];
+    updateTrendTable();
+}
+
+function downloadCSV(content, filename) {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+function showAlert(message, type) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type === 'error' ? 'error' : 'success'}`;
+    alert.textContent = message;
+
+    const container = document.querySelector('.container');
+    if (container) {
+        container.insertBefore(alert, container.firstChild);
+
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 5000);
+    }
+}
+
+function showLoading(show) {
+    const loading = document.getElementById('loading');
+    const form = document.getElementById('deviceForm');
+
+    if (loading) {
+        if (show) {
+            loading.classList.add('show');
+            if (form) form.style.display = 'none';
+        } else {
+            loading.classList.remove('show');
+            if (form) form.style.display = 'block';
+        }
+    }
+}
+
+function loadEquipmentFromCSV(lines) {
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line) {
+            const values = line.split(',');
+            const device = {
+                id: Date.now().toString() + i,
+                device_name: values[0] || '',
+                device_type: values[1] || '',
+                tag_prefix: values[3] || '',
+                io_device: values[4] || '',
+                protocol: 'modbus',
+                modbusVariant: 'tcp',
+                variables: [],
+                alarms: [],
+                trends: []
+            };
+            devices.push(device);
+        }
+    }
+
+    saveDevicesToStorage();
+    updateDeviceList();
+    updateDeviceCounter();
+}
+
+function loadUnitsFromCSV(lines) {
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line) {
+            const values = line.split(',');
+            const existingDevice = devices.find(d => d.device_name === values[0]);
+
+            if (existingDevice) {
+                existingDevice.port_name = values[2] || '';
+                existingDevice.device_ip = values[3] || '';
+                existingDevice.protocol_name = values[4] || '';
+                existingDevice.memory = values[5] || 'TRUE';
+                existingDevice.unit_number = values[6] || '1';
+            } else {
+                const device = {
+                    id: Date.now().toString() + i,
+                    device_name: values[0] || '',
+                    device_type: values[1] === 'IED' ? 'IED' : 'PLC',
+                    port_name: values[2] || '',
+                    device_ip: values[3] || '',
+                    protocol_name: values[4] || '',
+                    memory: values[5] || 'TRUE',
+                    unit_number: values[6] || '1',
+                    protocol: values[4] && values[4].includes('IEC') ? 'iec' : 'modbus',
+                    modbusVariant: 'tcp',
+                    variables: [],
+                    alarms: [],
+                    trends: []
+                };
+                devices.push(device);
+            }
+        }
+    }
+
+    saveDevicesToStorage();
+    updateDeviceList();
+    updateDeviceCounter();
+}
+</script>
 </body>
 </html>
