@@ -1861,7 +1861,6 @@ function showFieldError(field, message) {
     `;
 
     const icon = document.createElement('span');
-    icon.innerHTML = '⚠️';
     icon.style.marginRight = '4px';
     errorDiv.insertBefore(icon, errorDiv.firstChild);
 
@@ -1930,17 +1929,17 @@ function isTrendFormComplete() {
     return allFieldsFilled && !hasTrendErrors;
 }
 
-// FIXED: Updated main form validation functions
+
 function getMainFormRequiredFields() {
     const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
 
     if (currentProtocol === 'modbus') {
         if (currentModbusVariant === 'tcp') {
-            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'unit_number');
+            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'memory_tcp');
         } else if (currentModbusVariant === 'rtu') {
-            requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port');
+            requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'memory_rtu');
 
-            // Add advanced options if they are enabled
+
             const advancedEnabled = document.getElementById('advancedOptionsCheckbox')?.checked;
             if (advancedEnabled) {
                 requiredFields.push('baud_rate', 'data_bits', 'parity', 'stop_bits');
@@ -1962,12 +1961,10 @@ function isMainFormComplete() {
             console.warn(`Field ${fieldName} not found`);
             return false;
         }
-
-        // Check if field is visible and has a value
         const isVisible = isFieldVisible(field);
         const hasValue = field.value && field.value.trim() !== '';
 
-        // For hidden fields, consider them as completed
+
         if (!isVisible) {
             return true;
         }
@@ -1988,7 +1985,7 @@ function hasMainFormValidationErrors() {
     });
 }
 
-// FIXED: Updated updateFormButtons function
+
 function updateFormButtons() {
     const saveButton = document.querySelector('button[onclick="saveDevice()"]');
     const generateButton = document.querySelector('button[onclick="generateCSV()"]');
