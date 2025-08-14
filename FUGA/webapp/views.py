@@ -12,3 +12,5 @@ def submit_config(request):
         print(f"IP: {ip}, Param1: {param1}, Param2: {param2}")
         return HttpResponse("Configuration submitted successfully.")
     return HttpResponse("Invalid request.")
+
+

@@ -303,6 +303,15 @@
       background: #c82333;
     }
 
+    .btn-warning {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+
     .button-group {
       display: flex;
       gap: 16px;
@@ -471,19 +480,55 @@
     .data-table td {
       padding: 12px;
       border: 1px solid #dee2e6;
+      position: relative;
     }
 
+    /* Enhanced editable cell styles */
     .editable-cell {
       background: transparent;
-      border: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
       width: 100%;
-      padding: 4px;
+      padding: 8px;
       font-size: 14px;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .editable-cell:hover {
+      border-color: #3dcd68;
+      background: #f8fff9;
     }
 
     .editable-cell:focus {
       background: #fff3cd;
-      border: 1px solid #ffc107;
+      border-color: #ffc107;
+      box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+      outline: none;
+    }
+
+    .editable-select {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .editable-select:hover {
+      border-color: #3dcd68;
+      background: #f8fff9;
+    }
+
+    .editable-select:focus {
+      background: #fff3cd;
+      border-color: #ffc107;
+      box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+      outline: none;
     }
 
     .table-container {
@@ -579,6 +624,38 @@
     .advanced-options-content.enabled {
       opacity: 1;
       pointer-events: all;
+    }
+
+    .editing-row {
+      background-color: rgba(255, 193, 7, 0.1) !important;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .action-buttons button {
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .editable-row:hover {
+      background-color: rgba(61, 205, 104, 0.05);
+    }
+
+    .row-changed {
+      background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    .row-changed .editable-cell,
+    .row-changed .editable-select {
+      background-color: rgba(255, 193, 7, 0.05);
     }
 
     @media (max-width: 768px) {
@@ -933,7 +1010,7 @@
                     </select>
                   </div>
 
-                                    <div class="form-group">
+                  <div class="form-group">
                     <label for="parity">
                       Parity
                       <div class="info-icon">
@@ -1088,37 +1165,73 @@
         </div>
       </div>
 
-      <div class="tab-content" id="variables">
+       <div class="tab-content" id="variables">
         <div class="config-section">
           <h3>Variable Configuration</h3>
-          <div class="form-grid-2">
+          <div class="form-grid-3">
             <div class="form-group">
-              <label for="variable_name">
-                Variable Name
+              <label for="item_name">
+                Item Name
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Name of the process variable. Use descriptive names like ActivePower, Voltage, Temperature. No spaces or special characters.
+                    Short item identifier for the variable (e.g. Ia, Vab, P, Q, F, Temp01). Should be unique and descriptive.
                   </div>
                 </div>
               </label>
-              <input type="text" id="variable_name" placeholder="e.g. ActivePower" />
+              <input type="text" id="item_name" placeholder="e.g. Ia" />
             </div>
 
             <div class="form-group">
-              <label for="variable_type">
-                Variable Type
+              <label for="io_device_var">
+                I/O Device
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Variable type: Analog (continuous values), Digital (binary values 0/1)
+                    Name of the I/O device or communication interface where this variable is connected (e.g. Inverter_01, PLC_Main).
                   </div>
                 </div>
               </label>
-              <select id="variable_type">
-                <option value="analog">Analog</option>
-                <option value="digital">Digital</option>
-              </select>
+              <input type="text" id="io_device_var" placeholder="e.g. Inverter_01" />
+            </div>
+
+            <div class="form-group">
+              <label for="tag_name_var">
+                Tag Name
+                <div class="info-icon">
+                  i
+                  <div class="tooltip">
+                    Full tag name including logical node and data object (IEC 61850 format: MMXU1\A\phsA or Modbus register reference).
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="tag_name_var" placeholder="e.g. MMXU1\A\phsA" />
+            </div>
+
+            <div class="form-group">
+              <label for="address">
+                Address
+                <div class="info-icon">
+                  i
+                  <div class="tooltip">
+                    Register address or memory location where the variable is stored (e.g. 40001, 30001 for Modbus registers).
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="address" placeholder="e.g. 40001" />
+            </div>
+
+            <div class="form-group">
+              <label for="equipment_var">
+                Equipment
+                <div class="info-icon">
+                  i
+                  <div class="tooltip">
+                    Equipment hierarchy path where this variable belongs (e.g. Site.Building.Device, Virtual.System).
+                  </div>
+                </div>
+              </label>
+              <input type="text" id="equipment_var" placeholder="e.g. Virtual.System" />
             </div>
 
             <div class="form-group">
@@ -1138,19 +1251,6 @@
                 <option value="string">String</option>
               </select>
             </div>
-
-            <div class="form-group">
-              <label for="unit">
-                Unit
-                <div class="info-icon">
-                  i
-                  <div class="tooltip">
-                    Unit of measurement for the variable. Examples: kW, V, A, °C, Hz, %
-                  </div>
-                </div>
-              </label>
-              <input type="text" id="unit" placeholder="e.g. kW" />
-            </div>
           </div>
           <div class="button-group">
             <button class="btn btn-primary" id="addVariableBtn" onclick="addVariable()">Add Variable</button>
@@ -1161,10 +1261,12 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Variable Name</th>
-                <th>Type</th>
+                <th>Item Name</th>
+                <th>I/O Device</th>
+                <th>Tag Name</th>
+                <th>Address</th>
+                <th>Equipment</th>
                 <th>Data Type</th>
-                <th>Unit</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1323,6 +1425,23 @@
               </select>
             </div>
 
+              <div class="form-group">
+              <label for="trend_time">
+                Time
+                <div class="info-icon">
+                  i
+                  <div class="tooltip">
+                    Time
+                  </div>
+                </div>
+              </label>
+              <select id="trend_time">
+                <option value="event">1 minute</option>
+                <option value="periodic">15 minutes</option>
+                <option value="periodic-event">1 hour</option>
+              </select>
+            </div>
+
             <div class="form-group">
               <label for="tag_name">
                 Tag Name
@@ -1333,7 +1452,7 @@
                   </div>
                 </div>
               </label>
-              <input type="text" id="tag_name" placeholder="e.g. MMXU1\A\phsA" />
+              <input type="text" id="tag_name" placeholder="e.g. PV4" />
             </div>
 
             <div class="form-group">
@@ -1346,7 +1465,7 @@
                   </div>
                 </div>
               </label>
-              <input type="text" id="item_name_trend" placeholder="e.g. Ia" />
+              <input type="text" id="item_name_trend" placeholder="e.g. PVPanel4" />
             </div>
           </div>
           <div class="button-group">
@@ -1362,6 +1481,7 @@
                 <th>Trend Types</th>
                 <th>Tag Name</th>
                 <th>Item Name</th>
+                  <th>Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1374,6 +1494,7 @@
   </div>
 
 
+
 <script>
 
 let currentProtocol = 'modbus';
@@ -1384,6 +1505,9 @@ let alarms = [];
 let trends = [];
 let currentDevice = null;
 let validationErrors = {};
+let editingVariable = null;
+let editingAlarm = null;
+let editingTrend = null;
 
 const validationRules = {
     device_name: {
@@ -1488,26 +1612,41 @@ const validationRules = {
         maxLength: 20,
         message: 'Port name is required (1-20 characters)'
     },
-    variable_name: {
+
+    item_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 30,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Item name must start with letter or underscore, contain only letters, numbers, and underscores'
+    },
+    io_device_var: {
         required: true,
         minLength: 1,
         maxLength: 50,
-        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-        message: 'Variable name must start with letter or underscore, contain only letters, numbers, and underscores'
+        message: 'I/O Device is required (1-50 characters)'
     },
-    variable_type: {
+    tag_name_var: {
         required: true,
-        message: 'Please select a variable type'
+        minLength: 1,
+        maxLength: 100,
+        message: 'Tag name is required (1-100 characters)'
+    },
+    address: {
+        required: true,
+        minLength: 1,
+        maxLength: 20,
+        message: 'Address is required (1-20 characters)'
+    },
+    equipment_var: {
+        required: true,
+        minLength: 1,
+        maxLength: 50,
+        message: 'Equipment is required (1-50 characters)'
     },
     data_type: {
         required: true,
         message: 'Please select a data type'
-    },
-    unit: {
-        required: true,
-        minLength: 1,
-        maxLength: 20,
-        message: 'Unit is required (1-20 characters)'
     },
     alarm_name: {
         required: true,
@@ -1615,7 +1754,7 @@ function setupValidation() {
 }
 
 function setupSubFormValidation() {
-    const variableFields = ['variable_name', 'variable_type', 'data_type', 'unit'];
+    const variableFields = ['item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type'];
     variableFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
@@ -1659,7 +1798,7 @@ function setupSubFormValidation() {
         }
     });
 
-    const trendFields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+    const trendFields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend','trend_time'];
     trendFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
@@ -1765,9 +1904,9 @@ function validateField(field) {
 
 function isSubFormField(fieldName) {
     const subFormFields = [
-        'variable_name', 'variable_type', 'data_type', 'unit',
+        'item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type',
         'alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm',
-        'tag_description', 'trend_types', 'tag_name', 'item_name_trend'
+        'tag_description', 'trend_types', 'tag_name', 'item_name_trend','trend_time'
     ];
     return subFormFields.includes(fieldName);
 }
@@ -1821,10 +1960,12 @@ function getFieldLabel(field) {
         ied_name: 'IED Name',
         access_point: 'Access Point',
         logical_device: 'Logical Device',
-        variable_name: 'Variable Name',
-        variable_type: 'Variable Type',
+        item_name: 'Item Name',
+        io_device_var: 'I/O Device',
+        tag_name_var: 'Tag Name',
+        address: 'Address',
+        equipment_var: 'Equipment',
         data_type: 'Data Type',
-        unit: 'Unit',
         alarm_name: 'Alarm Name',
         alarm_type: 'Alarm Type',
         category: 'Category',
@@ -1833,6 +1974,7 @@ function getFieldLabel(field) {
         item_name_alarm: 'Item Name',
         tag_description: 'Tag Description',
         trend_types: 'Trend Type',
+        time: 'Trend Time',
         tag_name: 'Tag Name',
         item_name_trend: 'Item Name'
     };
@@ -1885,7 +2027,7 @@ function clearFieldError(field) {
 }
 
 function isVariableFormComplete() {
-    const requiredFields = ['variable_name', 'variable_type', 'data_type', 'unit'];
+    const requiredFields = ['item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type'];
 
     const allFieldsFilled = requiredFields.every(fieldName => {
         const field = document.getElementById(fieldName);
@@ -1916,19 +2058,44 @@ function isAlarmFormComplete() {
 
 function isTrendFormComplete() {
     const requiredFields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+    const optionalFields = ['trend_time']; // Time field is optional
 
-    const allFieldsFilled = requiredFields.every(fieldName => {
+    // Check required fields
+    const allRequiredFieldsFilled = requiredFields.every(fieldName => {
         const field = document.getElementById(fieldName);
         return field && field.value.trim() !== '';
     });
 
-    const hasTrendErrors = requiredFields.some(fieldName =>
-        validationErrors.hasOwnProperty(fieldName)
+    // Check for validation errors in required fields
+    const hasRequiredFieldErrors = requiredFields.some(fieldName =>
+        validationErrors && validationErrors.hasOwnProperty(fieldName)
     );
 
-    return allFieldsFilled && !hasTrendErrors;
-}
+    // Check optional fields - if they exist, they should be valid
+    const hasOptionalFieldErrors = optionalFields.some(fieldName => {
+        const field = document.getElementById(fieldName);
+        if (field && field.value.trim() !== '') {
+            // If optional field has value, check for validation errors
+            return validationErrors && validationErrors.hasOwnProperty(fieldName);
+        }
+        return false; // No error if field doesn't exist or is empty
+    });
 
+    console.log('Trend form validation:', {
+        allRequiredFieldsFilled,
+        hasRequiredFieldErrors,
+        hasOptionalFieldErrors,
+        validationErrors: validationErrors || {},
+        requiredFields: requiredFields.map(f => ({
+            name: f,
+            exists: !!document.getElementById(f),
+            value: document.getElementById(f)?.value || 'N/A',
+            filled: document.getElementById(f) && document.getElementById(f).value.trim() !== ''
+        }))
+    });
+
+    return allRequiredFieldsFilled && !hasRequiredFieldErrors && !hasOptionalFieldErrors;
+}
 
 function getMainFormRequiredFields() {
     const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
@@ -1938,7 +2105,6 @@ function getMainFormRequiredFields() {
             requiredFields.push('device_ip', 'modbus_port', 'port_name', 'memory_tcp');
         } else if (currentModbusVariant === 'rtu') {
             requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'memory_rtu');
-
 
             const advancedEnabled = document.getElementById('advancedOptionsCheckbox')?.checked;
             if (advancedEnabled) {
@@ -1964,7 +2130,6 @@ function isMainFormComplete() {
         const isVisible = isFieldVisible(field);
         const hasValue = field.value && field.value.trim() !== '';
 
-
         if (!isVisible) {
             return true;
         }
@@ -1984,7 +2149,6 @@ function hasMainFormValidationErrors() {
         return validationErrors.hasOwnProperty(fieldName);
     });
 }
-
 
 function updateFormButtons() {
     const saveButton = document.querySelector('button[onclick="saveDevice()"]');
@@ -2184,6 +2348,7 @@ function selectProtocol(protocol) {
     updateProgressBar();
 }
 
+
 function clearProtocolErrors() {
     const protocolFields = [
         'device_ip', 'modbus_port', 'port_name', 'unit_number',
@@ -2323,12 +2488,14 @@ function addVariable() {
         return;
     }
 
-    const name = document.getElementById('variable_name');
-    const type = document.getElementById('variable_type');
+    const name = document.getElementById('item_name');
+    const io_device = document.getElementById('io_device_var');
     const dataType = document.getElementById('data_type');
-    const unit = document.getElementById('unit');
+    const unit = document.getElementById('tag_name_var');
+    const address = document.getElementById('address');
+    const equipment = document.getElementById('equipment_var');
 
-    if (variables.some(v => v.variable_name.toLowerCase() === name.value.trim().toLowerCase())) {
+    if (variables.some(v => v.item_name && v.item_name.toLowerCase() === name.value.trim().toLowerCase())) {
         showAlert('Variable name already exists', 'error');
         showFieldError(name, 'This variable name is already used');
         return;
@@ -2336,10 +2503,12 @@ function addVariable() {
 
     const variable = {
         id: Date.now().toString(),
-        variable_name: name.value.trim(),
-        variable_type: type.value,
+        item_name: name.value.trim(),
+        io_device: io_device.value,
         data_type: dataType.value,
-        unit: unit.value.trim()
+        tag_name: unit.value.trim(),
+        address: address.value.trim(),
+        equipment: equipment.value.trim()
     };
 
     variables.push(variable);
@@ -2353,16 +2522,58 @@ function updateVariableTable() {
     const tbody = document.getElementById('variableTableBody');
     if (!tbody) return;
 
+
+    console.log('All variables:', variables);
+    console.log('First variable keys:', variables[0] ? Object.keys(variables[0]) : 'No variables');
+
     tbody.innerHTML = '';
 
-    variables.forEach(variable => {
+    variables.forEach((variable, index) => {
+
+        console.log(`Variable ${index}:`, variable);
+        console.log(`IO Device value:`, variable.io_device, variable['I/O Device']);
+
         const row = document.createElement('tr');
+        row.className = 'editable-row';
+        row.setAttribute('data-id', variable.id);
+
         row.innerHTML = `
-            <td>${variable.variable_name}</td>
-            <td>${variable.variable_type}</td>
-            <td>${variable.data_type}</td>
-            <td>${variable.unit}</td>
             <td>
+                <input type="text" class="editable-cell" value="${variable.item_name || variable['Item Name'] || ''}"
+                       onchange="updateVariableField('${variable.id}', 'item_name', this.value)"
+                       onblur="saveVariableChanges('${variable.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${variable.io_device || variable['I/O Device'] || ''}"
+                       onchange="updateVariableField('${variable.id}', 'io_device', this.value)"
+                       onblur="saveVariableChanges('${variable.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${variable.tag_name || variable['Tag Name'] || ''}"
+                       onchange="updateVariableField('${variable.id}', 'tag_name', this.value)"
+                       onblur="saveVariableChanges('${variable.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${variable.address || variable['Address'] || ''}"
+                       onchange="updateVariableField('${variable.id}', 'address', this.value)"
+                       onblur="saveVariableChanges('${variable.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${variable.equipment || variable['Equipment'] || ''}"
+                       onchange="updateVariableField('${variable.id}', 'equipment', this.value)"
+                       onblur="saveVariableChanges('${variable.id}')" />
+            </td>
+            <td>
+                <select class="editable-select" onchange="updateVariableField('${variable.id}', 'data_type', this.value)" onblur="saveVariableChanges('${variable.id}')">
+                    <option value="float" ${(variable.data_type || variable['Data Type']) === 'float' ? 'selected' : ''}>Float</option>
+                    <option value="int" ${(variable.data_type || variable['Data Type']) === 'int' ? 'selected' : ''}>Integer</option>
+                    <option value="bool" ${(variable.data_type || variable['Data Type']) === 'bool' ? 'selected' : ''}>Boolean</option>
+                    <option value="string" ${(variable.data_type || variable['Data Type']) === 'string' ? 'selected' : ''}>String</option>
+                    <option value="REAL" ${(variable.data_type || variable['Data Type']) === 'REAL' ? 'selected' : ''}>REAL</option>
+                    <option value="INT" ${(variable.data_type || variable['Data Type']) === 'INT' ? 'selected' : ''}>INT</option>
+                </select>
+            </td>
+            <td class="action-buttons">
                 <button class="btn btn-danger" onclick="removeVariable('${variable.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
             </td>
         `;
@@ -2370,15 +2581,48 @@ function updateVariableTable() {
     });
 }
 
-function removeVariable(id) {
-    variables = variables.filter(v => v.id !== id);
-    updateVariableTable();
+function updateVariableField(id, field, value) {
+    const variable = variables.find(v => v.id === id);
+    if (variable) {
+        variable[field] = value;
+        markRowAsChanged(id, 'variable');
+    }
+}
+
+function saveVariableChanges(id) {
     saveVariablesToStorage();
-    showAlert('Variable removed successfully!', 'success');
+    unmarkRowAsChanged(id, 'variable');
+    showAlert('Variable updated successfully!', 'success');
+}
+function markRowAsChanged(id, type) {
+    const tableBodyId = type === 'variable' ? 'variableTableBody' :
+                       type === 'alarm' ? 'alarmTableBody' : 'trendTableBody';
+    const row = document.querySelector(`#${tableBodyId} tr[data-id="${id}"]`);
+    if (row) {
+        row.classList.add('row-changed');
+    }
+}
+
+function unmarkRowAsChanged(id, type) {
+    const tableBodyId = type === 'variable' ? 'variableTableBody' :
+                       type === 'alarm' ? 'alarmTableBody' : 'trendTableBody';
+    const row = document.querySelector(`#${tableBodyId} tr[data-id="${id}"]`);
+    if (row) {
+        row.classList.remove('row-changed');
+    }
+}
+
+function removeVariable(id) {
+    if (confirm('Are you sure you want to remove this variable?')) {
+        variables = variables.filter(v => v.id !== id);
+        updateVariableTable();
+        saveVariablesToStorage();
+        showAlert('Variable removed successfully!', 'success');
+    }
 }
 
 function clearVariableForm() {
-    const fields = ['variable_name', 'variable_type', 'data_type', 'unit'];
+    const fields = ['item_name', 'io_device_var', 'data_type', 'tag_name_var', 'address', 'equipment_var'];
 
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
@@ -2440,14 +2684,46 @@ function updateAlarmTable() {
 
     alarms.forEach(alarm => {
         const row = document.createElement('tr');
+        row.className = 'editable-row';
+        row.setAttribute('data-id', alarm.id);
+
         row.innerHTML = `
-            <td>${alarm.alarm_name}</td>
-            <td>${alarm.alarm_type}</td>
-            <td>${alarm.category}</td>
-            <td>${alarm.alarm_tag}</td>
-            <td>${alarm.equipment}</td>
-            <td>${alarm.item_name}</td>
             <td>
+                <input type="text" class="editable-cell" value="${alarm.alarm_name}"
+                       onchange="updateAlarmField('${alarm.id}', 'alarm_name', this.value)"
+                       onblur="saveAlarmChanges('${alarm.id}')" />
+            </td>
+            <td>
+                <select class="editable-select" onchange="updateAlarmField('${alarm.id}', 'alarm_type', this.value)" onblur="saveAlarmChanges('${alarm.id}')">
+                    <option value="analog" ${alarm.alarm_type === 'analog' ? 'selected' : ''}>Analog</option>
+                    <option value="digital" ${alarm.alarm_type === 'digital' ? 'selected' : ''}>Digital</option>
+                    <option value="advanced" ${alarm.alarm_type === 'advanced' ? 'selected' : ''}>Advanced</option>
+                </select>
+            </td>
+            <td>
+                <select class="editable-select" onchange="updateAlarmField('${alarm.id}', 'category', this.value)" onblur="saveAlarmChanges('${alarm.id}')">
+                    <option value="low" ${alarm.category === 'low' ? 'selected' : ''}>Low</option>
+                    <option value="medium" ${alarm.category === 'medium' ? 'selected' : ''}>Medium</option>
+                    <option value="high" ${alarm.category === 'high' ? 'selected' : ''}>High</option>
+                    <option value="event" ${alarm.category === 'event' ? 'selected' : ''}>Event</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${alarm.alarm_tag}"
+                       onchange="updateAlarmField('${alarm.id}', 'alarm_tag', this.value)"
+                       onblur="saveAlarmChanges('${alarm.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${alarm.equipment}"
+                       onchange="updateAlarmField('${alarm.id}', 'equipment', this.value)"
+                       onblur="saveAlarmChanges('${alarm.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${alarm.item_name}"
+                       onchange="updateAlarmField('${alarm.id}', 'item_name', this.value)"
+                       onblur="saveAlarmChanges('${alarm.id}')" />
+            </td>
+            <td class="action-buttons">
                 <button class="btn btn-danger" onclick="removeAlarm('${alarm.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
             </td>
         `;
@@ -2455,11 +2731,27 @@ function updateAlarmTable() {
     });
 }
 
-function removeAlarm(id) {
-    alarms = alarms.filter(a => a.id !== id);
-    updateAlarmTable();
+function updateAlarmField(id, field, value) {
+    const alarm = alarms.find(a => a.id === id);
+    if (alarm) {
+        alarm[field] = value;
+        markRowAsChanged(id, 'alarm');
+    }
+}
+
+function saveAlarmChanges(id) {
     saveAlarmsToStorage();
-    showAlert('Alarm removed successfully!', 'success');
+    unmarkRowAsChanged(id, 'alarm');
+    showAlert('Alarm updated successfully!', 'success');
+}
+
+function removeAlarm(id) {
+    if (confirm('Are you sure you want to remove this alarm?')) {
+        alarms = alarms.filter(a => a.id !== id);
+        updateAlarmTable();
+        saveAlarmsToStorage();
+        showAlert('Alarm removed successfully!', 'success');
+    }
 }
 
 function clearAlarmForm() {
@@ -2481,6 +2773,7 @@ function clearAlarmForm() {
     updateFormButtons();
 }
 
+
 function addTrend() {
     if (!isTrendFormComplete()) {
         showAlert('Please complete all trend fields before adding', 'error');
@@ -2491,6 +2784,7 @@ function addTrend() {
     const type = document.getElementById('trend_types');
     const tagName = document.getElementById('tag_name');
     const itemName = document.getElementById('item_name_trend');
+    const time = document.getElementById('trend_time');
 
     if (trends.some(t => t.tag_description.toLowerCase() === description.value.trim().toLowerCase())) {
         showAlert('Tag description already exists', 'error');
@@ -2503,7 +2797,8 @@ function addTrend() {
         tag_description: description.value.trim(),
         trend_types: type.value,
         tag_name: tagName.value.trim(),
-        item_name: itemName.value.trim()
+        item_name: itemName.value.trim(),
+        time: time.value
     };
 
     trends.push(trend);
@@ -2521,12 +2816,38 @@ function updateTrendTable() {
 
     trends.forEach(trend => {
         const row = document.createElement('tr');
+        row.className = 'editable-row';
+        row.setAttribute('data-id', trend.id);
+
         row.innerHTML = `
-            <td>${trend.tag_description}</td>
-            <td>${trend.trend_types}</td>
-            <td>${trend.tag_name}</td>
-            <td>${trend.item_name}</td>
             <td>
+                <input type="text" class="editable-cell" value="${trend.tag_description}"
+                       onchange="updateTrendField('${trend.id}', 'tag_description', this.value)"
+                       onblur="saveTrendChanges('${trend.id}')" />
+            </td>
+            <td>
+                <select class="editable-select" onchange="updateTrendField('${trend.id}', 'trend_types', this.value)" onblur="saveTrendChanges('${trend.id}')">
+                    <option value="event" ${trend.trend_types === 'event' ? 'selected' : ''}>Event</option>
+                    <option value="periodic" ${trend.trend_types === 'periodic' ? 'selected' : ''}>Periodic</option>
+                    <option value="periodic-event" ${trend.trend_types === 'periodic-event' ? 'selected' : ''}>Periodic-Event</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${trend.tag_name}"
+                       onchange="updateTrendField('${trend.id}', 'tag_name', this.value)"
+                       onblur="saveTrendChanges('${trend.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${trend.item_name}"
+                       onchange="updateTrendField('${trend.id}', 'item_name', this.value)"
+                       onblur="saveTrendChanges('${trend.id}')" />
+            </td>
+            <td>
+                <input type="text" class="editable-cell" value="${trend.time}"
+                       onchange="updateTrendField('${trend.id}', 'trend_time', this.value)"
+                       onblur="saveTrendChanges('${trend.id}')" />
+            </td>
+            <td class="action-buttons">
                 <button class="btn btn-danger" onclick="removeTrend('${trend.id}')" style="background: #dc3545; padding: 6px 12px; font-size: 0.8rem;">Remove</button>
             </td>
         `;
@@ -2534,15 +2855,31 @@ function updateTrendTable() {
     });
 }
 
-function removeTrend(id) {
-    trends = trends.filter(t => t.id !== id);
-    updateTrendTable();
+function updateTrendField(id, field, value) {
+    const trend = trends.find(t => t.id === id);
+    if (trend) {
+        trend[field] = value;
+        markRowAsChanged(id, 'trend');
+    }
+}
+
+function saveTrendChanges(id) {
     saveTrendsToStorage();
-    showAlert('Trend removed successfully!', 'success');
+    unmarkRowAsChanged(id, 'trend');
+    showAlert('Trend updated successfully!', 'success');
+}
+
+function removeTrend(id) {
+    if (confirm('Are you sure you want to remove this trend?')) {
+        trends = trends.filter(t => t.id !== id);
+        updateTrendTable();
+        saveTrendsToStorage();
+        showAlert('Trend removed successfully!', 'success');
+    }
 }
 
 function clearTrendForm() {
-    const fields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+    const fields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend','trend_time'];
 
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
@@ -2787,73 +3124,328 @@ function generateUnitsCSV() {
     downloadCSV(rows.join('\n'), 'UNITS.csv');
 }
 
-function generateVariablesCSV() {
-    if (variables.length === 0) {
-        showAlert('No variables configured', 'error');
+function loadCID(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.cid')) {
+        showAlert('Please select a valid CID file', 'error');
         return;
     }
 
-    const headers = ['VARIABLE_NAME', 'VARIABLE_TYPE', 'DATA_TYPE', 'UNIT'];
-    const rows = [headers.join(',')];
+    showLoading(true);
 
-    variables.forEach(variable => {
-        const row = [
-            variable.variable_name,
-            variable.variable_type,
-            variable.data_type,
-            variable.unit
-        ];
-        rows.push(row.join(','));
-    });
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const cidContent = e.target.result;
 
-    downloadCSV(rows.join('\n'), 'VARIABLES.csv');
+
+            if (!cidContent.includes('<?xml') || !cidContent.includes('<SCL')) {
+                showAlert('Invalid CID file format. Expected SCL XML format.', 'error');
+                showLoading(false);
+                return;
+            }
+
+
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(cidContent, 'text/xml');
+
+
+            const parserError = xmlDoc.querySelector('parsererror');
+            if (parserError) {
+                showAlert('Error parsing CID file: Invalid XML format', 'error');
+                showLoading(false);
+                return;
+            }
+
+
+            parseCIDData(xmlDoc);
+
+        } catch (error) {
+            console.error('Error loading CID file:', error);
+            showAlert('Error loading CID file: ' + error.message, 'error');
+        } finally {
+            showLoading(false);
+        }
+    };
+
+    reader.readAsText(file);
 }
 
-function generateAlarmsCSV() {
-    if (alarms.length === 0) {
-        showAlert('No alarms configured', 'error');
-        return;
+function parseCIDData(xmlDoc) {
+    try {
+
+        validationErrors = {};
+        const form = document.getElementById('deviceForm');
+        const fields = form.querySelectorAll('input, select');
+        fields.forEach(field => clearFieldError(field));
+
+
+        selectProtocol('iec');
+
+
+        const communication = xmlDoc.querySelector('Communication');
+        if (communication) {
+            parseCommunicationData(communication);
+        }
+
+
+        const ieds = xmlDoc.querySelectorAll('IED');
+        if (ieds.length > 0) {
+            parseIEDData(ieds);
+        }
+
+
+        const dataTypes = xmlDoc.querySelector('DataTypeTemplates');
+        if (dataTypes) {
+            parseDataTypes(dataTypes);
+        }
+
+        updateFormButtons();
+        updateProgressBar();
+
+        showAlert('CID file parsed successfully! Form populated with IEC 61850 configuration.', 'success');
+
+    } catch (error) {
+        console.error('Error parsing CID data:', error);
+        showAlert('Error parsing CID data: ' + error.message, 'error');
+    }
+}
+
+function parseCommunicationData(communication) {
+
+    const subNetworks = communication.querySelectorAll('SubNetwork');
+
+    subNetworks.forEach(subNetwork => {
+        const connectedAPs = subNetwork.querySelectorAll('ConnectedAP');
+
+        connectedAPs.forEach((connectedAP, index) => {
+            if (index === 0) {
+                const iedName = connectedAP.getAttribute('iedName');
+                const apName = connectedAP.getAttribute('apName');
+
+
+                if (iedName) {
+                    document.getElementById('ied_name').value = iedName;
+                }
+                if (apName) {
+                    document.getElementById('access_point').value = apName;
+                }
+
+
+                const address = connectedAP.querySelector('Address');
+                if (address) {
+                    const pElements = address.querySelectorAll('P');
+
+                    pElements.forEach(p => {
+                        const type = p.getAttribute('type');
+                        const value = p.textContent;
+
+                        switch (type) {
+                            case 'IP':
+                                document.getElementById('iec_device_ip').value = value;
+                                break;
+                            case 'IP-SUBNET':
+
+                                break;
+                            case 'IP-GATEWAY':
+
+                                break;
+                            case 'OSI-TSEL':
+                            case 'OSI-SSEL':
+                            case 'OSI-PSEL':
+
+                                break;
+                        }
+                    });
+                }
+
+
+                const gseElements = connectedAP.querySelectorAll('GSE');
+                const smvElements = connectedAP.querySelectorAll('SMV');
+
+
+                if (!document.getElementById('iec_port').value) {
+                    document.getElementById('iec_port').value = '102';
+                }
+            }
+        });
+    });
+}
+
+function parseIEDData(ieds) {
+    const parsedDevices = [];
+
+    ieds.forEach((ied, index) => {
+        const iedName = ied.getAttribute('name');
+        const iedType = ied.getAttribute('type') || 'IED';
+        const manufacturer = ied.getAttribute('manufacturer') || '';
+        const configVersion = ied.getAttribute('configVersion') || '';
+
+
+        if (index === 0) {
+            document.getElementById('device_name').value = iedName || 'IED_Device';
+            document.getElementById('device_type').value = iedType;
+            document.getElementById('tag_prefix').value = (iedName || 'IED').substring(0, 10).toUpperCase();
+            document.getElementById('io_device').value = manufacturer || 'IEC61850_Device';
+        }
+
+
+        const accessPoints = ied.querySelectorAll('AccessPoint');
+        accessPoints.forEach(ap => {
+            const apName = ap.getAttribute('name');
+
+            if (index === 0 && !document.getElementById('access_point').value) {
+                document.getElementById('access_point').value = apName;
+            }
+
+
+            const server = ap.querySelector('Server');
+            if (server) {
+                const logicalDevices = server.querySelectorAll('LDevice');
+
+                logicalDevices.forEach((lDevice, ldIndex) => {
+                    const ldInst = lDevice.getAttribute('inst');
+
+                    if (index === 0 && ldIndex === 0) {
+                        document.getElementById('logical_device').value = ldInst || 'LD0';
+                    }
+
+
+                    const logicalNodes = lDevice.querySelectorAll('LN, LN0');
+                    parseLogicalNodes(logicalNodes, iedName, ldInst);
+                });
+            }
+        });
+
+
+        if (index > 0) {
+            parsedDevices.push({
+                name: iedName,
+                type: iedType,
+                manufacturer: manufacturer,
+                configVersion: configVersion
+            });
+        }
+    });
+
+
+    if (parsedDevices.length > 0) {
+        showAlert(`CID file contains ${ieds.length} IEDs. First IED loaded into form. Additional IEDs: ${parsedDevices.map(d => d.name).join(', ')}`, 'info');
+    }
+}
+
+function parseLogicalNodes(logicalNodes, iedName, ldInst) {
+    const extractedVariables = [];
+    const extractedAlarms = [];
+
+    logicalNodes.forEach(ln => {
+        const lnClass = ln.getAttribute('lnClass');
+        const lnInst = ln.getAttribute('inst');
+        const lnType = ln.getAttribute('lnType');
+
+
+        const dataObjects = ln.querySelectorAll('DOI');
+        dataObjects.forEach(doi => {
+            const doName = doi.getAttribute('name');
+
+
+            const dataAttributes = doi.querySelectorAll('DAI');
+            dataAttributes.forEach(dai => {
+                const daName = dai.getAttribute('name');
+                const fullPath = `${iedName}/${ldInst}/${lnClass}${lnInst}.${doName}.${daName}`;
+
+
+                let variableType = 'analog';
+                let dataType = 'float';
+                let unit = '';
+
+                if (daName.includes('stVal') || doName.includes('Pos') || doName.includes('St')) {
+                    if (lnClass.includes('SPC') || lnClass.includes('DPC')) {
+                        variableType = 'digital';
+                        dataType = 'bool';
+                    }
+                } else if (daName.includes('mag') || doName.includes('A') || doName.includes('V') || doName.includes('W')) {
+                    variableType = 'analog';
+                    dataType = 'float';
+
+
+                    if (doName.includes('A') || doName.toLowerCase().includes('amp')) unit = 'A';
+                    else if (doName.includes('V') || doName.toLowerCase().includes('vol')) unit = 'V';
+                    else if (doName.includes('W') || doName.toLowerCase().includes('pow')) unit = 'W';
+                    else if (doName.includes('Hz') || doName.toLowerCase().includes('freq')) unit = 'Hz';
+                    else if (doName.includes('Tmp') || doName.toLowerCase().includes('temp')) unit = '°C';
+                }
+
+
+                const variable = {
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                    variable_name: `${lnClass}${lnInst}_${doName}_${daName}`,
+                    variable_type: variableType,
+                    data_type: dataType,
+                    unit: unit || 'PU'
+                };
+
+                extractedVariables.push(variable);
+
+
+                if (doName.includes('Alm') || doName.includes('Wrn') || lnClass.includes('PTOC') || lnClass.includes('PIOC')) {
+                    const alarm = {
+                        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                        alarm_name: `${lnClass}${lnInst}_${doName}_Alarm`,
+                        alarm_type: 'digital',
+                        category: doName.includes('Alm') ? 'high' : 'medium',
+                        alarm_tag: `ALM_${lnClass}${lnInst}_${doName}`,
+                        equipment: iedName || 'IED_Equipment',
+                        item_name: `${lnClass}${lnInst}_${doName}`
+                    };
+
+                    extractedAlarms.push(alarm);
+                }
+            });
+        });
+    });
+
+
+    if (extractedVariables.length > 0) {
+        const maxVariables = 50;
+        const variablesToAdd = extractedVariables.slice(0, maxVariables);
+
+        variables.push(...variablesToAdd);
+        updateVariableTable();
+        saveVariablesToStorage();
+
+        if (extractedVariables.length > maxVariables) {
+            showAlert(`Imported ${maxVariables} variables from CID file (${extractedVariables.length} total found)`, 'info');
+        }
     }
 
-    const headers = ['ALARM_NAME', 'ALARM_TYPE', 'CATEGORY', 'ALARM_TAG', 'EQUIPMENT', 'ITEM_NAME'];
-    const rows = [headers.join(',')];
 
-    alarms.forEach(alarm => {
-        const row = [
-            alarm.alarm_name,
-            alarm.alarm_type,
-            alarm.category,
-            alarm.alarm_tag,
-            alarm.equipment,
-            alarm.item_name
-        ];
-        rows.push(row.join(','));
-    });
+    if (extractedAlarms.length > 0) {
+        const maxAlarms = 30;
+        const alarmsToAdd = extractedAlarms.slice(0, maxAlarms);
 
-    downloadCSV(rows.join('\n'), 'ALARMS.csv');
-}
+        alarms.push(...alarmsToAdd);
+        updateAlarmTable();
+        saveAlarmsToStorage();
 
-function generateTrendsCSV() {
-    if (trends.length === 0) {
-        showAlert('No trends configured', 'error');
-        return;
+        if (extractedAlarms.length > maxAlarms) {
+            showAlert(`Imported ${maxAlarms} alarms from CID file (${extractedAlarms.length} total found)`, 'info');
+        }
     }
-
-    const headers = ['TAG_DESCRIPTION', 'TREND_TYPES', 'TAG_NAME', 'ITEM_NAME'];
-    const rows = [headers.join(',')];
-
-    trends.forEach(trend => {
-        const row = [
-            trend.tag_description,
-            trend.trend_types,
-            trend.tag_name,
-            trend.item_name
-        ];
-        rows.push(row.join(','));
-    });
-
-    downloadCSV(rows.join('\n'), 'TRENDS.csv');
 }
+
+function parseDataTypes(dataTypes) {
+
+
+    const lnTypes = dataTypes.querySelectorAll('LNodeType');
+    const doTypes = dataTypes.querySelectorAll('DOType');
+    const daTypes = dataTypes.querySelectorAll('DAType');
+
+    console.log(`Found ${lnTypes.length} LNode types, ${doTypes.length} DO types, ${daTypes.length} DA types in CID file`);
+}
+
 
 function loadCSV(event) {
     const file = event.target.files[0];
@@ -2894,6 +3486,307 @@ function loadCSV(event) {
     reader.readAsText(file);
 }
 
+function loadTrendsCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('Trends CSV file appears to be empty', 'error');
+                return;
+            }
+
+            const headerLine = lines[0];
+            const headers = parseCSVLine(headerLine);
+
+            console.log('CSV Headers:', headers);
+
+
+            const equipmentIndex = findColumnIndex(headers, ['Equipment', 'EQUIPMENT']);
+            const itemNameIndex = findColumnIndex(headers, ['Item Name', 'ITEM_NAME', 'Item Name']);
+            const tagNameIndex = findColumnIndex(headers, ['Tag Name', 'TAG_NAME', 'Tag Name']);
+            const typeIndex = findColumnIndex(headers, ['Type', 'TYPE']);
+            const commentIndex = findColumnIndex(headers, ['Comment', 'COMMENT']);
+            const samplePeriodIndex = findColumnIndex(headers, ['Sample Period', 'SAMPLE_PERIOD', 'Sample Period']);
+            const timeIndex = findColumnIndex(headers, ['Time', 'TIME']);
+            const expressionIndex = findColumnIndex(headers, ['Expression', 'EXPRESSION']);
+
+            if (equipmentIndex === -1 && itemNameIndex === -1 && tagNameIndex === -1) {
+                showAlert('CSV format not recognized. Could not find Equipment, Item Name, or Tag Name columns.', 'error');
+                return;
+            }
+
+            trends = [];
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    try {
+                        const values = parseCSVLine(line);
+
+                        const equipment = values[equipmentIndex] || '';
+                        const itemName = values[itemNameIndex] || '';
+                        const tagName = values[tagNameIndex] || '';
+                        const type = values[typeIndex] || '';
+                        const comment = values[commentIndex] || '';
+                        const samplePeriod = values[samplePeriodIndex] || '';
+                        const time = values[timeIndex] || '';
+                        const expression = values[expressionIndex] || '';
+
+                        const cleanEquipment = cleanCSVValue(equipment);
+                        const cleanItemName = cleanCSVValue(itemName);
+                        const cleanTagName = cleanCSVValue(tagName);
+                        const cleanType = cleanCSVValue(type);
+                        const cleanComment = cleanCSVValue(comment);
+                        const cleanSamplePeriod = cleanCSVValue(samplePeriod);
+                        const cleanTime = cleanCSVValue(time);
+                        const cleanExpression = cleanCSVValue(expression);
+
+                        if (cleanEquipment || cleanItemName || cleanTagName || cleanExpression) {
+
+                            let tagDescription = cleanComment;
+                            if (!tagDescription) {
+                                tagDescription = cleanItemName || cleanTagName || cleanEquipment;
+                            }
+
+
+                            let trendTime = '00:00';
+                            if (cleanTime) {
+                                trendTime = cleanTime;
+                            } else if (cleanSamplePeriod) {
+
+                                const timeParts = cleanSamplePeriod.split(':');
+                                if (timeParts.length >= 2) {
+                                    trendTime = `${timeParts[0]}:${timeParts[1]}`;
+                                }
+                            }
+
+
+                            let trendType = 'periodic';
+                            if (cleanType) {
+                                const typeUpper = cleanType.toUpperCase();
+                                if (typeUpper.includes('EVENT')) {
+                                    trendType = 'event';
+                                } else if (typeUpper.includes('PERIODIC-EVENT')) {
+                                    trendType = 'periodic-event';
+                                } else if (typeUpper.includes('PERIODIC') || typeUpper.includes('TRN_PERIODIC')) {
+                                    trendType = 'periodic';
+                                }
+                            }
+
+                            const trend = {
+                                id: Date.now().toString() + '_' + i + '_' + Math.random().toString(36).substr(2, 5),
+                                tag_description: tagDescription || `Trend_${i}`,
+                                trend_types: trendType,
+                                tag_name: cleanTagName || cleanExpression || `Tag_${i}`,
+                                item_name: cleanItemName || cleanEquipment || `Item_${i}`,
+                                time: trendTime
+                            };
+
+                            trends.push(trend);
+                            successCount++;
+                        } else {
+                            errorCount++;
+                            console.warn(`Line ${i + 1}: No valid data found`, values);
+                        }
+                    } catch (lineError) {
+                        errorCount++;
+                        console.error(`Error parsing line ${i + 1}:`, lineError, line);
+                    }
+                }
+            }
+
+            updateTrendTable();
+            saveTrendsToStorage();
+
+            if (successCount > 0) {
+                let message = `Successfully imported ${successCount} trends from CSV file`;
+                if (errorCount > 0) {
+                    message += ` (${errorCount} rows skipped due to errors)`;
+                    showAlert(message, 'warning');
+                } else {
+                    showAlert(message, 'success');
+                }
+            } else {
+                showAlert('No valid trends found in CSV file', 'error');
+            }
+
+        } catch (error) {
+            console.error('Error loading Trends CSV:', error);
+            showAlert('Error loading Trends CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    let i = 0;
+
+    while (i < line.length) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+
+        if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+
+                current += '"';
+                i += 2;
+            } else {
+
+                inQuotes = !inQuotes;
+                i++;
+            }
+        } else if (char === ',' && !inQuotes) {
+
+            result.push(current);
+            current = '';
+            i++;
+        } else {
+
+            current += char;
+            i++;
+        }
+    }
+
+
+    result.push(current);
+    return result;
+}
+
+
+function findColumnIndex(headers, possibleNames) {
+    for (let possibleName of possibleNames) {
+        const index = headers.findIndex(header => {
+            const cleanHeader = cleanCSVValue(header).toUpperCase();
+            return cleanHeader === possibleName.toUpperCase();
+        });
+        if (index !== -1) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+
+function cleanCSVValue(value) {
+    if (!value) return '';
+
+
+    let cleaned = value.toString().trim();
+    if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+        cleaned = cleaned.slice(1, -1);
+    }
+
+
+    cleaned = cleaned.replace(/""/g, '"');
+
+    return cleaned.trim();
+}
+
+
+function generateTrendsCSV() {
+    if (trends.length === 0) {
+        showAlert('No trends configured', 'error');
+        return;
+    }
+
+    const useAdvancedFormat = confirm('Export in advanced format (compatible with imported format)? Click Cancel for simple format.');
+
+    let csvContent;
+
+    if (useAdvancedFormat) {
+
+        const headers = [
+            'Equipment', 'Item Name', 'Tag Name', 'Cluster Name', 'Type', 'Expression', 'Trigger',
+            'Sample Period', 'Eng Units', 'Format', 'Deadband', 'Comment', 'Zero Scale', 'Full Scale',
+            'File Name', 'No. Files', 'Period', 'Trend Time', 'Storage Method', 'Area', 'Privilege',
+            'Historize', 'Project', 'SPCFLAG', 'LSL', 'USL', 'SUBGRPSIZE', 'XDOUBLEBAR', 'RANGE',
+            'SDEVIATION', 'TAGGENLINK', 'EDITCODE', 'LINKED'
+        ];
+
+        const rows = [headers.join(',')];
+
+        trends.forEach(trend => {
+
+            let typeValue = 'TRN_PERIODIC';
+            if (trend.trend_types === 'event') {
+                typeValue = 'TRN_EVENT';
+            } else if (trend.trend_types === 'periodic-event') {
+                typeValue = 'TRN_PERIODIC_EVENT';
+            }
+
+
+            let samplePeriod = '00:15:00';
+            if (trend.time && trend.time !== '00:00') {
+                samplePeriod = `${trend.time}:00`;
+            }
+
+
+            const equipment = trend.item_name ? trend.item_name.split('\\')[0] : '';
+
+            const row = [
+                `"${equipment}"`,
+                `"${trend.item_name || ''}"`,
+                `"${trend.tag_name || ''}"`,
+                '"c1"',
+                `"${typeValue}"`,
+                `"${trend.tag_name || ''}"`,
+                '""',
+                `"${samplePeriod}"`,
+                '"@(PU)"',
+                '"###.#"',
+                '""',
+                `"@(${trend.tag_description || ''})"`,
+                '""', '""', '""',
+                '"13"', '"1st"', '""',
+                '"Floating Point (8-byte samples)"',
+                '""', '""', '""',
+                '"Project"',
+                ...Array(12).fill('""')
+            ];
+            rows.push(row.join(','));
+        });
+
+        csvContent = rows.join('\n');
+    } else {
+
+        const headers = ['TAG_DESCRIPTION', 'TREND_TYPES', 'TAG_NAME', 'ITEM_NAME', 'TIME'];
+        const rows = [headers.join(',')];
+
+        trends.forEach(trend => {
+            const row = [
+                trend.tag_description || '',
+                trend.trend_types || '',
+                trend.tag_name || '',
+                trend.item_name || '',
+                trend.time || '00:00'
+            ];
+            rows.push(row.join(','));
+        });
+
+        csvContent = rows.join('\n');
+    }
+
+    downloadCSV(csvContent, 'TRENDS.csv');
+    showAlert('Trends CSV generated successfully!', 'success');
+}
+
 function loadVariablesCSV(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -2914,22 +3807,39 @@ function loadVariablesCSV(event) {
                 return;
             }
 
+
+            const headerLine = lines[0];
+            const headers = headerLine.split(',').map(h => h.trim().replace(/"/g, ''));
+
+            console.log('CSV Headers:', headers);
+
+
+            const equipmentIndex = headers.findIndex(h => h === 'Equipment');
+            const itemNameIndex = headers.findIndex(h => h === 'Item Name');
+            const tagNameIndex = headers.findIndex(h => h === 'Tag Name');
+            const ioDeviceIndex = headers.findIndex(h => h === 'I/O Device');
+            const dataTypeIndex = headers.findIndex(h => h === 'Data Type');
+            const addressIndex = headers.findIndex(h => h === 'Address');
+
             variables = [];
             let errorCount = 0;
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (line) {
-                    const values = line.split(',').map(v => v.trim());
+                    const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
 
-                    if (values[0] && values[0].length > 0) {
+                    if (values[itemNameIndex] && values[itemNameIndex].length > 0) {
                         const variable = {
                             id: Date.now().toString() + i,
-                            variable_name: values[0] || '',
-                            variable_type: values[1] || 'analog',
-                            data_type: values[2] || 'float',
-                            unit: values[3] || ''
+                            equipment: equipmentIndex >= 0 ? values[equipmentIndex] || '' : '',
+                            item_name: itemNameIndex >= 0 ? values[itemNameIndex] || '' : '',
+                            tag_name: tagNameIndex >= 0 ? values[tagNameIndex] || '' : '',
+                            io_device: ioDeviceIndex >= 0 ? values[ioDeviceIndex] || '' : '',
+                            data_type: dataTypeIndex >= 0 ? values[dataTypeIndex] || 'float' : 'float',
+                            address: addressIndex >= 0 ? values[addressIndex] || '' : ''
                         };
+                        console.log('Created variable:', variable);
                         variables.push(variable);
                     } else {
                         errorCount++;
@@ -2946,11 +3856,37 @@ function loadVariablesCSV(event) {
                 showAlert('Variables CSV loaded successfully!', 'success');
             }
         } catch (error) {
+            console.error('CSV loading error:', error);
             showAlert('Error loading Variables CSV: ' + error.message, 'error');
         }
     };
     reader.readAsText(file);
 }
+
+function generateVariablesCSV() {
+    if (variables.length === 0) {
+        showAlert('No variables configured', 'error');
+        return;
+    }
+
+    const headers = ['Equipment', 'Item Name', 'Tag Name', 'I/O Device', 'Data Type', 'Address'];
+    const rows = [headers.join(',')];
+
+    variables.forEach(variable => {
+        const row = [
+            variable.equipment || '',
+            variable.item_name || '',
+            variable.tag_name || '',
+            variable.io_device || '',
+            variable.data_type || '',
+            variable.address || ''
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'VARIABLES.csv');
+}
+
 
 function loadAlarmsCSV(event) {
     const file = event.target.files[0];
@@ -2972,129 +3908,278 @@ function loadAlarmsCSV(event) {
                 return;
             }
 
-            alarms = [];
+            const headerLine = lines[0];
+            const headers = parseCSVLine(headerLine);
+
+            console.log('Alarms CSV Headers:', headers);
+
+
+            const equipmentIndex = findColumnIndex(headers, ['Equipment', 'EQUIPMENT']);
+            const itemNameIndex = findColumnIndex(headers, ['Item Name', 'ITEM_NAME']);
+            const alarmTagIndex = findColumnIndex(headers, ['Alarm Tag', 'ALARM_TAG', 'Tag Name', 'TAG_NAME']);
+            const alarmNameIndex = findColumnIndex(headers, ['Alarm Name', 'ALARM_NAME', 'Name', 'NAME']);
+            const categoryIndex = findColumnIndex(headers, ['Category', 'CATEGORY']);
+            const alarmDescIndex = findColumnIndex(headers, ['Alarm Desc', 'ALARM_DESC', 'Description', 'DESCRIPTION']);
+            const commentIndex = findColumnIndex(headers, ['Comment', 'COMMENT']);
+            const variableTagAIndex = findColumnIndex(headers, ['Variable Tag A', 'VARIABLE_TAG_A']);
+
+            if (equipmentIndex === -1 && itemNameIndex === -1 && alarmTagIndex === -1) {
+                showAlert('Alarms CSV format not recognized. Could not find Equipment, Item Name, or Alarm Tag columns.', 'error');
+                return;
+            }
+
+            alarms = alarms || [];
+            let successCount = 0;
             let errorCount = 0;
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (line) {
-                    const values = line.split(',').map(v => v.trim());
+                    try {
+                        const values = parseCSVLine(line);
 
-                    if (values[0] && values[0].length > 0) {
-                        const alarm = {
-                            id: Date.now().toString() + i,
-                            alarm_name: values[0] || '',
-                            alarm_type: values[1] || 'analog',
-                            category: values[2] || 'low',
-                            alarm_tag: values[3] || '',
-                            equipment: values[4] || '',
-                            item_name: values[5] || ''
-                        };
-                        alarms.push(alarm);
-                    } else {
+                        const equipment = values[equipmentIndex] || '';
+                        const itemName = values[itemNameIndex] || '';
+                        const alarmTag = values[alarmTagIndex] || '';
+                        const alarmName = values[alarmNameIndex] || '';
+                        const category = values[categoryIndex] || '';
+                        const alarmDesc = values[alarmDescIndex] || '';
+                        const comment = values[commentIndex] || '';
+                        const variableTagA = values[variableTagAIndex] || '';
+
+
+                        const cleanEquipment = cleanCSVValue(equipment);
+                        const cleanItemName = cleanCSVValue(itemName);
+                        const cleanAlarmTag = cleanCSVValue(alarmTag);
+                        const cleanAlarmName = cleanCSVValue(alarmName);
+                        const cleanCategory = cleanCSVValue(category);
+                        const cleanAlarmDesc = cleanCSVValue(alarmDesc);
+                        const cleanComment = cleanCSVValue(comment);
+                        const cleanVariableTagA = cleanCSVValue(variableTagA);
+
+                        if (cleanEquipment || cleanItemName || cleanAlarmTag) {
+
+                            let description = cleanAlarmName;
+                            if (!description) {
+                                description = cleanAlarmDesc || cleanComment || cleanItemName || cleanAlarmTag;
+                            }
+
+
+                            let priority = 'LOW';
+                            if (cleanCategory) {
+                                const catUpper = cleanCategory.toUpperCase();
+                                if (catUpper.includes('HIGH') || catUpper.includes('CRITICAL')) {
+                                    priority = 'HIGH';
+                                } else if (catUpper.includes('MEDIUM')) {
+                                    priority = 'MEDIUM';
+                                } else if (catUpper.includes('LOW')) {
+                                    priority = 'LOW';
+                                }
+                            }
+
+                            const alarm = {
+                                id: Date.now().toString() + '_' + i + '_' + Math.random().toString(36).substr(2, 5),
+                                equipment: cleanEquipment || `Equipment_${i}`,
+                                item_name: cleanItemName || cleanEquipment || `Item_${i}`,
+                                alarm_tag: cleanAlarmTag || cleanItemName || `AlarmTag_${i}`,
+                                alarm_name: cleanAlarmName || description || `Alarm_${i}`,
+                                category: cleanCategory || '_PLSALM_LOW',
+                                description: description || `Alarm_${i}`,
+                                priority: priority,
+                                variable_tag: cleanVariableTagA || cleanAlarmTag || ''
+                            };
+
+                            alarms.push(alarm);
+                            successCount++;
+                        } else {
+                            errorCount++;
+                            console.warn(`Alarms Line ${i + 1}: No valid data found`, values);
+                        }
+                    } catch (lineError) {
                         errorCount++;
+                        console.error(`Error parsing alarms line ${i + 1}:`, lineError, line);
                     }
                 }
             }
 
-            updateAlarmTable();
-            saveAlarmsToStorage();
 
-            if (errorCount > 0) {
-                showAlert(`Alarms CSV loaded with ${errorCount} rows skipped due to missing names`, 'warning');
+            if (typeof updateAlarmTable === 'function') updateAlarmTable();
+            if (typeof saveAlarmsToStorage === 'function') saveAlarmsToStorage();
+
+            if (successCount > 0) {
+                let message = `Successfully imported ${successCount} alarms from CSV file`;
+                if (errorCount > 0) {
+                    message += ` (${errorCount} rows skipped due to errors)`;
+                    showAlert(message, 'warning');
+                } else {
+                    showAlert(message, 'success');
+                }
             } else {
-                showAlert('Alarms CSV loaded successfully!', 'success');
+                showAlert('No valid alarms found in CSV file', 'error');
             }
+
         } catch (error) {
+            console.error('Error loading Alarms CSV:', error);
             showAlert('Error loading Alarms CSV: ' + error.message, 'error');
         }
     };
     reader.readAsText(file);
 }
 
-function loadTrendsCSV(event) {
-    const file = event.target.files[0];
-    if (!file) return;
 
-    if (!file.name.toLowerCase().endsWith('.csv')) {
-        showAlert('Please select a valid CSV file', 'error');
+function generateAlarmsCSV() {
+    if (!alarms || alarms.length === 0) {
+        showAlert('No alarms configured', 'error');
         return;
     }
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const csv = e.target.result;
-            const lines = csv.split('\n').filter(line => line.trim());
+    const useAdvancedFormat = confirm('Export in advanced format (compatible with imported format)? Click Cancel for simple format.');
 
-            if (lines.length < 2) {
-                showAlert('Trends CSV file appears to be empty', 'error');
-                return;
-            }
+    let csvContent;
 
-            trends = [];
-            let errorCount = 0;
+    if (useAdvancedFormat) {
 
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (line) {
-                    const values = line.split(',').map(v => v.trim());
+        const headers = [
+            'Equipment', 'Item Name', 'Alarm Tag', 'Alarm Name', 'Cluster Name', 'Category', 'Alarm Desc',
+            'Delay', 'Help', 'Comment', 'Variable Tag A', 'Variable Tag B', 'Custom 1', 'Custom 2',
+            'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6', 'Custom 7', 'Custom 8', 'Paging',
+            'Paging Group', 'Area', 'Privilege', 'Historize', 'Project', 'SEQUENCE', 'TAGGENLINK',
+            'EDITCODE', 'LINKED'
+        ];
 
-                    if (values[0] && values[0].length > 0) {
-                        const trend = {
-                            id: Date.now().toString() + i,
-                            tag_description: values[0] || '',
-                            trend_types: values[1] || 'event',
-                            tag_name: values[2] || '',
-                            item_name: values[3] || ''
-                        };
-                        trends.push(trend);
-                    } else {
-                        errorCount++;
-                    }
-                }
-            }
+        const rows = [headers.join(',')];
 
-            updateTrendTable();
-            saveTrendsToStorage();
+        alarms.forEach(alarm => {
+            const row = [
+                `"${alarm.equipment || ''}"`,
+                `"${alarm.item_name || ''}"`,
+                `"${alarm.alarm_tag || ''}"`,
+                `"@(${alarm.alarm_name || ''})"`,
+                '"VIE02_Cluster1"',
+                `"${alarm.category || '_PLSALM_LOW'}"`,
+                '"Alarm,Normal"',
+                '""', '""', '""',
+                `"${alarm.variable_tag || alarm.alarm_tag || ''}"`,
+                '""',
+                `"${alarm.equipment || ''}"`,
+                ...Array(7).fill('""'),
+                `"${alarm.equipment || ''}"`,
+                '""', '""', '""', '""',
+                '"Msft_VIE02_P1"',
+                '""', '""', '""', '""'
+            ];
+            rows.push(row.join(','));
+        });
 
-            if (errorCount > 0) {
-                showAlert(`Trends CSV loaded with ${errorCount} rows skipped due to missing descriptions`, 'warning');
+        csvContent = rows.join('\n');
+    } else {
+
+        const headers = ['EQUIPMENT', 'ITEM_NAME', 'ALARM_TAG', 'ALARM_NAME', 'CATEGORY', 'DESCRIPTION', 'PRIORITY', 'VARIABLE_TAG'];
+        const rows = [headers.join(',')];
+
+        alarms.forEach(alarm => {
+            const row = [
+                alarm.equipment || '',
+                alarm.item_name || '',
+                alarm.alarm_tag || '',
+                alarm.alarm_name || '',
+                alarm.category || '',
+                alarm.description || '',
+                alarm.priority || '',
+                alarm.variable_tag || ''
+            ];
+            rows.push(row.join(','));
+        });
+
+        csvContent = rows.join('\n');
+    }
+
+    downloadCSV(csvContent, 'ALARMS.csv');
+    showAlert('Alarms CSV generated successfully!', 'success');
+}
+
+
+function downloadCSV(csvContent, filename) {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+
+
+function loadEquipmentFromCSV(lines) {
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line) {
+            const values = line.split(',');
+            const device = {
+                id: Date.now().toString() + i,
+                device_name: values[0] || '',
+                device_type: values[1] || '',
+                tag_prefix: values[3] || '',
+                io_device: values[4] || '',
+                protocol: 'modbus',
+                modbusVariant: 'tcp',
+                variables: [],
+                alarms: [],
+                trends: []
+            };
+            devices.push(device);
+        }
+    }
+
+    saveDevicesToStorage();
+    updateDeviceList();
+    updateDeviceCounter();
+}
+
+function loadUnitsFromCSV(lines) {
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (line) {
+            const values = line.split(',');
+            const existingDevice = devices.find(d => d.device_name === values[0]);
+
+            if (existingDevice) {
+                existingDevice.port_name = values[2] || '';
+                existingDevice.device_ip = values[3] || '';
+                existingDevice.protocol_name = values[4] || '';
+                existingDevice.memory = values[5] || 'TRUE';
+                existingDevice.unit_number = values[6] || '1';
             } else {
-                showAlert('Trends CSV loaded successfully!', 'success');
+                const device = {
+                    id: Date.now().toString() + i,
+                    device_name: values[0] || '',
+                    device_type: values[1] === 'IED' ? 'IED' : 'PLC',
+                    port_name: values[2] || '',
+                    device_ip: values[3] || '',
+                    protocol_name: values[4] || '',
+                    memory: values[5] || 'TRUE',
+                    unit_number: values[6] || '1',
+                    protocol: values[4] && values[4].includes('IEC') ? 'iec' : 'modbus',
+                    modbusVariant: 'tcp',
+                    variables: [],
+                    alarms: [],
+                    trends: []
+                };
+                devices.push(device);
             }
-        } catch (error) {
-            showAlert('Error loading Trends CSV: ' + error.message, 'error');
         }
-    };
-    reader.readAsText(file);
-}
-
-function loadCID(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!file.name.toLowerCase().endsWith('.cid')) {
-        showAlert('Please select a valid CID file', 'error');
-        return;
     }
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const cidContent = e.target.result;
-            if (!cidContent.includes('<?xml') || !cidContent.includes('<SCL')) {
-                showAlert('Invalid CID file format. Expected SCL XML format.', 'error');
-                return;
-            }
-
-            showAlert('CID file loaded successfully!', 'success');
-        } catch (error) {
-            showAlert('Error loading CID file: ' + error.message, 'error');
-        }
-    };
-    reader.readAsText(file);
+    saveDevicesToStorage();
+    updateDeviceList();
+    updateDeviceCounter();
 }
+
 
 function updateDeviceList() {
     const deviceList = document.getElementById('deviceList');
@@ -3219,6 +4304,7 @@ function updateDeviceCounter() {
     }
 }
 
+
 function saveDevicesToStorage() {
     console.log('Devices saved:', devices);
 }
@@ -3254,6 +4340,7 @@ function loadTrendsFromStorage() {
     trends = [];
     updateTrendTable();
 }
+
 
 function downloadCSV(content, filename) {
     const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
@@ -3300,71 +4387,6 @@ function showLoading(show) {
             if (form) form.style.display = 'block';
         }
     }
-}
-
-function loadEquipmentFromCSV(lines) {
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line) {
-            const values = line.split(',');
-            const device = {
-                id: Date.now().toString() + i,
-                device_name: values[0] || '',
-                device_type: values[1] || '',
-                tag_prefix: values[3] || '',
-                io_device: values[4] || '',
-                protocol: 'modbus',
-                modbusVariant: 'tcp',
-                variables: [],
-                alarms: [],
-                trends: []
-            };
-            devices.push(device);
-        }
-    }
-
-    saveDevicesToStorage();
-    updateDeviceList();
-    updateDeviceCounter();
-}
-
-function loadUnitsFromCSV(lines) {
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line) {
-            const values = line.split(',');
-            const existingDevice = devices.find(d => d.device_name === values[0]);
-
-            if (existingDevice) {
-                existingDevice.port_name = values[2] || '';
-                existingDevice.device_ip = values[3] || '';
-                existingDevice.protocol_name = values[4] || '';
-                existingDevice.memory = values[5] || 'TRUE';
-                existingDevice.unit_number = values[6] || '1';
-            } else {
-                const device = {
-                    id: Date.now().toString() + i,
-                    device_name: values[0] || '',
-                    device_type: values[1] === 'IED' ? 'IED' : 'PLC',
-                    port_name: values[2] || '',
-                    device_ip: values[3] || '',
-                    protocol_name: values[4] || '',
-                    memory: values[5] || 'TRUE',
-                    unit_number: values[6] || '1',
-                    protocol: values[4] && values[4].includes('IEC') ? 'iec' : 'modbus',
-                    modbusVariant: 'tcp',
-                    variables: [],
-                    alarms: [],
-                    trends: []
-                };
-                devices.push(device);
-            }
-        }
-    }
-
-    saveDevicesToStorage();
-    updateDeviceList();
-    updateDeviceCounter();
 }
 </script>
 </body>
