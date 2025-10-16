@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Device Configuration Generator - Schneider Electric</title>
   <style>
+    /* Main styles for Device Configuration Generator */
     body {
       margin: 0;
       padding: 0;
@@ -164,6 +166,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
     }
 
     .info-icon {
@@ -286,12 +291,12 @@
     }
 
     .btn-secondary {
-      background: #007bff;
+      background: #6c757d;
       color: white;
     }
 
     .btn-secondary:hover {
-      background: #007bff;
+      background: #5a6268;
     }
 
     .btn-danger {
@@ -301,15 +306,6 @@
 
     .btn-danger:hover {
       background: #c82333;
-    }
-
-    .btn-warning {
-      background: #ffc107;
-      color: #212529;
-    }
-
-    .btn-warning:hover {
-      background: #e0a800;
     }
 
     .button-group {
@@ -356,13 +352,6 @@
       color: #6c757d;
       cursor: not-allowed;
       opacity: 0.6;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
     }
 
     .loading {
@@ -483,7 +472,6 @@
       position: relative;
     }
 
-    /* Enhanced editable cell styles */
     .editable-cell {
       background: transparent;
       border: 1px solid transparent;
@@ -626,38 +614,49 @@
       pointer-events: all;
     }
 
-    .editing-row {
-      background-color: rgba(255, 193, 7, 0.1) !important;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-    }
-
-    .action-buttons button {
-      padding: 4px 8px;
-      font-size: 0.8rem;
-      border-radius: 4px;
-      border: none;
+    /* Device sidebar styles */
+    .device-item {
+      background: rgba(255,255,255,0.1);
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
 
-    .editable-row:hover {
-      background-color: rgba(61, 205, 104, 0.05);
+    .device-item:hover {
+      background: rgba(255,255,255,0.2);
     }
 
-    .row-changed {
-      background-color: rgba(255, 193, 7, 0.1);
+    .device-name {
+      font-weight: bold;
+      margin-bottom: 4px;
     }
 
-    .row-changed .editable-cell,
-    .row-changed .editable-select {
-      background-color: rgba(255, 193, 7, 0.05);
+    .device-info {
+      font-size: 0.9em;
+      opacity: 0.8;
     }
 
+    .remove-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8em;
+      margin-top: 8px;
+      cursor: pointer;
+    }
+
+    .device-counter {
+      background: rgba(255,255,255,0.2);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.9em;
+    }
+
+    /* Responsive design */
     @media (max-width: 768px) {
       .config-cards {
         flex-direction: column;
@@ -678,6 +677,14 @@
       .file-upload-grid {
         grid-template-columns: 1fr;
       }
+
+      .main-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -696,6 +703,11 @@
       <div class="header">
         <div class="header-content">
           <h1>Device Configuration Generator</h1>
+
+          <img src="{% static 'images/schneider_logo.png' %}"
+     alt="Schneider Electric - Life Is On"
+     class="company-logo"
+     style="position: absolute; top: 30px; right: 40px; width: 360px; height: auto; z-index: 100;" />
 
           <div class="file-upload-section">
             <h3>File Upload</h3>
@@ -805,11 +817,11 @@
 
               <div class="form-group">
                 <label for="io_device">
-                  I/O Device
+                  I/O Device Name
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      Name of the physical I/O device or inverter to which the device is connected. Example: Inverter_PV1
+                      Name of the physical I/O device, gateway, or communication interface. This should match your network configuration. Example: Gateway_01, ModbusRTU_Master
                     </div>
                   </div>
                 </label>
@@ -818,12 +830,13 @@
             </div>
           </div>
 
+          <!-- Modbus Configuration Section -->
           <div class="config-section" id="modbus-config">
             <h3>Modbus Network Configuration</h3>
 
             <div class="modbus-variant-selection">
-              <h4 style="margin: 0 0 10px 0; color: #007bff;">Select Modbus Variant</h4>
-              <p style="margin: 0 0 16px 0; color: #666; font-size: 0.9rem;">Choose between TCP/IP or RTU communication</p>
+              <h4>Select Modbus Variant</h4>
+              <p>Choose between TCP/IP or RTU communication</p>
               <div class="modbus-variant-buttons">
                 <button type="button" class="modbus-variant-btn active" onclick="selectModbusVariant('tcp')">
                   TCP/IP
@@ -838,63 +851,93 @@
               <div class="form-grid-2">
                 <div class="form-group">
                   <label for="device_ip">
-                    Device IP Address
+                    IP Address
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                        IP address of the device on the network. Must be in IPv4 format (e.g. 192.168.1.100). Make sure the address is unique on the network.
+                        IPv4 address of the Modbus TCP device. Must be reachable from your SCADA system. Example: 192.168.1.100
                       </div>
                     </div>
                   </label>
-                  <input type="text" name="device_ip" id="device_ip" required placeholder="e.g. 192.168.1.100" />
+                  <input type="text" name="device_ip" id="device_ip" placeholder="e.g. 127.0.0.1" />
                 </div>
-
                 <div class="form-group">
                   <label for="modbus_port">
                     Modbus TCP Port
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                        TCP port for Modbus communication. Standard port is 502.
+                        TCP port number for Modbus communication. Default is 502. Check device documentation if using custom port.
                       </div>
                     </div>
                   </label>
-                  <select name="modbus_port" id="modbus_port" required>
-                    <option value="502">502</option>
-                  </select>
+                  <input type="number" name="modbus_port" id="modbus_port" placeholder="502" value="502" />
                 </div>
-
                 <div class="form-group">
                   <label for="port_name">
                     Port Name
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                        Communication port name in the SCADA system. Example: P14_BOARD1_PRJ3
+                        Unique identifier for this communication port in your SCADA system. Format: P[number]_[board]_[project]. Example: P14_BOARD1_PRJ3
                       </div>
                     </div>
                   </label>
                   <input type="text" name="port_name" id="port_name" placeholder="e.g. P14_BOARD1_PRJ3" />
                 </div>
-
                 <div class="form-group">
-                  <label for="memory_tcp">
-                    MEMORY
+                  <label for="unit_number">
+                    Unit Number
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                        TRUE/FALSE
+                        Modbus unit identifier (1-247). Also known as Slave ID in some contexts. Must match device configuration.
+                      </div>
+                    </div>
+                  </label>
+                  <input type="number" name="unit_number" id="unit_number" placeholder="1" value="1" min="1" max="247" />
+                </div>
+                <div class="form-group">
+                  <label for="board_name_tcp">
+                    Board Name
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Name of the communication board or interface card. Used for organizing multiple communication channels. Example: BOARD1, ETH_CARD1
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="board_name_tcp" id="board_name_tcp" placeholder="e.g. BOARD1" />
+                </div>
+                <div class="form-group">
+                  <label for="project_name">
+                    Project Name
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Name of your SCADA project. Used for file organization and reference. Keep it short and descriptive.
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="project_name" id="project_name" placeholder="e.g. DTU_project" value="DTU_project" />
+                </div>
+                <div class="form-group">
+                  <label for="memory_tcp">
+                    Memory
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Enable memory buffering for communication reliability. TRUE recommended for critical applications.
                       </div>
                     </div>
                   </label>
                   <select id="memory_tcp" name="memory">
-                    <option value="TRUE">TRUE</option>
-                    <option value="FALSE">FALSE</option>
+                    <option value="true">TRUE</option>
+                    <option value="false">FALSE</option>
                   </select>
                 </div>
               </div>
             </div>
-
             <div id="modbus-rtu-config" class="hidden">
               <div class="form-grid-2">
                 <div class="form-group">
@@ -903,66 +946,74 @@
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                        Gateway address of the device on the network.
+                        IP address of the Modbus RTU to TCP gateway device. This converts between serial RTU and Ethernet TCP protocols.
                       </div>
                     </div>
                   </label>
                   <input type="text" name="gateway_address" id="gateway_address" placeholder="e.g. 192.168.1.100" />
                 </div>
-
                 <div class="form-group">
                   <label for="slave_id">
                     Slave ID
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                         Modbus RTU slave address (1-247). Each device on the serial bus must have a unique slave ID.
+                        Modbus RTU slave identifier (1-247). Each device on the RTU network must have a unique slave ID.
                       </div>
                     </div>
                   </label>
-                  <input type="number" name="slave_id" id="slave_id" placeholder="7" min="1" max="247" />
+                  <input type="number" name="slave_id" id="slave_id" placeholder="1" min="1" max="247" />
                 </div>
-
                 <div class="form-group">
                   <label for="port_name_rtu">
                     Port Name
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                        Communication port name in the SCADA system. Example: P14_BOARD1_PRJ3
+                        Unique identifier for this RTU communication port in your SCADA system. Example: P15_SERIAL1_RTU
                       </div>
                     </div>
                   </label>
                   <input type="text" name="port_name_rtu" id="port_name_rtu" placeholder="e.g. P14_BOARD1_PRJ3" />
                 </div>
-
-                <div class="form-group">
-                  <label for="memory_rtu">
-                    MEMORY
-                    <div class="info-icon">
-                      i
-                      <div class="tooltip">
-                        TRUE/FALSE
-                      </div>
-                    </div>
-                  </label>
-                  <select id="memory_rtu" name="memory_rtu">
-                    <option value="TRUE">TRUE</option>
-                    <option value="FALSE">FALSE</option>
-                  </select>
-                </div>
-
                 <div class="form-group">
                   <label for="serial_port">
                     Serial Port
                     <div class="info-icon">
                       i
                       <div class="tooltip">
-                        Serial communication port (e.g. COM1, COM2, /dev/ttyS0). This is the physical port on the computer or gateway.
+                        Serial communication port identifier. Examples: COM1 (Windows), /dev/ttyUSB0 (Linux). Check your system's device manager.
                       </div>
                     </div>
                   </label>
                   <input type="text" name="serial_port" id="serial_port" placeholder="e.g. COM1" />
+                </div>
+                <div class="form-group">
+                  <label for="memory_rtu">
+                    Memory
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Enable memory buffering for RTU communication reliability. TRUE recommended for stable operation.
+                      </div>
+                    </div>
+                  </label>
+                  <select id="memory_rtu" name="memory_rtu">
+                    <option value="true">TRUE</option>
+                    <option value="false">FALSE</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="board_name_rtu">
+                    Board Name
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Name of the serial communication board or RS485 interface. Used for hardware identification. Example: SERIAL_BOARD1
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="board_name_rtu" id="board_name_rtu" placeholder="e.g. BOARD1" />
                 </div>
               </div>
 
@@ -981,7 +1032,7 @@
                       <div class="info-icon">
                         i
                         <div class="tooltip">
-                          Serial communication speed in bits per second. Common values: 9600, 19200, 38400, 57600, 115200.
+                          Serial communication speed in bits per second. Must match all devices on the RTU network. 38400 is commonly used.
                         </div>
                       </div>
                     </label>
@@ -993,14 +1044,13 @@
                       <option value="115200">115200</option>
                     </select>
                   </div>
-
                   <div class="form-group">
                     <label for="data_bits">
                       Data Bits
                       <div class="info-icon">
                         i
                         <div class="tooltip">
-                          Number of data bits per character. Standard is 8 bits.
+                          Number of data bits per character. 8 bits is standard for most Modbus RTU applications.
                         </div>
                       </div>
                     </label>
@@ -1009,14 +1059,13 @@
                       <option value="8" selected>8</option>
                     </select>
                   </div>
-
                   <div class="form-group">
                     <label for="parity">
                       Parity
                       <div class="info-icon">
                         i
                         <div class="tooltip">
-                          Error checking method. None = no parity, Even = even parity, Odd = odd parity.
+                          Error detection method. 'None' is most common. Must match all devices on the network for proper communication.
                         </div>
                       </div>
                     </label>
@@ -1026,14 +1075,13 @@
                       <option value="Odd">Odd</option>
                     </select>
                   </div>
-
                   <div class="form-group">
                     <label for="stop_bits">
                       Stop Bits
                       <div class="info-icon">
                         i
                         <div class="tooltip">
-                          Number of stop bits. Standard is 1 stop bit.
+                          Number of stop bits for serial framing. 1 stop bit is standard. Must match device configuration.
                         </div>
                       </div>
                     </label>
@@ -1044,21 +1092,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div class="form-group">
-              <label for="protocol">
-                Protocol
-                <div class="info-icon">
-                  i
-                  <div class="tooltip">
-                    Communication protocol used to connect to the device.
-                  </div>
-                </div>
-              </label>
-              <select name="protocol" id="protocol" required>
-                <option value="Modbus TCP">Modbus TCP/IP</option>
-              </select>
             </div>
           </div>
 
@@ -1071,77 +1104,141 @@
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      IP address of the IEC 61850 device. Must be in IPv4 format (e.g. 192.168.1.100). Ensure unique addressing on the substation network.
+                      IPv4 address of the IEC 61850 device (IED). Must be reachable from your SCADA system network.
                     </div>
                   </div>
                 </label>
                 <input type="text" name="iec_device_ip" id="iec_device_ip" placeholder="e.g. 192.168.1.100" />
               </div>
-
               <div class="form-group">
                 <label for="iec_port">
-                  IEC Port
+                  Port Number
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      TCP port for IEC 61850 communication. Standard port is 102 for MMS services. Can be customized if needed.
+                      TCP port for IEC 61850 MMS communication. Default is 102. Check device configuration if different.
                     </div>
                   </div>
                 </label>
                 <input type="number" name="iec_port" id="iec_port" placeholder="102" value="102" min="1" max="65535" />
               </div>
-
               <div class="form-group">
                 <label for="ied_name">
                   IED Name
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      Intelligent Electronic Device name as defined in the SCL configuration. Must match the IED name in the substation configuration file.
+                      Intelligent Electronic Device name as defined in the SCL file. Must match exactly with device configuration. Example: PROT_RELAY_01
                     </div>
                   </div>
                 </label>
                 <input type="text" name="ied_name" id="ied_name" placeholder="e.g. PROT_RELAY_01" />
               </div>
-
               <div class="form-group">
                 <label for="access_point">
-                  Access Point
+                  Port Name
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      Access Point name for the IED communication interface. Typically defined in the IED configuration (e.g. S1, AP1, ETH1).
+                      Communication access point name for this IED connection. Used for port identification in SCADA system. Example: P_RELAY_01
                     </div>
                   </div>
                 </label>
-                <input type="text" name="access_point" id="access_point" placeholder="e.g. S1" />
+                <input type="text" name="access_point" id="access_point" placeholder="e.g. P_RELAY_01" />
               </div>
-
               <div class="form-group">
                 <label for="logical_device">
                   Logical Device
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      Logical Device name within the IED. Represents a logical grouping of functions (e.g. LD0, PROT, CTRL).
+                      Logical device instance within the IED. Usually LD0, LD1, etc. Check your device's SCL file for exact name.
                     </div>
                   </div>
                 </label>
-                <input type="text" name="logical_device" id="logical_device" placeholder="e.g. LD0" />
+                <input type="text" name="logical_device" id="logical_device" placeholder="e.g. Relay" />
               </div>
-
               <div class="form-group">
-                <label for="report_control">
-                  Report Control Block
+                <label for="board_name">
+                  Board Name
                   <div class="info-icon">
                     i
                     <div class="tooltip">
-                      Name of the Report Control Block (RCB) for data reporting. Used for unbuffered or buffered reporting of data changes and events.
+                      Name of the communication board handling IEC 61850 protocol. Used for hardware organization. Example: IEC_BOARD1
                     </div>
                   </div>
                 </label>
-                <input type="text" name="report_control" id="report_control" placeholder="e.g. brcb01" />
+                <input type="text" name="board_name" id="board_name" placeholder="e.g. BOARD1" />
               </div>
+              <div class="form-group">
+                <label for="memory_iec">
+                  Memory
+                  <div class="info-icon">
+                    i
+                    <div class="tooltip">
+                      Enable memory buffering for IEC 61850 communication reliability. TRUE recommended for critical power system applications.
+                    </div>
+                  </div>
+                </label>
+                <select id="memory_iec" name="memory_iec">
+                  <option value="true">TRUE</option>
+                  <option value="false">FALSE</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Report Control Blocks Section -->
+            <div class="config-section">
+              <h4>Report Control Blocks</h4>
+              <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">
+                Fill in at least one of the report control blocks (BRCB or URCB). You can configure both if needed.
+              </p>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="brcb">
+                    BRCB (Buffered Report Control Block)
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Buffered Report Control Block for reliable data transmission with store-and-forward capability. Example: LLN0$BR$brcbEV1
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="brcb" id="brcb" placeholder="e.g. LLN0$BR$brcbEV1" />
+                </div>
+
+                <div class="form-group">
+                  <label for="urcb">
+                    URCB (Unbuffered Report Control Block)
+                    <div class="info-icon">
+                      i
+                      <div class="tooltip">
+                        Unbuffered Report Control Block for fast, real-time data transmission without buffering. Example: LLN0$RP$urcbEV4
+                      </div>
+                    </div>
+                  </label>
+                  <input type="text" name="urcb" id="urcb" placeholder="e.g. LLN0$RP$urcbEV4" />
+                </div>
+              </div>
+
+              <!-- Validation message for report control blocks -->
+              <div id="rcb-validation" style="display: none; color: #dc3545; font-size: 0.9em; margin-top: 8px;">
+                Please fill in at least one Report Control Block (BRCB or URCB).
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="scl_file">
+                SCL File Path (Optional)
+                <div class="info-icon">
+                  i
+                  <div class="tooltip">
+                    Path to the System Configuration Language file (.cid, .scd, .icd). Contains device data model definition. Format: [USER]:Project\Device.cid
+                  </div>
+                </div>
+              </label>
+              <input type="text" name="scl_file" id="scl_file" placeholder="e.g. [USER]:Project\Device.cid" />
             </div>
           </div>
 
@@ -1155,17 +1252,18 @@
 
             <button type="button" class="btn btn-success" id="saveDeviceBtn" onclick="saveDevice()">Save Device</button>
             <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-            <button type="button" class="btn btn-primary" id="generateCSVBtn" onclick="generateCSV()">Generate CSV Files</button>
+            <button type="button" class="btn btn-primary" id="generateCSVBtn" onclick="generateAllCSV()">Generate CSV Files</button>
           </div>
         </form>
 
         <div class="loading" id="loading">
           <div class="spinner"></div>
-          <p>Generating configuration files</p>
+          <p>Processing configuration...</p>
         </div>
       </div>
 
-       <div class="tab-content" id="variables">
+      <!-- Variables Tab -->
+      <div class="tab-content" id="variables">
         <div class="config-section">
           <h3>Variable Configuration</h3>
           <div class="form-grid-3">
@@ -1175,72 +1273,67 @@
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Short item identifier for the variable (e.g. Ia, Vab, P, Q, F, Temp01). Should be unique and descriptive.
+                    Unique variable identifier. Use descriptive names starting with letter/underscore. Example: Ia, ActivePower, Temperature
                   </div>
                 </div>
               </label>
               <input type="text" id="item_name" placeholder="e.g. Ia" />
             </div>
-
             <div class="form-group">
               <label for="io_device_var">
                 I/O Device
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Name of the I/O device or communication interface where this variable is connected (e.g. Inverter_01, PLC_Main).
+                    Communication device or gateway handling this variable. Must match a configured I/O device name.
                   </div>
                 </div>
               </label>
               <input type="text" id="io_device_var" placeholder="e.g. Inverter_01" />
             </div>
-
             <div class="form-group">
               <label for="tag_name_var">
                 Tag Name
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Full tag name including logical node and data object (IEC 61850 format: MMXU1\A\phsA or Modbus register reference).
+                    Complete tag reference including logical nodes. For IEC: MMXU1\A\phsA. For Modbus: use descriptive names like PV_Power_kW.
                   </div>
                 </div>
               </label>
-              <input type="text" id="tag_name_var" placeholder="e.g. MMXU1\A\phsA" />
+              <input type="text" id="tag_name_var" placeholder="e.g. MMXU1\\A\\phsA" />
             </div>
-
             <div class="form-group">
               <label for="address">
                 Address
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Register address or memory location where the variable is stored (e.g. 40001, 30001 for Modbus registers).
+                    Register address for Modbus (e.g. 40001) or data object reference for IEC 61850. Check device documentation for correct addresses.
                   </div>
                 </div>
               </label>
               <input type="text" id="address" placeholder="e.g. 40001" />
             </div>
-
             <div class="form-group">
               <label for="equipment_var">
                 Equipment
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Equipment hierarchy path where this variable belongs (e.g. Site.Building.Device, Virtual.System).
+                    Equipment or system this variable belongs to. Used for organization in SCADA displays. Example: Virtual.System, PV.Inverter1
                   </div>
                 </div>
               </label>
               <input type="text" id="equipment_var" placeholder="e.g. Virtual.System" />
             </div>
-
             <div class="form-group">
               <label for="data_type">
                 Data Type
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Data type: Float (floating point numbers), Integer (whole numbers), Boolean (true/false), String (text).
+                    Data type of the variable. Float for analog values, Integer for counts, Boolean for digital states, String for text.
                   </div>
                 </div>
               </label>
@@ -1276,6 +1369,7 @@
         </div>
       </div>
 
+      <!-- Alarms Tab -->
       <div class="tab-content" id="alarms">
         <div class="config-section">
           <h3>Alarms Configuration</h3>
@@ -1286,20 +1380,19 @@
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Name for the alarm. Use clear naming convention like PowerFailure24V, HighTemperature, CommLoss
+                    Descriptive name for the alarm. Use clear, meaningful names that indicate the problem. Example: PowerFailure24V, HighTemperature, CommunicationLoss
                   </div>
                 </div>
               </label>
               <input type="text" id="alarm_name" placeholder="e.g. PowerFailure24V" />
             </div>
-
             <div class="form-group">
               <label for="alarm_type">
                 Alarm Type
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Alarm type: Analog, Digital, Advanced
+                    Type of alarm processing. Analog: for threshold alarms on numeric values. Digital: for binary state changes. Advanced: for complex conditions.
                   </div>
                 </div>
               </label>
@@ -1309,14 +1402,13 @@
                 <option value="advanced">Advanced</option>
               </select>
             </div>
-
             <div class="form-group">
               <label for="category">
                 Category
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Priority level: Low (informational), Medium (warning), High (critical), Event (status change)
+                    Alarm severity level. Low: informational. Medium: requires attention. High: critical, immediate action needed. Event: status notification.
                   </div>
                 </div>
               </label>
@@ -1327,40 +1419,37 @@
                 <option value="event">Event</option>
               </select>
             </div>
-
             <div class="form-group">
               <label for="alarm_tag">
                 Alarm Tag
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Tag name associated with the alarm. Links alarm to specific data point or signal.
+                    Variable tag that triggers this alarm. Should reference an existing variable or be a system-generated tag.
                   </div>
                 </div>
               </label>
               <input type="text" id="alarm_tag" placeholder="e.g. User_Event" />
             </div>
-
             <div class="form-group">
               <label for="equipment">
                 Equipment
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Equipment hierarchy path. Defines where the alarm belongs in the system structure.
+                    Equipment or system component this alarm is associated with. Used for alarm grouping and filtering. Example: Virtual.System, Inverter.Unit1
                   </div>
                 </div>
               </label>
               <input type="text" id="equipment" placeholder="e.g. Virtual.System" />
             </div>
-
             <div class="form-group">
               <label for="item_name_alarm">
                 Item Name
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Specific item name that triggers the alarm (e.g. CommHealth, Temperature, Voltage)
+                    Data item or variable name this alarm monitors. Should match variable names for consistency. Example: CommHealth, Voltage_L1
                   </div>
                 </div>
               </label>
@@ -1391,6 +1480,7 @@
         </div>
       </div>
 
+      <!-- Trends Tab -->
       <div class="tab-content" id="trends">
         <div class="config-section">
           <h3>Trends Configuration</h3>
@@ -1401,20 +1491,19 @@
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Text for the trend tag. Should clearly identify what is being trended (e.g. "Phase A Current", "Active Power Output").
+                    Human-readable description of what this trend represents. Used in reports and displays. Example: "Solar Panel 4 Power Output"
                   </div>
                 </div>
               </label>
               <input type="text" id="tag_description" placeholder="e.g. Current A" />
             </div>
-
             <div class="form-group">
               <label for="trend_types">
                 Trend Types
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Trend collection type: Event (on change), Periodic (time-based), Periodic-Event (both time and change based)
+                    Data collection method. Event: triggered by changes. Periodic: fixed time intervals. Periodic-Event: both methods combined.
                   </div>
                 </div>
               </label>
@@ -1424,44 +1513,41 @@
                 <option value="periodic-event">Periodic-Event</option>
               </select>
             </div>
-
-              <div class="form-group">
+            <div class="form-group">
               <label for="trend_time">
-                Time
+                Sample Period
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Time
+                    Sample interval for periodic trends. Shorter intervals provide more detail but use more storage space.
                   </div>
                 </div>
               </label>
               <select id="trend_time">
-                <option value="event">1 minute</option>
-                <option value="periodic">15 minutes</option>
-                <option value="periodic-event">1 hour</option>
+                <option value="00:01">1 minute</option>
+                <option value="00:15">15 minutes</option>
+                <option value="01:00">1 hour</option>
               </select>
             </div>
-
             <div class="form-group">
               <label for="tag_name">
                 Tag Name
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Full tag name path including logical node and data object (IEC 61850 format: MMXU1\A\phsA)
+                    Unique identifier for the trend tag in your SCADA system. Should be short and descriptive. Example: PV_Power, Wind_Speed, BESS_SOC
                   </div>
                 </div>
               </label>
               <input type="text" id="tag_name" placeholder="e.g. PV4" />
             </div>
-
             <div class="form-group">
               <label for="item_name_trend">
                 Item Name
                 <div class="info-icon">
                   i
                   <div class="tooltip">
-                    Short item identifier for the trending parameter (e.g. Ia, Vab, P, Q, F)
+                    Name of the data item being trended. Should match variable names for consistency. Used for data organization and display labels.
                   </div>
                 </div>
               </label>
@@ -1481,7 +1567,7 @@
                 <th>Trend Types</th>
                 <th>Tag Name</th>
                 <th>Item Name</th>
-                  <th>Time</th>
+                <th>Time</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -1493,10 +1579,7 @@
     </div>
   </div>
 
-
-
-<script>
-
+  <script>
 
 let currentProtocol = 'modbus';
 let currentModbusVariant = 'tcp';
@@ -1509,43 +1592,1093 @@ let validationErrors = {};
 
 
 const validationRules = {
-    device_name: { required: true, minLength: 2, maxLength: 50, pattern: /^[a-zA-Z_][a-zA-Z0-9_-]*$/, message: 'Device name must start with letter/underscore, 2-50 chars, alphanumeric only' },
-    device_type: { required: true, message: 'Please select a device type' },
-    tag_prefix: { required: true, minLength: 1, maxLength: 10, pattern: /^[A-Z_][A-Z0-9_]*$/, message: 'Tag prefix must start with uppercase letter/underscore' },
-    io_device: { required: true, message: 'Please select an I/O device' },
-    device_ip: { required: true, pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/, message: 'Enter valid IP address' },
-    modbus_port: { required: true, min: 1, max: 65535, message: 'Port must be 1-65535' },
-    port_name: { required: true, minLength: 1, maxLength: 20, message: 'Port name required (1-20 chars)' },
-    unit_number: { required: true, min: 1, max: 247, message: 'Unit number must be 1-247' },
-    gateway_address: { required: true, pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/, message: 'Enter valid gateway IP' },
-    slave_id: { required: true, min: 1, max: 247, message: 'Slave ID must be 1-247' },
-    serial_port: { required: true, pattern: /^COM\d+$|^\/dev\/tty[A-Za-z0-9]+$/, message: 'Enter valid serial port' },
-    iec_device_ip: { required: true, pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/, message: 'Enter valid IEC IP' },
-    iec_port: { required: true, min: 1, max: 65535, message: 'IEC port must be 1-65535' },
-    ied_name: { required: true, minLength: 1, maxLength: 64, pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/, message: 'IED name must start with letter/underscore' },
-    access_point: { required: true, minLength: 1, maxLength: 32, message: 'Access point required (1-32 chars)' },
-    logical_device: { required: true, minLength: 1, maxLength: 64, message: 'Logical device required (1-64 chars)' },
 
-    item_name: { required: true, minLength: 1, maxLength: 30, pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/, message: 'Item name must start with letter/underscore' },
-    io_device_var: { required: true, minLength: 1, maxLength: 50, message: 'I/O Device required' },
-    tag_name_var: { required: true, minLength: 1, maxLength: 100, message: 'Tag name required' },
-    address: { required: true, minLength: 1, maxLength: 20, message: 'Address required' },
-    equipment_var: { required: true, minLength: 1, maxLength: 50, message: 'Equipment required' },
-    data_type: { required: true, message: 'Select data type' },
+    device_name: {
+        required: true,
+        minLength: 2,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_-]*$/,
+        message: 'Device name must start with letter/underscore, cannot start with digit, 2-64 chars'
+    },
+    device_type: {
+        required: true,
+        enum: ['PV', 'WindTurbine', 'FuelTurbine', 'FuelCell', 'BESS'],
+        message: 'Please select a valid device type'
+    },
+    tag_prefix: {
+        required: true,
+        minLength: 1,
+        maxLength: 16,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Tag prefix must start with letter/underscore, cannot start with digit, max 16 chars'
+    },
+    io_device: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_-]*$/,
+        message: 'I/O Device name must start with letter/underscore, cannot start with digit'
+    },
 
-    alarm_name: { required: true, minLength: 1, maxLength: 50, pattern: /^[a-zA-Z_][a-zA-Z0-9_\s]*$/, message: 'Alarm name must start with letter/underscore' },
-    alarm_type: { required: true, message: 'Select alarm type' },
-    category: { required: true, message: 'Select category' },
-    alarm_tag: { required: true, minLength: 1, maxLength: 30, message: 'Alarm tag required' },
-    equipment: { required: true, minLength: 1, maxLength: 30, message: 'Equipment required' },
-    item_name_alarm: { required: true, minLength: 1, maxLength: 30, message: 'Item name required' },
 
-    tag_description: { required: true, minLength: 3, maxLength: 100, message: 'Tag description 3-100 chars' },
-    trend_types: { required: true, message: 'Select trend type' },
-    tag_name: { required: true, minLength: 1, maxLength: 50, message: 'Tag name required' },
-    item_name_trend: { required: true, minLength: 1, maxLength: 30, message: 'Item name required' }
+
+    device_ip: {
+        required: true,
+        pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+        message: 'Enter valid IPv4 address (e.g., 192.168.1.100)'
+    },
+    modbus_port: {
+        required: true,
+        min: 1,
+        max: 65535,
+        message: 'Modbus port must be between 1-65535'
+    },
+    port_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Port name must start with letter/underscore, cannot start with digit, max 32 chars'
+    },
+    unit_number: {
+        required: true,
+        min: 1,
+        max: 247,
+        message: 'Unit number must be between 1-247'
+    },
+    board_name_tcp: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Board name must start with letter/underscore, cannot start with digit, max 32 chars'
+    },
+    project_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Project name must start with letter/underscore, cannot start with digit'
+    },
+    memory_tcp: {
+        required: true,
+        enum: ['true', 'false'],
+        message: 'Select memory option'
+    },
+
+
+    gateway_address: {
+        required: true,
+        pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+        message: 'Enter valid gateway IPv4 address'
+    },
+    slave_id: {
+        required: true,
+        min: 1,
+        max: 247,
+        message: 'Slave ID must be between 1-247'
+    },
+    port_name_rtu: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'RTU port name must start with letter/underscore, cannot start with digit'
+    },
+    serial_port: {
+        required: true,
+        pattern: /^(COM\d+|\/dev\/tty[A-Za-z0-9]+)$/,
+        message: 'Enter valid serial port (COM1, COM2, /dev/ttyUSB0, etc.)'
+    },
+    memory_rtu: {
+        required: true,
+        enum: ['true', 'false'],
+        message: 'Select RTU memory option'
+    },
+    board_name_rtu: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'RTU board name must start with letter/underscore, cannot start with digit'
+    },
+
+
+    baud_rate: {
+        required: false,
+        enum: ['9600', '19200', '38400', '57600', '115200'],
+        message: 'Select valid baud rate'
+    },
+    data_bits: {
+        required: false,
+        enum: ['7', '8'],
+        message: 'Select 7 or 8 data bits'
+    },
+    parity: {
+        required: false,
+        enum: ['None', 'Even', 'Odd'],
+        message: 'Select valid parity option'
+    },
+    stop_bits: {
+        required: false,
+        enum: ['1', '2'],
+        message: 'Select 1 or 2 stop bits'
+    },
+
+
+    iec_device_ip: {
+        required: true,
+        pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+        message: 'Enter valid IEC device IPv4 address'
+    },
+    iec_port: {
+        required: true,
+        min: 1,
+        max: 65535,
+        message: 'IEC port must be between 1-65535 (default: 102)'
+    },
+    ied_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'IED name must start with letter/underscore, cannot start with digit, max 64 chars'
+    },
+    access_point: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Access point must start with letter/underscore, cannot start with digit'
+    },
+    logical_device: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Logical device must start with letter/underscore, cannot start with digit'
+    },
+    board_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Board name must start with letter/underscore, cannot start with digit'
+    },
+    memory_iec: {
+        required: true,
+        enum: ['true', 'false'],
+        message: 'Select IEC memory option'
+    },
+    brcb: {
+        required: false,
+        minLength: 1,
+        maxLength: 128,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_$\\]*$/,
+        message: 'BRCB must start with letter/underscore, cannot start with digit, IEC format'
+    },
+    urcb: {
+        required: false,
+        minLength: 1,
+        maxLength: 128,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_$\\]*$/,
+        message: 'URCB must start with letter/underscore, cannot start with digit, IEC format'
+    },
+    scl_file: {
+        required: false,
+        minLength: 1,
+        maxLength: 255,
+        pattern: /^(\[USER\]:)?[a-zA-Z_][a-zA-Z0-9_\\.\-]*\.(cid|scd|icd)$/i,
+        message: 'SCL file path format: [USER]:Project\\File.cid (or .scd, .icd)'
+    },
+
+
+    item_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Item name must start with letter/underscore, cannot start with digit, max 64 chars'
+    },
+    io_device_var: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_-]*$/,
+        message: 'I/O Device must start with letter/underscore, cannot start with digit'
+    },
+    tag_name_var: {
+        required: true,
+        minLength: 1,
+        maxLength: 128,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_\\$]*$/,
+        message: 'Tag name must start with letter/underscore, cannot start with digit. For IEC use format: MMXU1\\A\\phsA'
+    },
+    address: {
+        required: true,
+        minLength: 1,
+        maxLength: 32,
+        pattern: /^([a-zA-Z_][a-zA-Z0-9_\\$]*|[1-9][0-9]{0,4}|[1-6][0-9]{4}|7[0-5][0-9]{3}|76[0-7][0-9]{2}|768[0-9]{2}|7690[0-9]|76901)$/,
+        message: 'Address: Modbus register (1-76901) or IEC reference starting with letter/underscore'
+    },
+    equipment_var: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_\.]*$/,
+        message: 'Equipment must start with letter/underscore, cannot start with digit. Format: Virtual.System'
+    },
+    data_type: {
+        required: true,
+        enum: ['float', 'int', 'bool', 'string', 'REAL', 'INT', 'BOOLEAN', 'STRING'],
+        message: 'Select valid data type'
+    },
+
+
+    alarm_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_\s]*$/,
+        message: 'Alarm name must start with letter/underscore, cannot start with digit, max 64 chars'
+    },
+    alarm_type: {
+        required: true,
+        enum: ['analog', 'digital', 'advanced', 'system'],
+        message: 'Select valid alarm type'
+    },
+    category: {
+        required: true,
+        enum: ['low', 'medium', 'high', 'critical', 'event'],
+        message: 'Select valid alarm category'
+    },
+    alarm_tag: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Alarm tag must start with letter/underscore, cannot start with digit'
+    },
+    equipment: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_\.]*$/,
+        message: 'Equipment must start with letter/underscore, cannot start with digit. Format: Virtual.System'
+    },
+    item_name_alarm: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Alarm item name must start with letter/underscore, cannot start with digit'
+    },
+
+
+    tag_description: {
+        required: true,
+        minLength: 3,
+        maxLength: 128,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_\s\-\.]*$/,
+        message: 'Tag description must start with letter/underscore, cannot start with digit, 3-128 chars'
+    },
+    trend_types: {
+        required: true,
+        enum: ['event', 'periodic', 'periodic-event', 'on-change'],
+        message: 'Select valid trend type'
+    },
+    tag_name: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Trend tag name must start with letter/underscore, cannot start with digit'
+    },
+    item_name_trend: {
+        required: true,
+        minLength: 1,
+        maxLength: 64,
+        pattern: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        message: 'Trend item name must start with letter/underscore, cannot start with digit'
+    },
+    trend_time: {
+        required: true,
+        pattern: /^(\d{1,2}:\d{2}|PT\d+[HMS])$/,
+        enum: ['00:01', '00:05', '00:15', '00:30', '01:00', '04:00', '12:00', '24:00'],
+        message: 'Select valid sample period (1min, 5min, 15min, 30min, 1h, 4h, 12h, 24h)'
+    }
 };
 
+
+function getMainFormRequiredFields() {
+    const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'unit_number', 'board_name_tcp');
+        } else {
+           requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'board_name_rtu');
+            if (document.getElementById('advancedOptionsCheckbox')?.checked) {
+                requiredFields.push('baud_rate');
+            }
+        }
+    } else if (currentProtocol === 'iec') {
+        requiredFields.push('iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device', 'board_name');
+    }
+
+    return requiredFields;
+}
+
+
+const additionalValidationRules = {
+    board_name: { required: true, minLength: 1, maxLength: 20, message: 'Board name required (1-20 chars)' },
+    brcb: { minLength: 1, maxLength: 64, message: 'BRCB format invalid' },
+    urcb: { minLength: 1, maxLength: 64, message: 'URCB format invalid' },
+    scl_file: { maxLength: 255, message: 'SCL file path too long' }
+};
+
+
+Object.assign(validationRules, additionalValidationRules);
+
+
+function validateFieldIEC(field) {
+    const fieldName = field.name || field.id;
+    const value = field.value.trim();
+
+
+    if (fieldName === 'brcb' || fieldName === 'urcb') {
+        validateReportControlBlocks();
+        return true;
+    }
+
+
+    return validateField(field);
+}
+
+
+function validateReportControlBlocks() {
+    const brcb = document.getElementById('brcb');
+    const urcb = document.getElementById('urcb');
+    const validationDiv = document.getElementById('rcb-validation');
+
+    const brcbValue = brcb?.value.trim() || '';
+    const urcbValue = urcb?.value.trim() || '';
+
+
+    if (currentProtocol === 'iec' && !brcbValue && !urcbValue) {
+        if (validationDiv) {
+            validationDiv.style.display = 'block';
+            validationDiv.textContent = 'Please fill in at least one Report Control Block (BRCB or URCB).';
+        }
+
+
+        validationErrors['report_control_blocks'] = 'At least one Report Control Block required';
+        return false;
+    } else {
+        if (validationDiv) {
+            validationDiv.style.display = 'none';
+        }
+        delete validationErrors['report_control_blocks'];
+        return true;
+    }
+}
+
+
+function getMainFormRequiredFieldsUpdated() {
+    const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'unit_number', 'board_name_tcp');
+        } else {
+            requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'board_name_tcp');
+            if (document.getElementById('advancedOptionsCheckbox')?.checked) {
+                requiredFields.push('baud_rate');
+            }
+        }
+    } else if (currentProtocol === 'iec') {
+        requiredFields.push('iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device', 'board_name');
+
+    }
+
+    return requiredFields;
+}
+
+function generateIECXML() {
+    if (devices.length === 0) {
+        showAlert('No devices configured. Please save at least one IEC device first.', 'error');
+        return;
+    }
+
+
+    const iecDevices = devices.filter(d => d.protocol === 'iec');
+    if (iecDevices.length === 0) {
+        showAlert('No IEC devices found. Please configure at least one IEC device.', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        iecDevices.forEach((device, index) => {
+            const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
+<ScadaDevice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.schneider-electric.com/SCADA/Drivers/IEC61850/DeviceConfig/v1/">
+  <SCL>${device.scl_file || `[USER]:${device.device_name}_Project\\${device.device_name}.cid`}</SCL>
+  <IED>${device.ied_name || device.device_name}</IED>
+  <LogicalDevice Name="${device.logical_device || 'Relay'}">
+    ${device.urcb ? `<URCB>${device.urcb}</URCB>` : ''}
+    ${device.brcb ? `<BRCB>${device.brcb}</BRCB>` : ''}
+  </LogicalDevice>
+</ScadaDevice>`;
+
+
+            const blob = new Blob([xmlContent], { type: 'application/xml;charset=utf-8;' });
+            const link = document.createElement('a');
+
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `${device.device_name || 'IEC_Device'}.xml`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        });
+
+        showAlert('XML files generated successfully!', 'success');
+    } catch (error) {
+        showAlert('Error generating XML files: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+
+
+function generateUnitsCSV() {
+    const isModbus = devices.some(device => device.protocol === 'modbus');
+
+    if (isModbus) {
+        const headers = [
+            'Server Name',
+            'Name',
+            'Number',
+            'Address',
+            'Protocol',
+            'Port Name',
+            'Startup Mode',
+            'Priority',
+            'Memory',
+            'Read-Only',
+            'Exclusive',
+            'Comment',
+            'Linked',
+            'Database Type',
+            'External Database',
+            'Connection String',
+            'Tag Prefix',
+            'Automatic Refresh',
+            'Live Update',
+            'Log Write',
+            'Log Read',
+            'Cache',
+            'Cache Time',
+            'Background Poll',
+            'Background Rate',
+            'Min Update Rate',
+            'Staleness Period',
+            'Scheduled',
+            'Time',
+            'Period',
+            'Connect Action',
+            'Disconnect Action',
+            'Phone Number',
+            'Caller ID',
+            'Persist',
+            'Persist Period',
+            'File Name',
+            'Project',
+            'PROTOCOLID',
+            'LASTUPDATE',
+            'REMOTEWRIT',
+            'ONBROWSE',
+            'LASTVARMOD',
+            'TAGGEN',
+            'TAGGENTEMP'
+        ];
+        const rows = [headers.join(',')];
+
+        let numberCounter = 1;
+
+        devices.forEach((device, index) => {
+            if (device.protocol === 'modbus') {
+                let address = '';
+                let portName = '';
+                let comment = '';
+
+                if (device.modbusVariant === 'tcp') {
+                    address = device.device_ip || '';
+                    portName = device.port_name || '';
+                    comment = 'TCP/IP';
+                } else {
+                    address = device.gateway_address || '';
+                    portName = device.port_name_rtu || '';
+                    comment = 'GATEWAY';
+                }
+
+                const row = [
+                    `"IOServer1"`,
+                    `"${device.io_device || device.device_name}"`,
+                    `"${numberCounter}"`,
+                    `"${address}"`,
+                    `"PWRMOD"`,
+                    `"${portName}"`,
+                    `"Primary"`,
+                    `"1"`,
+                    `"TRUE"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `"TRUE"`,
+                    `"0:05:00"`,
+                    `""`,
+                    `"FUGA_sim_copy"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`
+                ];
+                rows.push(row.join(','));
+
+                numberCounter++;
+            }
+        });
+
+        downloadCSV(rows.join('\n'), 'UNITS.csv');
+    } else {
+        const headers = [
+            'Server Name',
+            'Name',
+            'Number',
+            'Address',
+            'Protocol',
+            'Port Name',
+            'Startup Mode',
+            'Priority',
+            'Memory',
+            'Read-Only',
+            'Exclusive',
+            'Comment',
+            'Linked',
+            'Database Type',
+            'External Database',
+            'Connection String',
+            'Tag Prefix',
+            'Automatic Refresh',
+            'Live Update',
+            'Log Write',
+            'Log Read',
+            'Cache',
+            'Cache Time',
+            'Background Poll',
+            'Background Rate',
+            'Min Update Rate',
+            'Staleness Period',
+            'Scheduled',
+            'Time',
+            'Period',
+            'Connect Action',
+            'Disconnect Action',
+            'Phone Number',
+            'Caller ID',
+            'Persist',
+            'Persist Period',
+            'File Name',
+            'Project',
+            'PROTOCOLID',
+            'LASTUPDATE',
+            'REMOTEWRIT',
+            'ONBROWSE',
+            'LASTVARMOD',
+            'TAGGEN',
+            'TAGGENTEMP'
+        ];
+        const rows = [headers.join(',')];
+
+        devices.forEach((device, index) => {
+            if (device.protocol === 'iec') {
+                const address = device.iec_device_ip || '';
+                const protocol = `IEC${device.iec_port || '61850'}N`;
+                const portName = device.access_point || '';
+                const memory = device.memory_iec === 'false' ? 'FALSE' : 'TRUE';
+
+                const row = [
+                    `"IOServer1"`,
+                    `"${device.io_device || device.device_name}"`,
+                    `"${index + 1}"`,
+                    `"${address}"`,
+                    `"${protocol}"`,
+                    `"${portName}"`,
+                    `"Primary"`,
+                    `"1"`,
+                    `"${memory}"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `"FUGA_sim_copy"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`
+                ];
+                rows.push(row.join(','));
+            }
+        });
+
+        downloadCSV(rows.join('\n'), 'UNITS.csv');
+    }
+}
+
+
+function generateAlarmsCSV() {
+    if (alarms.length === 0) {
+        showAlert('No alarms configured', 'error');
+        return;
+    }
+
+    const headers = ['Cluster Name', 'EQUIPMENT', 'ITEM_NAME', 'ALARM_TAG', 'Variable Tag A', 'ALARM_NAME', 'CATEGORY', 'ALARM_TYPE'];
+    const rows = [headers.join(',')];
+
+    alarms.forEach(alarm => {
+        const row = [
+            `"c1"`,
+            `"${alarm.equipment || ''}"`,
+            `"${alarm.item_name || ''}"`,
+            `"${alarm.alarm_tag || ''}"`,
+            `"${alarm.alarm_tag || ''}"`,
+            `"${alarm.alarm_name || ''}"`,
+            `"${alarm.category || ''}"`,
+            `"${alarm.alarm_type || ''}"`
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'ALARMS.csv');
+}
+
+function generatePortsCSV() {
+    const headers = ['Server Name', 'Port Name', 'Port Number', 'Board Name', 'Baud Rate', 'Data Bits', 'Stop Bits', 'Parity', 'Special Options', 'Comment', 'Project'];
+    const rows = [headers.join(',')];
+
+    devices.forEach(device => {
+        let portNumber = '';
+        let portName = '';
+        let boardName = '';
+        let specialOptions = '';
+
+        if (device.protocol === 'modbus') {
+            if (device.modbusVariant === 'tcp') {
+                portNumber = device.modbus_port || '502';
+                portName = device.port_name || '';
+                boardName = device.board_name || '';
+                specialOptions = 'TCP/IP';
+            } else {
+                portNumber = device.slave_id || '1';
+                portName = device.port_name_rtu || '';
+                boardName = device.board_name_rtu || '';
+                specialOptions = 'TCP/IP';
+            }
+        } else if (device.protocol === 'iec') {
+            portNumber = device.iec_port || '102';
+            portName = device.access_point || '';
+            boardName = device.board_name || '';
+            specialOptions = 'GATEWAY';
+        }
+
+        const row = [
+            `"IOServer1"`,
+            `"${portName}"`,
+            `"${portNumber}"`,
+            `"${boardName}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"#NAZWA? ${specialOptions}"`,
+            `""`,
+            `"DTU_project"`
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'PORTS.csv');
+}
+
+
+function generateAllCSV() {
+    if (devices.length === 0) {
+        showAlert('No devices to export. Please save at least one device first.', 'error');
+        return;
+    }
+
+    showLoading(true);
+    setTimeout(() => {
+        try {
+
+
+            generateEquipmentCSV();
+            generateUnitsCSV();
+            generatePortsCSV();
+            generateVariablesCSV();
+            generateAlarmsCSV();
+            generateTrendsCSV();
+
+            showAlert('All CSV files generated successfully!', 'success');
+        } catch (error) {
+            showAlert('Error generating CSV files: ' + error.message, 'error');
+        } finally {
+            showLoading(false);
+        }
+    }, 1000);
+}
+
+
+
+
+function addGenerateButtons() {
+    const buttonGroup = document.querySelector('.button-group');
+    if (!buttonGroup) return;
+
+
+    const oldIecBtn = document.getElementById('generateIECBtn');
+    if (oldIecBtn) {
+        oldIecBtn.remove();
+    }
+
+
+    if (!document.getElementById('generateXMLBtn')) {
+        const xmlButton = document.createElement('button');
+        xmlButton.type = 'button';
+        xmlButton.className = 'btn btn-primary';
+        xmlButton.id = 'generateXMLBtn';
+        xmlButton.textContent = 'Generate XML';
+        xmlButton.onclick = generateIECXML;
+        xmlButton.title = 'Generate XML files for IEC devices';
+        buttonGroup.appendChild(xmlButton);
+    }
+
+
+    const csvButton = document.getElementById('generateCSVBtn');
+    if (csvButton) {
+        csvButton.onclick = generateAllCSV;
+        csvButton.textContent = 'Generate CSV Files';
+        csvButton.title = 'Generate all CSV files (including IEC)';
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    updateDeviceCounter();
+    setupValidation();
+    setupIECValidation();
+    setupFileHandlers();
+    setTimeout(addGenerateButtons, 100);
+});
+
+
+window.generateIECXML = generateIECXML;
+window.generateAllCSV = generateAllCSV;
+
+function saveDeviceUpdated() {
+    if (!performCompleteValidation()) {
+        showAlert('Please fix all validation errors before saving', 'error');
+        return;
+    }
+
+
+    if (currentProtocol === 'iec' && !validateReportControlBlocks()) {
+        showAlert('Please fill in at least one Report Control Block (BRCB or URCB)', 'error');
+        return;
+    }
+
+    const form = document.getElementById('deviceForm');
+    const formData = new FormData(form);
+    const deviceName = formData.get('device_name');
+
+    const existingDevice = devices.find(d =>
+        d.device_name.toLowerCase() === deviceName.toLowerCase() &&
+        (!currentDevice || d.id !== currentDevice.id)
+    );
+
+    if (existingDevice) {
+        showFieldError(document.getElementById('device_name'), 'Device name already exists');
+        showAlert('Device name already exists. Please choose a different name.', 'error');
+        return;
+    }
+
+    const device = {
+        id: currentDevice ? currentDevice.id : Date.now().toString(),
+        protocol: currentProtocol,
+        modbusVariant: currentModbusVariant,
+        device_name: deviceName,
+        device_type: formData.get('device_type'),
+        tag_prefix: formData.get('tag_prefix'),
+        io_device: formData.get('io_device'),
+        variables: [...variables],
+        alarms: [...alarms],
+        trends: [...trends]
+    };
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            Object.assign(device, {
+                device_ip: formData.get('device_ip'),
+                modbus_port: formData.get('modbus_port'),
+                port_name: formData.get('port_name'),
+                unit_number: formData.get('unit_number'),
+                memory: formData.get('memory'),
+                board_name: formData.get('board_name_tcp')
+            });
+        } else {
+            Object.assign(device, {
+                gateway_address: formData.get('gateway_address'),
+                slave_id: formData.get('slave_id'),
+                port_name_rtu: formData.get('port_name_rtu'),
+                memory_rtu: formData.get('memory_rtu'),
+                serial_port: formData.get('serial_port'),
+                board_name_rtu: formData.get('board_name_rtu')
+            });
+
+            if (document.getElementById('advancedOptionsCheckbox').checked) {
+                Object.assign(device, {
+                    baud_rate: formData.get('baud_rate'),
+                    data_bits: formData.get('data_bits'),
+                    parity: formData.get('parity'),
+                    stop_bits: formData.get('stop_bits')
+                });
+            }
+        }
+        device.protocol_name = formData.get('protocol');
+    } else if (currentProtocol === 'iec') {
+        Object.assign(device, {
+            iec_device_ip: formData.get('iec_device_ip'),
+            iec_port: formData.get('iec_port'),
+            ied_name: formData.get('ied_name'),
+            access_point: formData.get('access_point'),
+            logical_device: formData.get('logical_device'),
+            board_name: formData.get('board_name'),
+            memory_iec: formData.get('memory_iec'),
+            brcb: formData.get('brcb'),
+            urcb: formData.get('urcb'),
+            scl_file: formData.get('scl_file'),
+            protocol_name: 'IEC61850'
+        });
+    }
+
+    if (currentDevice) {
+        const index = devices.findIndex(d => d.id === currentDevice.id);
+        if (index !== -1) devices[index] = device;
+    } else {
+        devices.push(device);
+    }
+
+    updateDeviceList();
+    updateDeviceCounter();
+    showAlert('Device saved successfully!', 'success');
+    currentDevice = null;
+}
+
+
+function loadDevice(deviceId) {
+    const device = devices.find(d => d.id === deviceId);
+    if (!device) return;
+
+    currentDevice = device;
+    validationErrors = {};
+    document.querySelectorAll('input, select').forEach(field => clearFieldError(field));
+
+    const basicFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
+    basicFields.forEach(field => {
+        const el = document.getElementById(field);
+        if (el) el.value = device[field] || '';
+    });
+
+    selectProtocol(device.protocol);
+
+    if (device.protocol === 'modbus') {
+        selectModbusVariant(device.modbusVariant || 'tcp');
+
+        if (device.modbusVariant === 'tcp') {
+            const tcpFields = ['device_ip', 'modbus_port', 'port_name', 'unit_number', 'project_name', 'board_name_tcp'];
+            tcpFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+
+
+
+
+            const memoryTcpEl = document.getElementById('memory_tcp');
+            if (memoryTcpEl) {
+                memoryTcpEl.value = device.memory || 'true';
+            }
+        } else {
+            const rtuFields = ['gateway_address', 'slave_id', 'port_name_rtu', 'serial_port'];
+            rtuFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+
+           const boardNameRtuEl = document.getElementById('board_name_rtu');
+           if (boardNameRtuEl) {
+                boardNameRtuEl.value = device.board_name_rtu || '';
+    }
+
+
+            const memoryRtuEl = document.getElementById('memory_rtu');
+            if (memoryRtuEl) {
+                memoryRtuEl.value = device.memory_rtu || 'true';
+            }
+        }
+
+        if (device.baud_rate) {
+            document.getElementById('advancedOptionsCheckbox').checked = true;
+            toggleAdvancedOptions();
+            ['baud_rate', 'data_bits', 'parity', 'stop_bits'].forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+        }
+    } else if (device.protocol === 'iec') {
+        const iecFields = [
+            'iec_device_ip', 'iec_port', 'ied_name', 'access_point',
+            'logical_device', 'board_name', 'memory_iec', 'brcb', 'urcb', 'scl_file'
+        ];
+        iecFields.forEach(field => {
+            const el = document.getElementById(field);
+            if (el) el.value = device[field] || '';
+        });
+    }
+
+    variables = device.variables || [];
+    alarms = device.alarms || [];
+    trends = device.trends || [];
+
+    updateVariableTable();
+    updateAlarmTable();
+    updateTrendTable();
+    updateFormButtons();
+    updateProgressBar();
+    showAlert('Device loaded successfully!', 'success');
+}
+
+
+function setupIECValidation() {
+    const iecFields = ['brcb', 'urcb', 'board_name', 'scl_file'];
+
+    iecFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            ['input', 'change', 'blur', 'focus'].forEach(event => {
+                field.addEventListener(event, function() {
+                    if (event === 'focus') {
+                        clearFieldError(this);
+                    } else {
+                        validateFieldIEC(this);
+                        updateFormButtons();
+                    }
+                });
+            });
+        }
+    });
+}
+
+
+function addIECGenerateButton() {
+    const buttonGroup = document.querySelector('.button-group');
+    if (buttonGroup && !document.getElementById('generateIECBtn')) {
+        const iecButton = document.createElement('button');
+        iecButton.type = 'button';
+        iecButton.className = 'btn btn-primary';
+        iecButton.id = 'generateIECBtn';
+        iecButton.textContent = 'Generate IEC Files';
+        iecButton.onclick = generateIECFiles;
+        iecButton.title = 'Generate IEC configuration files (3 CSV + XML)';
+
+        buttonGroup.appendChild(iecButton);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    updateDeviceCounter();
+    setupValidation();
+    setupIECValidation();
+    setupFileHandlers();
+    setTimeout(addIECGenerateButton, 100);
+});
+
+
+window.saveDevice = saveDeviceUpdated;
+window.loadDevice = loadDeviceUpdated;
+window.getMainFormRequiredFields = getMainFormRequiredFieldsUpdated;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeForm();
@@ -1772,7 +2905,7 @@ function getMainFormRequiredFields() {
 
     if (currentProtocol === 'modbus') {
         if (currentModbusVariant === 'tcp') {
-            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'memory_tcp');
+            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'memory_tcp', 'board_name_tcp');
         } else {
             requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'memory_rtu');
             if (document.getElementById('advancedOptionsCheckbox')?.checked) {
@@ -1871,6 +3004,7 @@ function selectProtocol(protocol) {
     const iecConfig = document.getElementById('iec-config');
     const cidElements = ['cidInputLabel', 'cidFile'];
 
+
     if (protocol === 'modbus') {
         modbusConfig?.classList.remove('hidden');
         iecConfig?.classList.add('hidden');
@@ -1925,7 +3059,7 @@ function selectModbusVariant(variant) {
 
 function clearProtocolErrors() {
     const protocolFields = [
-        'device_ip', 'modbus_port', 'port_name', 'unit_number',
+        'device_ip', 'modbus_port', 'port_name', 'unit_number', 'board_name_tcp',
         'gateway_address', 'slave_id', 'port_name_rtu', 'serial_port',
         'iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device'
     ];
@@ -2200,10 +3334,14 @@ function saveDevice() {
         return;
     }
 
+    if (currentProtocol === 'iec' && !validateReportControlBlocks()) {
+        showAlert('Please fill in at least one Report Control Block (BRCB or URCB)', 'error');
+        return;
+    }
+
     const form = document.getElementById('deviceForm');
     const formData = new FormData(form);
     const deviceName = formData.get('device_name');
-
 
     const existingDevice = devices.find(d =>
         d.device_name.toLowerCase() === deviceName.toLowerCase() &&
@@ -2229,14 +3367,19 @@ function saveDevice() {
         trends: [...trends]
     };
 
-
     if (currentProtocol === 'modbus') {
+
+        const boardNameValue = formData.get('board_name_tcp') ||
+                              document.getElementById('board_name_tcp')?.value || '';
+
         if (currentModbusVariant === 'tcp') {
             Object.assign(device, {
                 device_ip: formData.get('device_ip'),
                 modbus_port: formData.get('modbus_port'),
                 port_name: formData.get('port_name'),
                 unit_number: formData.get('unit_number'),
+                board_name_tcp: formData.get('board_name_tcp'),
+                project_name: formData.get('project_name'),
                 memory: formData.get('memory')
             });
         } else {
@@ -2245,7 +3388,8 @@ function saveDevice() {
                 slave_id: formData.get('slave_id'),
                 port_name_rtu: formData.get('port_name_rtu'),
                 memory_rtu: formData.get('memory_rtu'),
-                serial_port: formData.get('serial_port')
+                serial_port: formData.get('serial_port'),
+                board_name_tcp: boardNameValue
             });
 
             if (document.getElementById('advancedOptionsCheckbox').checked) {
@@ -2265,11 +3409,14 @@ function saveDevice() {
             ied_name: formData.get('ied_name'),
             access_point: formData.get('access_point'),
             logical_device: formData.get('logical_device'),
-            report_control: formData.get('report_control'),
+            board_name: formData.get('board_name'),
+            memory_iec: formData.get('memory_iec'),
+            brcb: formData.get('brcb'),
+            urcb: formData.get('urcb'),
+            scl_file: formData.get('scl_file'),
             protocol_name: 'IEC61850'
         });
     }
-
 
     if (currentDevice) {
         const index = devices.findIndex(d => d.id === currentDevice.id);
@@ -2283,6 +3430,7 @@ function saveDevice() {
     showAlert('Device saved successfully!', 'success');
     currentDevice = null;
 }
+
 
 function performCompleteValidation() {
     const form = document.getElementById('deviceForm');
@@ -2364,7 +3512,6 @@ function loadDevice(deviceId) {
     validationErrors = {};
     document.querySelectorAll('input, select').forEach(field => clearFieldError(field));
 
-
     const basicFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
     basicFields.forEach(field => {
         const el = document.getElementById(field);
@@ -2373,19 +3520,40 @@ function loadDevice(deviceId) {
 
     selectProtocol(device.protocol);
 
-
     if (device.protocol === 'modbus') {
         selectModbusVariant(device.modbusVariant || 'tcp');
 
-        const fieldMaps = {
-            tcp: ['device_ip', 'modbus_port', 'port_name', 'unit_number'],
-            rtu: ['gateway_address', 'slave_id', 'port_name_rtu', 'serial_port']
-        };
 
-        fieldMaps[device.modbusVariant || 'tcp'].forEach(field => {
-            const el = document.getElementById(field);
-            if (el) el.value = device[field] || '';
-        });
+        const boardNameEl = document.getElementById('board_name_tcp');
+        if (boardNameEl) {
+            boardNameEl.value = device.board_name_tcp || device.board_name || '';
+        }
+
+        if (device.modbusVariant === 'tcp') {
+            const tcpFields = ['device_ip', 'modbus_port', 'port_name', 'unit_number', 'project_name'];
+            tcpFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+
+
+            const memoryTcpEl = document.getElementById('memory_tcp');
+            if (memoryTcpEl) {
+                memoryTcpEl.value = device.memory || 'true';
+            }
+        } else {
+            const rtuFields = ['gateway_address', 'slave_id', 'port_name_rtu', 'serial_port'];
+            rtuFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+
+
+            const memoryRtuEl = document.getElementById('memory_rtu');
+            if (memoryRtuEl) {
+                memoryRtuEl.value = device.memory_rtu || 'true';
+            }
+        }
 
         if (device.baud_rate) {
             document.getElementById('advancedOptionsCheckbox').checked = true;
@@ -2396,7 +3564,10 @@ function loadDevice(deviceId) {
             });
         }
     } else if (device.protocol === 'iec') {
-        const iecFields = ['iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device', 'report_control'];
+        const iecFields = [
+            'iec_device_ip', 'iec_port', 'ied_name', 'access_point',
+            'logical_device', 'board_name', 'memory_iec', 'brcb', 'urcb', 'scl_file'
+        ];
         iecFields.forEach(field => {
             const el = document.getElementById(field);
             if (el) el.value = device[field] || '';
@@ -2455,54 +3626,82 @@ function generateCSV() {
 }
 
 function generateEquipmentCSV() {
-    const headers = ['ITEM_NAME', 'EQUIP_TYPE', 'COMMENT', 'CUSTOM01', 'CUSTOM02'];
+    const headers = [
+        'Name',
+        'Cluster Name',
+        'Display Name',
+        'Type',
+        'Location',
+        'Page',
+        'Content',
+        'Help',
+        'Comment',
+        'Tag Prefix',
+        'I/O Device',
+        'Hidden',
+        'Area',
+        'Custom 1',
+        'Custom 2',
+        'Custom 3',
+        'Custom 4',
+        'Custom 5',
+        'Custom 6',
+        'Custom 7',
+        'Custom 8',
+        'Scheduled',
+        'Default State',
+        'Schedule ID',
+        'Device Schedule',
+        'Parameters',
+        'Project',
+        'COMPOSITE',
+        'TAGGENLINK',
+        'LINKED',
+        'EDITCODE',
+        'REFERENCE'
+    ];
+
     const rows = [headers.join(',')];
 
     devices.forEach(device => {
         const row = [
-            device.device_name,
-            device.device_type,
-            `${device.device_type} - ${device.device_name}`,
-            device.tag_prefix,
-            device.io_device
+            `"${device.device_name || ''}"`,
+            `"c1"`,
+            `""`,
+            `"${device.device_type || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"${device.tag_prefix || ''}"`,
+            `"${device.io_device || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`
         ];
         rows.push(row.join(','));
     });
 
     downloadCSV(rows.join('\n'), 'EQUIP.csv');
-}
-
-function generateUnitsCSV() {
-    const headers = ['UNIT_NAME', 'UNIT_TYPE', 'PORT_NAME', 'IP_ADDRESS', 'PROTOCOL', 'MEMORY', 'UNIT_NUMBER'];
-    const rows = [headers.join(',')];
-
-    devices.forEach(device => {
-        let row;
-        if (device.protocol === 'modbus') {
-            row = [
-                device.device_name,
-                'PLC',
-                device.modbusVariant === 'tcp' ? (device.port_name || '') : (device.port_name_rtu || ''),
-                device.modbusVariant === 'tcp' ? (device.device_ip || '') : (device.gateway_address || ''),
-                device.protocol_name || 'Modbus TCP',
-                device.modbusVariant === 'tcp' ? (device.memory || 'TRUE') : (device.memory_rtu || 'TRUE'),
-                device.modbusVariant === 'tcp' ? (device.unit_number || '1') : (device.slave_id || '1')
-            ];
-        } else {
-            row = [
-                device.device_name,
-                'IED',
-                device.ied_name || '',
-                device.iec_device_ip || '',
-                'IEC61850',
-                'TRUE',
-                device.iec_port || '102'
-            ];
-        }
-        rows.push(row.join(','));
-    });
-
-    downloadCSV(rows.join('\n'), 'UNITS.csv');
 }
 
 function generateVariablesCSV() {
@@ -2511,17 +3710,52 @@ function generateVariablesCSV() {
         return;
     }
 
-    const headers = ['Equipment', 'Item Name', 'Tag Name', 'I/O Device', 'Data Type', 'Address'];
+    const headers = [
+        'Equipment', 'Item Name', 'Tag Name', 'Cluster Name', 'I/O Device',
+        'Data Type', 'Address', 'Comment', 'Deadband', 'Eng Units', 'Format',
+        'Raw Zero Scale', 'Raw Full Scale', 'Eng Zero Scale', 'Eng Full Scale',
+        'Custom 1', 'Custom 2', 'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6',
+        'Custom 7', 'Custom 8', 'Write Roles', 'Historize', 'Project', 'EDITCODE',
+        'LINKED', 'OID', 'REF1', 'REF2', 'CUSTOM', 'TAGGENLINK', 'Unique ID'
+    ];
     const rows = [headers.join(',')];
 
     variables.forEach(variable => {
         const row = [
-            variable.equipment || '',
-            variable.item_name || '',
-            variable.tag_name || '',
-            variable.io_device || '',
-            variable.data_type || '',
-            variable.address || ''
+            `"${variable.equipment || ''}"`,
+            `"${variable.item_name || ''}"`,
+            `"${variable.tag_name || ''}"`,
+            `"c1"`,
+            `"${variable.io_device || ''}"`,
+            `"${variable.data_type || ''}"`,
+            `"${variable.address || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"${variable.unique_id || ''}"`
         ];
         rows.push(row.join(','));
     });
@@ -2535,17 +3769,47 @@ function generateAlarmsCSV() {
         return;
     }
 
-    const headers = ['EQUIPMENT', 'ITEM_NAME', 'ALARM_TAG', 'ALARM_NAME', 'CATEGORY', 'ALARM_TYPE'];
+    const headers = [
+        'Equipment', 'Item Name', 'Alarm Tag', 'Alarm Name', 'Cluster Name',
+        'Category', 'Alarm Desc', 'Delay', 'Help', 'Comment', 'Variable Tag A', 'Variable Tag B',
+        'Custom 1', 'Custom 2', 'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6',
+        'Custom 7', 'Custom 8', 'Paging', 'Paging Group', 'Area', 'Privilege',
+        'Historize', 'Project', 'SEQUENCE', 'TAGGENLINK', 'EDITCODE', 'LINKED'
+    ];
     const rows = [headers.join(',')];
 
     alarms.forEach(alarm => {
         const row = [
-            alarm.equipment || '',
-            alarm.item_name || '',
-            alarm.alarm_tag || '',
-            alarm.alarm_name || '',
-            alarm.category || '',
-            alarm.alarm_type || ''
+            `"${alarm.equipment || ''}"`,
+            `"${alarm.item_name || ''}"`,
+            `"${alarm.alarm_tag || ''}"`,
+            `"${alarm.alarm_name || ''}"`,
+            `"c1"`,
+            `"${alarm.category || ''}"`,
+            `"${alarm.alarm_desc || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `"${alarm.alarm_tag || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"${alarm.equipment || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`
         ];
         rows.push(row.join(','));
     });
@@ -2559,16 +3823,62 @@ function generateTrendsCSV() {
         return;
     }
 
-    const headers = ['TAG_DESCRIPTION', 'TREND_TYPES', 'TAG_NAME', 'ITEM_NAME', 'TIME'];
+    const headers = [
+        'Equipment', 'Item Name', 'Tag Name', 'Cluster Name', 'Type', 'Expression',
+        'Trigger', 'Sample Period', 'Eng Units', 'Format', 'Deadband', 'Comment',
+        'Zero Scale', 'Full Scale', 'File Name', 'No. Files', 'Period', 'Time',
+        'Storage Method', 'Area', 'Privilege', 'Historize', 'Project', 'SPCFLAG',
+        'LSL', 'USL', 'SUBGRPSIZE', 'XDOUBLEBAR', 'RANGE', 'SDEVIATION',
+        'TAGGENLINK', 'EDITCODE', 'LINKED'
+    ];
     const rows = [headers.join(',')];
 
     trends.forEach(trend => {
+        let samplePeriod = '900000000';
+        if (trend.time && trend.time.includes(':')) {
+            const parts = trend.time.split(':');
+            if (parts.length === 2) {
+                const minutes = parseInt(parts[0]);
+                const seconds = parseInt(parts[1]);
+                const totalMs = (minutes * 60 + seconds) * 1000;
+                samplePeriod = (totalMs * 10000).toString();
+            }
+        }
+
         const row = [
-            trend.tag_description || '',
-            trend.trend_types || '',
-            trend.tag_name || '',
-            trend.item_name || '',
-            trend.time || '00:00'
+            `"${trend.tag_description || ''}"`,
+            `"${trend.item_name || ''}"`,
+            `"${trend.tag_name || ''}"`,
+            `"c1"`,
+            `"TRN_PERIODIC"`,
+            `"${trend.tag_name || ''}"`,
+            `""`,
+            `"${samplePeriod}"`,
+            `"${trend.eng_units || ''}"`,
+            `"###.#"`,
+            `""`,
+            `"${trend.comment || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `"13"`,
+            `"1st"`,
+            `""`,
+            `"Floating Point (8-byte samples)"`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`
         ];
         rows.push(row.join(','));
     });
@@ -2615,51 +3925,6 @@ function loadCSV(event) {
 }
 
 function loadVariablesCSV(event) {
-    loadItemsFromCSV(event, 'variables', (values, headers) => ({
-        id: Date.now().toString() + Math.random(),
-        equipment: getValueByHeader(values, headers, ['Equipment']),
-        item_name: getValueByHeader(values, headers, ['Item Name', 'ITEM_NAME']),
-        tag_name: getValueByHeader(values, headers, ['Tag Name', 'TAG_NAME']),
-        io_device: getValueByHeader(values, headers, ['I/O Device', 'IO_DEVICE']),
-        data_type: getValueByHeader(values, headers, ['Data Type', 'DATA_TYPE']) || 'float',
-        address: getValueByHeader(values, headers, ['Address', 'ADDRESS'])
-    }), () => {
-        updateVariableTable();
-        variables = [...variables];
-    });
-}
-
-function loadAlarmsCSV(event) {
-    loadItemsFromCSV(event, 'alarms', (values, headers) => ({
-        id: Date.now().toString() + Math.random(),
-        equipment: getValueByHeader(values, headers, ['Equipment']),
-        item_name: getValueByHeader(values, headers, ['Item Name']),
-        alarm_tag: getValueByHeader(values, headers, ['Alarm Tag']),
-        alarm_name: getValueByHeader(values, headers, ['Alarm Name']),
-        category: getValueByHeader(values, headers, ['Category']),
-        alarm_type: 'analog'
-    }), () => {
-        updateAlarmTable();
-        alarms = [...alarms];
-    });
-}
-
-function loadTrendsCSV(event) {
-    loadItemsFromCSV(event, 'trends', (values, headers) => ({
-        id: Date.now().toString() + Math.random(),
-        equipment: getValueByHeader(values, headers, ['Equipment']),
-        item_name: getValueByHeader(values, headers, ['Item Name']),
-        tag_name: getValueByHeader(values, headers, ['Tag Name']),
-        tag_description: getValueByHeader(values, headers, ['Comment', 'Tag Description']),
-        trend_types: 'periodic',
-        time: '00:00'
-    }), () => {
-        updateTrendTable();
-        trends = [...trends];
-    });
-}
-
-function loadItemsFromCSV(event, type, createItem, callback) {
     const file = event.target.files[0];
     if (!file || !file.name.toLowerCase().endsWith('.csv')) {
         showAlert('Please select a valid CSV file', 'error');
@@ -2673,35 +3938,202 @@ function loadItemsFromCSV(event, type, createItem, callback) {
             const lines = csv.split('\n').filter(line => line.trim());
 
             if (lines.length < 2) {
-                showAlert(`${type} CSV file appears to be empty`, 'error');
+                showAlert('Variables CSV file appears to be empty', 'error');
                 return;
             }
 
             const headers = parseCSVLine(lines[0]);
-            const collections = { variables, alarms, trends };
-            collections[type] = [];
+            let loadedCount = 0;
 
-            let successCount = 0;
 
-            for (let i = 1; i < lines.length; i++) {
-                const values = parseCSVLine(lines[i]);
-                const item = createItem(values, headers);
-
-                if (item && (item.item_name || item.tag_name || item.equipment)) {
-                    collections[type].push(item);
-                    successCount++;
+            if (variables.length > 0) {
+                if (confirm('This will replace existing variables. Continue?')) {
+                    variables = [];
+                } else {
+                    return;
                 }
             }
 
-            callback();
-            showAlert(`Successfully imported ${successCount} ${type}!`, 'success');
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+
+                const equipment = getValueByHeader(values, headers, ['Equipment', 'EQUIPMENT']);
+                const item_name = getValueByHeader(values, headers, ['Item Name', 'ITEM_NAME']);
+                const tag_name = getValueByHeader(values, headers, ['Tag Name', 'TAG_NAME']);
+                const io_device = getValueByHeader(values, headers, ['I/O Device', 'IO_DEVICE']);
+                const data_type = getValueByHeader(values, headers, ['Data Type', 'DATA_TYPE']) || 'float';
+                const address = getValueByHeader(values, headers, ['Address', 'ADDRESS']);
+
+
+                if (item_name && tag_name) {
+
+                    if (!variables.some(v => v.item_name?.toLowerCase() === item_name.toLowerCase())) {
+                        const variable = {
+                            id: Date.now().toString() + Math.random(),
+                            equipment: equipment,
+                            item_name: item_name,
+                            tag_name: tag_name,
+                            io_device: io_device,
+                            data_type: data_type,
+                            address: address
+                        };
+
+                        variables.push(variable);
+                        loadedCount++;
+                    }
+                }
+            }
+
+
+            updateVariableTable();
+            showAlert(`${loadedCount} variables loaded from CSV!`, 'success');
         } catch (error) {
-            showAlert(`Error loading ${type} CSV: ` + error.message, 'error');
+            showAlert('Error loading variables CSV: ' + error.message, 'error');
         }
     };
     reader.readAsText(file);
 }
 
+function loadAlarmsCSV(event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('Alarms CSV file appears to be empty', 'error');
+                return;
+            }
+
+            const headers = parseCSVLine(lines[0]);
+            let loadedCount = 0;
+
+
+            if (alarms.length > 0) {
+                if (confirm('This will replace existing alarms. Continue?')) {
+                    alarms = [];
+                } else {
+                    return;
+                }
+            }
+
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+
+                const equipment = getValueByHeader(values, headers, ['Equipment', 'EQUIPMENT']);
+                const item_name = getValueByHeader(values, headers, ['Item Name', 'ITEM_NAME']);
+                const alarm_tag = getValueByHeader(values, headers, ['Alarm Tag', 'ALARM_TAG']);
+                const alarm_name = getValueByHeader(values, headers, ['Alarm Name', 'ALARM_NAME']);
+                const category = getValueByHeader(values, headers, ['Category', 'CATEGORY']) || 'medium';
+                const alarm_type = getValueByHeader(values, headers, ['Alarm Type', 'ALARM_TYPE']) || 'analog';
+
+
+                if (alarm_name && item_name) {
+
+                    if (!alarms.some(a => a.alarm_name?.toLowerCase() === alarm_name.toLowerCase())) {
+                        const alarm = {
+                            id: Date.now().toString() + Math.random(),
+                            equipment: equipment,
+                            item_name: item_name,
+                            alarm_tag: alarm_tag,
+                            alarm_name: alarm_name,
+                            category: category,
+                            alarm_type: alarm_type
+                        };
+
+                        alarms.push(alarm);
+                        loadedCount++;
+                    }
+                }
+            }
+
+
+            updateAlarmTable();
+            showAlert(`${loadedCount} alarms loaded from CSV!`, 'success');
+        } catch (error) {
+            showAlert('Error loading alarms CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function loadTrendsCSV(event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('Trends CSV file appears to be empty', 'error');
+                return;
+            }
+
+            const headers = parseCSVLine(lines[0]);
+            let loadedCount = 0;
+
+
+            if (trends.length > 0) {
+                if (confirm('This will replace existing trends. Continue?')) {
+                    trends = [];
+                } else {
+                    return;
+                }
+            }
+
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+
+                const tag_description = getValueByHeader(values, headers, ['Tag Description', 'TAG_DESCRIPTION', 'Comment']);
+                const item_name = getValueByHeader(values, headers, ['Item Name', 'ITEM_NAME']);
+                const tag_name = getValueByHeader(values, headers, ['Tag Name', 'TAG_NAME']);
+                const trend_types = getValueByHeader(values, headers, ['Trend Types', 'TREND_TYPES']) || 'periodic';
+                const time = getValueByHeader(values, headers, ['Time', 'TIME']) || '00:00';
+
+
+                if (tag_description && item_name) {
+
+                    if (!trends.some(t => t.tag_description?.toLowerCase() === tag_description.toLowerCase())) {
+                        const trend = {
+                            id: Date.now().toString() + Math.random(),
+                            tag_description: tag_description,
+                            item_name: item_name,
+                            tag_name: tag_name,
+                            trend_types: trend_types,
+                            time: time
+                        };
+
+                        trends.push(trend);
+                        loadedCount++;
+                    }
+                }
+            }
+
+
+            updateTrendTable();
+            showAlert(`${loadedCount} trends loaded from CSV!`, 'success');
+        } catch (error) {
+            showAlert('Error loading trends CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
 function parseCSVLine(line) {
     const result = [];
     let current = '';
@@ -2918,6 +4350,230 @@ function showLoading(show) {
         if (form) form.style.display = show ? 'none' : 'block';
     }
 }
-</script>
+
+    function loadCSV(event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('CSV file appears to be empty', 'error');
+                return;
+            }
+
+            const headers = parseCSVLine(lines[0]);
+
+
+            const isEquipCSV = headers.some(h =>
+                ['Name', 'ITEM_NAME', 'Type', 'EQUIP_TYPE'].includes(h.trim())
+            );
+
+            const isUnitsCSV = headers.some(h =>
+                ['Server Name', 'UNIT_NAME', 'Address', 'Protocol'].includes(h.trim())
+            );
+
+            if (isEquipCSV) {
+                loadEquipmentFromCSV(lines);
+            } else if (isUnitsCSV) {
+                loadUnitsFromCSV(lines);
+            } else {
+                showAlert('CSV format not recognized. Expected EQUIP.csv or UNITS.csv format', 'error');
+                return;
+            }
+
+            showAlert('CSV loaded and device created successfully!', 'success');
+        } catch (error) {
+            showAlert('Error loading CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function loadEquipmentFromCSV(lines) {
+    const headers = parseCSVLine(lines[0]);
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const rowData = {};
+        headers.forEach((header, index) => {
+            rowData[header.trim()] = values[index] ? values[index].trim() : '';
+        });
+
+
+        const deviceName = rowData['Name'] || rowData['ITEM_NAME'] || '';
+        const deviceType = rowData['Type'] || rowData['EQUIP_TYPE'] || 'PV';
+        const tagPrefix = rowData['Tag Prefix'] || deviceName.substring(0, 8).toUpperCase();
+        const ioDevice = rowData['I/O Device'] || `IO_${deviceName}`;
+
+        if (deviceName) {
+
+            resetForm();
+            document.getElementById('device_name').value = deviceName;
+            document.getElementById('device_type').value = deviceType;
+            document.getElementById('tag_prefix').value = tagPrefix;
+            document.getElementById('io_device').value = ioDevice;
+
+
+            selectProtocol('modbus');
+            break;
+        }
+    }
+}
+
+function loadCSV(event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+
+            if (lines.length < 2) {
+                showAlert('CSV file appears to be empty', 'error');
+                return;
+            }
+
+            const headers = parseCSVLine(lines[0]);
+
+
+            const isEquipCSV = headers.some(h =>
+                ['Name', 'Type', 'Tag Prefix', 'I/O Device'].includes(h.trim())
+            );
+
+
+            const isUnitsCSV = headers.some(h =>
+                ['Server Name', 'Port Name', 'Port Number', 'Board Name'].includes(h.trim())
+            );
+
+            let loadedSections = [];
+
+            if (isEquipCSV) {
+                loadEquipmentDataToForm(lines);
+                loadedSections.push('Device Configuration');
+            }
+
+            if (isUnitsCSV) {
+                loadUnitsDataToForm(lines);
+                loadedSections.push('Network Configuration');
+            }
+
+            if (loadedSections.length === 0) {
+                showAlert('CSV format not recognized. Expected EQUIP.csv or UNITS.csv format', 'error');
+                return;
+            }
+
+            showAlert(`CSV loaded successfully! Filled: ${loadedSections.join(' and ')}`, 'success');
+
+        } catch (error) {
+            showAlert('Error loading CSV: ' + error.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function loadEquipmentDataToForm(lines) {
+    const headers = parseCSVLine(lines[0]);
+
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const rowData = {};
+        headers.forEach((header, index) => {
+            rowData[header.trim()] = values[index] ? values[index].trim() : '';
+        });
+
+        const deviceName = rowData['Name'] || '';
+        const deviceType = rowData['Type'] || 'PV';
+        const tagPrefix = rowData['Tag Prefix'] || deviceName.substring(0, 8).toUpperCase();
+        const ioDevice = rowData['I/O Device'] || `IO_${deviceName}`;
+
+        if (deviceName) {
+
+            document.getElementById('device_name').value = deviceName;
+            document.getElementById('device_type').value = deviceType;
+            document.getElementById('tag_prefix').value = tagPrefix;
+            document.getElementById('io_device').value = ioDevice;
+            break;
+        }
+    }
+}
+
+function loadUnitsDataToForm(lines) {
+    const headers = parseCSVLine(lines[0]);
+
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const rowData = {};
+        headers.forEach((header, index) => {
+            rowData[header.trim()] = values[index] ? values[index].trim() : '';
+        });
+
+        const portName = rowData['Port Name'] || '';
+        const portNumber = rowData['Port Number'] || '';
+        const boardName = rowData['Board Name'] || '';
+        const specialOpt = rowData['Special Opt'] || '';
+        const comment = rowData['Comment'] || '';
+
+        if (portName && boardName) {
+
+            let ipAddress = '';
+            let tcpPort = '502';
+
+            if (specialOpt) {
+                const ipMatch = specialOpt.match(/-I([0-9.]+)/);
+                const portMatch = specialOpt.match(/-P(\d+)/);
+
+                if (ipMatch) ipAddress = ipMatch[1];
+                if (portMatch) tcpPort = portMatch[1];
+            }
+
+
+            if (comment && comment.toUpperCase().includes('TCP')) {
+                selectProtocol('modbus');
+                selectModbusVariant('tcp');
+                document.getElementById('device_ip').value = ipAddress;
+                document.getElementById('modbus_port').value = tcpPort;
+                document.getElementById('port_name').value = portName;
+                document.getElementById('unit_number').value = portNumber || '1';
+                document.getElementById('board_name_tcp').value = boardName;
+                document.getElementById('memory_tcp').value = 'true';
+            } else if (comment && comment.toUpperCase().includes('GATEWAY')) {
+                selectProtocol('modbus');
+                selectModbusVariant('rtu');
+                document.getElementById('gateway_address').value = ipAddress;
+                document.getElementById('slave_id').value = portNumber || '1';
+                document.getElementById('port_name_rtu').value = portName;
+                document.getElementById('board_name_rtu').value = boardName;
+                document.getElementById('memory_rtu').value = 'true';
+                document.getElementById('serial_port').value = 'COM1';
+            }
+            break;
+        }
+    }
+
+    updateFormButtons();
+    updateProgressBar();
+}
+  </script>
 </body>
 </html>
