@@ -1,4 +1,3 @@
-// Global variables
 let currentProtocol = 'modbus';
 let currentModbusVariant = 'tcp';
 let devices = [];
@@ -8,9 +7,9 @@ let trends = [];
 let currentDevice = null;
 let validationErrors = {};
 
-// Validation rules
+
 const validationRules = {
-    // Device basic fields
+
     device_name: {
         required: true,
         minLength: 2,
@@ -38,7 +37,8 @@ const validationRules = {
         message: 'I/O Device name must start with letter/underscore, cannot start with digit'
     },
 
-    // Modbus TCP fields
+
+
     device_ip: {
         required: true,
         pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
@@ -83,7 +83,7 @@ const validationRules = {
         message: 'Select memory option'
     },
 
-    // Modbus RTU fields
+
     gateway_address: {
         required: true,
         pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
@@ -120,7 +120,7 @@ const validationRules = {
         message: 'RTU board name must start with letter/underscore, cannot start with digit'
     },
 
-    // Advanced RTU options
+
     baud_rate: {
         required: false,
         enum: ['9600', '19200', '38400', '57600', '115200'],
@@ -142,7 +142,7 @@ const validationRules = {
         message: 'Select 1 or 2 stop bits'
     },
 
-    // IEC 61850 fields
+
     iec_device_ip: {
         required: true,
         pattern: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
@@ -209,7 +209,7 @@ const validationRules = {
         message: 'SCL file path format: [USER]:Project\\File.cid (or .scd, .icd)'
     },
 
-    // Variable fields
+
     item_name: {
         required: true,
         minLength: 1,
@@ -251,7 +251,7 @@ const validationRules = {
         message: 'Select valid data type'
     },
 
-    // Alarm fields
+
     alarm_name: {
         required: true,
         minLength: 1,
@@ -291,7 +291,7 @@ const validationRules = {
         message: 'Alarm item name must start with letter/underscore, cannot start with digit'
     },
 
-    // Trend fields
+
     tag_description: {
         required: true,
         minLength: 3,
@@ -326,7 +326,7 @@ const validationRules = {
     }
 };
 
-// Helper functions
+
 function getMainFormRequiredFields() {
     const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
 
@@ -334,7 +334,7 @@ function getMainFormRequiredFields() {
         if (currentModbusVariant === 'tcp') {
             requiredFields.push('device_ip', 'modbus_port', 'port_name', 'unit_number', 'board_name_tcp');
         } else {
-            requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'board_name_rtu');
+           requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'board_name_rtu');
             if (document.getElementById('advancedOptionsCheckbox')?.checked) {
                 requiredFields.push('baud_rate');
             }
@@ -346,6 +346,33 @@ function getMainFormRequiredFields() {
     return requiredFields;
 }
 
+
+const additionalValidationRules = {
+    board_name: { required: true, minLength: 1, maxLength: 20, message: 'Board name required (1-20 chars)' },
+    brcb: { minLength: 1, maxLength: 64, message: 'BRCB format invalid' },
+    urcb: { minLength: 1, maxLength: 64, message: 'URCB format invalid' },
+    scl_file: { maxLength: 255, message: 'SCL file path too long' }
+};
+
+
+Object.assign(validationRules, additionalValidationRules);
+
+
+function validateFieldIEC(field) {
+    const fieldName = field.name || field.id;
+    const value = field.value.trim();
+
+
+    if (fieldName === 'brcb' || fieldName === 'urcb') {
+        validateReportControlBlocks();
+        return true;
+    }
+
+
+    return validateField(field);
+}
+
+
 function validateReportControlBlocks() {
     const brcb = document.getElementById('brcb');
     const urcb = document.getElementById('urcb');
@@ -354,11 +381,14 @@ function validateReportControlBlocks() {
     const brcbValue = brcb?.value.trim() || '';
     const urcbValue = urcb?.value.trim() || '';
 
+
     if (currentProtocol === 'iec' && !brcbValue && !urcbValue) {
         if (validationDiv) {
             validationDiv.style.display = 'block';
             validationDiv.textContent = 'Please fill in at least one Report Control Block (BRCB or URCB).';
         }
+
+
         validationErrors['report_control_blocks'] = 'At least one Report Control Block required';
         return false;
     } else {
@@ -370,19 +400,710 @@ function validateReportControlBlocks() {
     }
 }
 
-function validateFieldIEC(field) {
-    const fieldName = field.name || field.id;
-    const value = field.value.trim();
 
-    if (fieldName === 'brcb' || fieldName === 'urcb') {
-        validateReportControlBlocks();
-        return true;
+function getMainFormRequiredFieldsUpdated() {
+    const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'unit_number', 'board_name_tcp');
+        } else {
+            requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'board_name_tcp');
+            if (document.getElementById('advancedOptionsCheckbox')?.checked) {
+                requiredFields.push('baud_rate');
+            }
+        }
+    } else if (currentProtocol === 'iec') {
+        requiredFields.push('iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device', 'board_name');
+
     }
 
-    return validateField(field);
+    return requiredFields;
 }
 
-// Initialize form
+function generateIECXML() {
+    if (devices.length === 0) {
+        showAlert('No devices configured. Please save at least one IEC device first.', 'error');
+        return;
+    }
+
+
+    const iecDevices = devices.filter(d => d.protocol === 'iec');
+    if (iecDevices.length === 0) {
+        showAlert('No IEC devices found. Please configure at least one IEC device.', 'error');
+        return;
+    }
+
+    showLoading(true);
+
+    try {
+        iecDevices.forEach((device, index) => {
+            const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
+<ScadaDevice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.schneider-electric.com/SCADA/Drivers/IEC61850/DeviceConfig/v1/">
+  <SCL>${device.scl_file || `[USER]:${device.device_name}_Project\\${device.device_name}.cid`}</SCL>
+  <IED>${device.ied_name || device.device_name}</IED>
+  <LogicalDevice Name="${device.logical_device || 'Relay'}">
+    ${device.urcb ? `<URCB>${device.urcb}</URCB>` : ''}
+    ${device.brcb ? `<BRCB>${device.brcb}</BRCB>` : ''}
+  </LogicalDevice>
+</ScadaDevice>`;
+
+
+            const blob = new Blob([xmlContent], { type: 'application/xml;charset=utf-8;' });
+            const link = document.createElement('a');
+
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `${device.device_name || 'IEC_Device'}.xml`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        });
+
+        showAlert('XML files generated successfully!', 'success');
+    } catch (error) {
+        showAlert('Error generating XML files: ' + error.message, 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+
+
+function generateUnitsCSV() {
+    const isModbus = devices.some(device => device.protocol === 'modbus');
+
+    if (isModbus) {
+        const headers = [
+            'Server Name',
+            'Name',
+            'Number',
+            'Address',
+            'Protocol',
+            'Port Name',
+            'Startup Mode',
+            'Priority',
+            'Memory',
+            'Read-Only',
+            'Exclusive',
+            'Comment',
+            'Linked',
+            'Database Type',
+            'External Database',
+            'Connection String',
+            'Tag Prefix',
+            'Automatic Refresh',
+            'Live Update',
+            'Log Write',
+            'Log Read',
+            'Cache',
+            'Cache Time',
+            'Background Poll',
+            'Background Rate',
+            'Min Update Rate',
+            'Staleness Period',
+            'Scheduled',
+            'Time',
+            'Period',
+            'Connect Action',
+            'Disconnect Action',
+            'Phone Number',
+            'Caller ID',
+            'Persist',
+            'Persist Period',
+            'File Name',
+            'Project',
+            'PROTOCOLID',
+            'LASTUPDATE',
+            'REMOTEWRIT',
+            'ONBROWSE',
+            'LASTVARMOD',
+            'TAGGEN',
+            'TAGGENTEMP'
+        ];
+        const rows = [headers.join(',')];
+
+        let numberCounter = 1;
+
+        devices.forEach((device, index) => {
+            if (device.protocol === 'modbus') {
+                let address = '';
+                let portName = '';
+                let comment = '';
+
+                if (device.modbusVariant === 'tcp') {
+                    address = device.device_ip || '';
+                    portName = device.port_name || '';
+                    comment = 'TCP/IP';
+                } else {
+                    address = device.gateway_address || '';
+                    portName = device.port_name_rtu || '';
+                    comment = 'GATEWAY';
+                }
+
+                const row = [
+                    `"IOServer1"`,
+                    `"${device.io_device || device.device_name}"`,
+                    `"${numberCounter}"`,
+                    `"${address}"`,
+                    `"PWRMOD"`,
+                    `"${portName}"`,
+                    `"Primary"`,
+                    `"1"`,
+                    `"TRUE"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `"TRUE"`,
+                    `"0:05:00"`,
+                    `""`,
+                    `"FUGA_sim_copy"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`
+                ];
+                rows.push(row.join(','));
+
+                numberCounter++;
+            }
+        });
+
+        downloadCSV(rows.join('\n'), 'UNITS.csv');
+    } else {
+        const headers = [
+            'Server Name',
+            'Name',
+            'Number',
+            'Address',
+            'Protocol',
+            'Port Name',
+            'Startup Mode',
+            'Priority',
+            'Memory',
+            'Read-Only',
+            'Exclusive',
+            'Comment',
+            'Linked',
+            'Database Type',
+            'External Database',
+            'Connection String',
+            'Tag Prefix',
+            'Automatic Refresh',
+            'Live Update',
+            'Log Write',
+            'Log Read',
+            'Cache',
+            'Cache Time',
+            'Background Poll',
+            'Background Rate',
+            'Min Update Rate',
+            'Staleness Period',
+            'Scheduled',
+            'Time',
+            'Period',
+            'Connect Action',
+            'Disconnect Action',
+            'Phone Number',
+            'Caller ID',
+            'Persist',
+            'Persist Period',
+            'File Name',
+            'Project',
+            'PROTOCOLID',
+            'LASTUPDATE',
+            'REMOTEWRIT',
+            'ONBROWSE',
+            'LASTVARMOD',
+            'TAGGEN',
+            'TAGGENTEMP'
+        ];
+        const rows = [headers.join(',')];
+
+        devices.forEach((device, index) => {
+            if (device.protocol === 'iec') {
+                const address = device.iec_device_ip || '';
+                const protocol = `IEC${device.iec_port || '61850'}N`;
+                const portName = device.access_point || '';
+                const memory = device.memory_iec === 'false' ? 'FALSE' : 'TRUE';
+
+                const row = [
+                    `"IOServer1"`,
+                    `"${device.io_device || device.device_name}"`,
+                    `"${index + 1}"`,
+                    `"${address}"`,
+                    `"${protocol}"`,
+                    `"${portName}"`,
+                    `"Primary"`,
+                    `"1"`,
+                    `"${memory}"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `"FUGA_sim_copy"`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`,
+                    `""`
+                ];
+                rows.push(row.join(','));
+            }
+        });
+
+        downloadCSV(rows.join('\n'), 'UNITS.csv');
+    }
+}
+
+
+function generateAlarmsCSV() {
+    if (alarms.length === 0) {
+        showAlert('No alarms configured', 'error');
+        return;
+    }
+
+    const headers = ['Cluster Name', 'EQUIPMENT', 'ITEM_NAME', 'ALARM_TAG', 'Variable Tag A', 'ALARM_NAME', 'CATEGORY', 'ALARM_TYPE'];
+    const rows = [headers.join(',')];
+
+    alarms.forEach(alarm => {
+        const row = [
+            `"c1"`,
+            `"${alarm.equipment || ''}"`,
+            `"${alarm.item_name || ''}"`,
+            `"${alarm.alarm_tag || ''}"`,
+            `"${alarm.alarm_tag || ''}"`,
+            `"${alarm.alarm_name || ''}"`,
+            `"${alarm.category || ''}"`,
+            `"${alarm.alarm_type || ''}"`
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'ALARMS.csv');
+}
+
+function generatePortsCSV() {
+    const headers = ['Server Name', 'Port Name', 'Port Number', 'Board Name', 'Baud Rate', 'Data Bits', 'Stop Bits', 'Parity', 'Special Options', 'Comment', 'Project'];
+    const rows = [headers.join(',')];
+
+    devices.forEach(device => {
+        let portNumber = '';
+        let portName = '';
+        let boardName = '';
+        let specialOptions = '';
+
+        if (device.protocol === 'modbus') {
+            if (device.modbusVariant === 'tcp') {
+                portNumber = device.modbus_port || '502';
+                portName = device.port_name || '';
+                boardName = device.board_name || '';
+                specialOptions = 'TCP/IP';
+            } else {
+                portNumber = device.slave_id || '1';
+                portName = device.port_name_rtu || '';
+                boardName = device.board_name_rtu || '';
+                specialOptions = 'TCP/IP';
+            }
+        } else if (device.protocol === 'iec') {
+            portNumber = device.iec_port || '102';
+            portName = device.access_point || '';
+            boardName = device.board_name || '';
+            specialOptions = 'GATEWAY';
+        }
+
+        const row = [
+            `"IOServer1"`,
+            `"${portName}"`,
+            `"${portNumber}"`,
+            `"${boardName}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"#NAZWA? ${specialOptions}"`,
+            `""`,
+            `"DTU_project"`
+        ];
+        rows.push(row.join(','));
+    });
+
+    downloadCSV(rows.join('\n'), 'PORTS.csv');
+}
+
+
+function generateAllCSV() {
+    if (devices.length === 0) {
+        showAlert('No devices to export. Please save at least one device first.', 'error');
+        return;
+    }
+
+    showLoading(true);
+    setTimeout(() => {
+        try {
+
+
+            generateEquipmentCSV();
+            generateUnitsCSV();
+            generatePortsCSV();
+            generateVariablesCSV();
+            generateAlarmsCSV();
+            generateTrendsCSV();
+
+            showAlert('All CSV files generated successfully!', 'success');
+        } catch (error) {
+            showAlert('Error generating CSV files: ' + error.message, 'error');
+        } finally {
+            showLoading(false);
+        }
+    }, 1000);
+}
+
+
+
+
+function addGenerateButtons() {
+    const buttonGroup = document.querySelector('.button-group');
+    if (!buttonGroup) return;
+
+
+    const oldIecBtn = document.getElementById('generateIECBtn');
+    if (oldIecBtn) {
+        oldIecBtn.remove();
+    }
+
+
+    if (!document.getElementById('generateXMLBtn')) {
+        const xmlButton = document.createElement('button');
+        xmlButton.type = 'button';
+        xmlButton.className = 'btn btn-primary';
+        xmlButton.id = 'generateXMLBtn';
+        xmlButton.textContent = 'Generate XML';
+        xmlButton.onclick = generateIECXML;
+        xmlButton.title = 'Generate XML files for IEC devices';
+        buttonGroup.appendChild(xmlButton);
+    }
+
+
+    const csvButton = document.getElementById('generateCSVBtn');
+    if (csvButton) {
+        csvButton.onclick = generateAllCSV;
+        csvButton.textContent = 'Generate CSV Files';
+        csvButton.title = 'Generate all CSV files (including IEC)';
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    updateDeviceCounter();
+    setupValidation();
+    setupIECValidation();
+    setupFileHandlers();
+    setTimeout(addGenerateButtons, 100);
+});
+
+
+window.generateIECXML = generateIECXML;
+window.generateAllCSV = generateAllCSV;
+
+function saveDeviceUpdated() {
+    if (!performCompleteValidation()) {
+        showAlert('Please fix all validation errors before saving', 'error');
+        return;
+    }
+
+
+    if (currentProtocol === 'iec' && !validateReportControlBlocks()) {
+        showAlert('Please fill in at least one Report Control Block (BRCB or URCB)', 'error');
+        return;
+    }
+
+    const form = document.getElementById('deviceForm');
+    const formData = new FormData(form);
+    const deviceName = formData.get('device_name');
+
+    const existingDevice = devices.find(d =>
+        d.device_name.toLowerCase() === deviceName.toLowerCase() &&
+        (!currentDevice || d.id !== currentDevice.id)
+    );
+
+    if (existingDevice) {
+        showFieldError(document.getElementById('device_name'), 'Device name already exists');
+        showAlert('Device name already exists. Please choose a different name.', 'error');
+        return;
+    }
+
+    const device = {
+        id: currentDevice ? currentDevice.id : Date.now().toString(),
+        protocol: currentProtocol,
+        modbusVariant: currentModbusVariant,
+        device_name: deviceName,
+        device_type: formData.get('device_type'),
+        tag_prefix: formData.get('tag_prefix'),
+        io_device: formData.get('io_device'),
+        variables: [...variables],
+        alarms: [...alarms],
+        trends: [...trends]
+    };
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            Object.assign(device, {
+                device_ip: formData.get('device_ip'),
+                modbus_port: formData.get('modbus_port'),
+                port_name: formData.get('port_name'),
+                unit_number: formData.get('unit_number'),
+                memory: formData.get('memory'),
+                board_name: formData.get('board_name_tcp')
+            });
+        } else {
+            Object.assign(device, {
+                gateway_address: formData.get('gateway_address'),
+                slave_id: formData.get('slave_id'),
+                port_name_rtu: formData.get('port_name_rtu'),
+                memory_rtu: formData.get('memory_rtu'),
+                serial_port: formData.get('serial_port'),
+                board_name_rtu: formData.get('board_name_rtu')
+            });
+
+            if (document.getElementById('advancedOptionsCheckbox').checked) {
+                Object.assign(device, {
+                    baud_rate: formData.get('baud_rate'),
+                    data_bits: formData.get('data_bits'),
+                    parity: formData.get('parity'),
+                    stop_bits: formData.get('stop_bits')
+                });
+            }
+        }
+        device.protocol_name = formData.get('protocol');
+    } else if (currentProtocol === 'iec') {
+        Object.assign(device, {
+            iec_device_ip: formData.get('iec_device_ip'),
+            iec_port: formData.get('iec_port'),
+            ied_name: formData.get('ied_name'),
+            access_point: formData.get('access_point'),
+            logical_device: formData.get('logical_device'),
+            board_name: formData.get('board_name'),
+            memory_iec: formData.get('memory_iec'),
+            brcb: formData.get('brcb'),
+            urcb: formData.get('urcb'),
+            scl_file: formData.get('scl_file'),
+            protocol_name: 'IEC61850'
+        });
+    }
+
+    if (currentDevice) {
+        const index = devices.findIndex(d => d.id === currentDevice.id);
+        if (index !== -1) devices[index] = device;
+    } else {
+        devices.push(device);
+    }
+
+    updateDeviceList();
+    updateDeviceCounter();
+    showAlert('Device saved successfully!', 'success');
+    currentDevice = null;
+}
+
+
+function loadDevice(deviceId) {
+    const device = devices.find(d => d.id === deviceId);
+    if (!device) return;
+
+    currentDevice = device;
+    validationErrors = {};
+    document.querySelectorAll('input, select').forEach(field => clearFieldError(field));
+
+    const basicFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
+    basicFields.forEach(field => {
+        const el = document.getElementById(field);
+        if (el) el.value = device[field] || '';
+    });
+
+    selectProtocol(device.protocol);
+
+    if (device.protocol === 'modbus') {
+        selectModbusVariant(device.modbusVariant || 'tcp');
+
+        if (device.modbusVariant === 'tcp') {
+            const tcpFields = ['device_ip', 'modbus_port', 'port_name', 'unit_number', 'project_name', 'board_name_tcp'];
+            tcpFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+
+
+
+
+            const memoryTcpEl = document.getElementById('memory_tcp');
+            if (memoryTcpEl) {
+                memoryTcpEl.value = device.memory || 'true';
+            }
+        } else {
+            const rtuFields = ['gateway_address', 'slave_id', 'port_name_rtu', 'serial_port'];
+            rtuFields.forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+
+           const boardNameRtuEl = document.getElementById('board_name_rtu');
+           if (boardNameRtuEl) {
+                boardNameRtuEl.value = device.board_name_rtu || '';
+    }
+
+
+            const memoryRtuEl = document.getElementById('memory_rtu');
+            if (memoryRtuEl) {
+                memoryRtuEl.value = device.memory_rtu || 'true';
+            }
+        }
+
+        if (device.baud_rate) {
+            document.getElementById('advancedOptionsCheckbox').checked = true;
+            toggleAdvancedOptions();
+            ['baud_rate', 'data_bits', 'parity', 'stop_bits'].forEach(field => {
+                const el = document.getElementById(field);
+                if (el) el.value = device[field] || '';
+            });
+        }
+    } else if (device.protocol === 'iec') {
+        const iecFields = [
+            'iec_device_ip', 'iec_port', 'ied_name', 'access_point',
+            'logical_device', 'board_name', 'memory_iec', 'brcb', 'urcb', 'scl_file'
+        ];
+        iecFields.forEach(field => {
+            const el = document.getElementById(field);
+            if (el) el.value = device[field] || '';
+        });
+    }
+
+    variables = device.variables || [];
+    alarms = device.alarms || [];
+    trends = device.trends || [];
+
+    updateVariableTable();
+    updateAlarmTable();
+    updateTrendTable();
+    updateFormButtons();
+    updateProgressBar();
+    showAlert('Device loaded successfully!', 'success');
+}
+
+
+function setupIECValidation() {
+    const iecFields = ['brcb', 'urcb', 'board_name', 'scl_file'];
+
+    iecFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            ['input', 'change', 'blur', 'focus'].forEach(event => {
+                field.addEventListener(event, function() {
+                    if (event === 'focus') {
+                        clearFieldError(this);
+                    } else {
+                        validateFieldIEC(this);
+                        updateFormButtons();
+                    }
+                });
+            });
+        }
+    });
+}
+
+
+function addIECGenerateButton() {
+    const buttonGroup = document.querySelector('.button-group');
+    if (buttonGroup && !document.getElementById('generateIECBtn')) {
+        const iecButton = document.createElement('button');
+        iecButton.type = 'button';
+        iecButton.className = 'btn btn-primary';
+        iecButton.id = 'generateIECBtn';
+        iecButton.textContent = 'Generate IEC Files';
+        iecButton.onclick = generateIECFiles;
+        iecButton.title = 'Generate IEC configuration files (3 CSV + XML)';
+
+        buttonGroup.appendChild(iecButton);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    updateDeviceCounter();
+    setupValidation();
+    setupIECValidation();
+    setupFileHandlers();
+    setTimeout(addIECGenerateButton, 100);
+});
+
+
+window.saveDevice = saveDeviceUpdated;
+window.loadDevice = loadDeviceUpdated;
+window.getMainFormRequiredFields = getMainFormRequiredFieldsUpdated;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeForm();
+    updateDeviceCounter();
+    setupValidation();
+    setupFileHandlers();
+});
+
 function initializeForm() {
     selectProtocol('modbus');
     selectModbusVariant('tcp');
@@ -393,7 +1114,6 @@ function initializeForm() {
     }
 }
 
-// Setup file handlers
 function setupFileHandlers() {
     const handlers = [
         ['csvFile', loadCSV],
@@ -408,7 +1128,7 @@ function setupFileHandlers() {
     });
 }
 
-// Setup validation
+
 function setupValidation() {
     const form = document.getElementById('deviceForm');
     if (!form) return;
@@ -419,7 +1139,294 @@ function setupValidation() {
             field.addEventListener(event, function() {
                 if (event === 'focus') clearFieldError(this);
                 else validateField(this);
-                updateProtocolSelect(currentModbusVariant === 'tcp' ? 'Modbus TCP' : 'Modbus RTU');
+                updateFormButtons();
+                if (event !== 'focus') updateProgressBar();
+            });
+        });
+    });
+    setupSubFormValidation();
+    updateFormButtons();
+}
+
+function setupSubFormValidation() {
+    const fieldGroups = [
+        ['item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type'],
+        ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'],
+        ['tag_description', 'trend_types', 'tag_name', 'item_name_trend', 'trend_time']
+    ];
+
+    fieldGroups.flat().forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            ['input', 'change', 'blur', 'focus'].forEach(event => {
+                field.addEventListener(event, function() {
+                    if (event === 'focus') clearFieldError(this);
+                    else validateField(this);
+                    updateFormButtons();
+                });
+            });
+        }
+    });
+}
+
+function validateField(field) {
+    const fieldName = field.name || field.id;
+    const value = field.value.trim();
+    const rules = validationRules[fieldName];
+
+    if (!rules || (!isFieldVisible(field) && !isSubFormField(fieldName))) {
+        delete validationErrors[fieldName];
+        clearFieldError(field);
+        return true;
+    }
+
+    let isValid = true;
+    let errorMessage = '';
+
+
+    if (rules.required && !value) {
+        isValid = false;
+        errorMessage = `${getFieldLabel(field)} is required`;
+    }
+
+
+    if (value) {
+        if (rules.minLength && value.length < rules.minLength) {
+            isValid = false;
+            errorMessage = `${getFieldLabel(field)} must be at least ${rules.minLength} characters`;
+        }
+        if (rules.maxLength && value.length > rules.maxLength) {
+            isValid = false;
+            errorMessage = `${getFieldLabel(field)} must not exceed ${rules.maxLength} characters`;
+        }
+        if (rules.pattern && !rules.pattern.test(value)) {
+            isValid = false;
+            errorMessage = rules.message || `${getFieldLabel(field)} format is invalid`;
+        }
+        if (rules.min !== undefined || rules.max !== undefined) {
+            const numValue = parseInt(value);
+            if (isNaN(numValue)) {
+                isValid = false;
+                errorMessage = `${getFieldLabel(field)} must be a valid number`;
+            } else {
+                if (rules.min !== undefined && numValue < rules.min) {
+                    isValid = false;
+                    errorMessage = `${getFieldLabel(field)} must be at least ${rules.min}`;
+                }
+                if (rules.max !== undefined && numValue > rules.max) {
+                    isValid = false;
+                    errorMessage = `${getFieldLabel(field)} must not exceed ${rules.max}`;
+                }
+            }
+        }
+    }
+
+
+    if (!isValid) {
+        validationErrors[fieldName] = errorMessage;
+        showFieldError(field, errorMessage);
+    } else {
+        delete validationErrors[fieldName];
+        clearFieldError(field);
+    }
+
+    return isValid;
+}
+
+function isSubFormField(fieldName) {
+    const subFormFields = [
+        'item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type',
+        'alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm',
+        'tag_description', 'trend_types', 'tag_name', 'item_name_trend', 'trend_time'
+    ];
+    return subFormFields.includes(fieldName);
+}
+
+function isFieldVisible(field) {
+    if (field.offsetParent === null) return false;
+    const fieldName = field.name || field.id;
+
+    if (currentProtocol === 'modbus') {
+        if (fieldName.startsWith('iec_')) return false;
+        if (currentModbusVariant === 'tcp') {
+            return !['gateway_address', 'slave_id', 'port_name_rtu', 'memory_rtu', 'serial_port', 'baud_rate'].includes(fieldName);
+        } else {
+            return !['device_ip', 'modbus_port', 'port_name', 'memory_tcp', 'unit_number'].includes(fieldName);
+        }
+    } else if (currentProtocol === 'iec') {
+        return !['device_ip', 'modbus_port', 'port_name', 'unit_number', 'memory_tcp', 'gateway_address', 'slave_id', 'port_name_rtu', 'memory_rtu', 'serial_port'].includes(fieldName);
+    }
+    return true;
+}
+
+function getFieldLabel(field) {
+    const labels = {
+        device_name: 'Device Name', device_type: 'Device Type', tag_prefix: 'Tag Prefix',
+        io_device: 'I/O Device', device_ip: 'Device IP', modbus_port: 'Modbus Port',
+        iec_device_ip: 'IEC Device IP', item_name: 'Item Name', alarm_name: 'Alarm Name'
+    };
+    return labels[field.name || field.id] || (field.name || field.id).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function showFieldError(field, message) {
+    field.classList.add('field-error');
+    const existingError = field.parentNode.querySelector('.error-message');
+    if (existingError) existingError.remove();
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.textContent = message;
+    errorDiv.style.cssText = 'color: #dc3545; font-size: 0.8rem; margin-top: 4px;';
+    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    field.style.cssText = 'border-color: #dc3545 !important; box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;';
+}
+
+function clearFieldError(field) {
+    field.classList.remove('field-error');
+    const errorMessage = field.parentNode.querySelector('.error-message');
+    if (errorMessage) errorMessage.remove();
+    field.style.cssText = '';
+}
+
+
+function isFormComplete(type) {
+    let requiredFields;
+    switch (type) {
+        case 'variable':
+            requiredFields = ['item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type'];
+            break;
+        case 'alarm':
+            requiredFields = ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'];
+            break;
+        case 'trend':
+            requiredFields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+            break;
+        case 'main':
+            requiredFields = getMainFormRequiredFields();
+            break;
+        default:
+            return false;
+    }
+
+    const allFieldsFilled = requiredFields.every(fieldName => {
+        const field = document.getElementById(fieldName);
+        return field && field.value.trim() !== '';
+    });
+
+    const hasErrors = requiredFields.some(fieldName => validationErrors.hasOwnProperty(fieldName));
+    return allFieldsFilled && !hasErrors;
+}
+
+function getMainFormRequiredFields() {
+    const requiredFields = ['device_name', 'device_type', 'tag_prefix', 'io_device'];
+
+    if (currentProtocol === 'modbus') {
+        if (currentModbusVariant === 'tcp') {
+            requiredFields.push('device_ip', 'modbus_port', 'port_name', 'memory_tcp', 'board_name_tcp');
+        } else {
+            requiredFields.push('gateway_address', 'slave_id', 'port_name_rtu', 'serial_port', 'memory_rtu');
+            if (document.getElementById('advancedOptionsCheckbox')?.checked) {
+                requiredFields.push('baud_rate');
+            }
+        }
+    } else if (currentProtocol === 'iec') {
+        requiredFields.push('iec_device_ip', 'iec_port', 'ied_name', 'access_point', 'logical_device');
+    }
+
+    return requiredFields;
+}
+
+function updateFormButtons() {
+    const buttonConfigs = [
+        { selector: 'button[onclick="saveDevice()"]', condition: () => isFormComplete('main'), title: 'Save device configuration' },
+        { selector: 'button[onclick="generateCSV()"]', condition: () => devices.length > 0, title: 'Generate CSV files' },
+        { selector: 'button[onclick="addVariable()"]', condition: () => isFormComplete('variable'), title: 'Add variable' },
+        { selector: 'button[onclick="addAlarm()"]', condition: () => isFormComplete('alarm'), title: 'Add alarm' },
+        { selector: 'button[onclick="addTrend()"]', condition: () => isFormComplete('trend'), title: 'Add trend' }
+    ];
+
+    buttonConfigs.forEach(({ selector, condition, title }) => {
+        const button = document.querySelector(selector);
+        if (button) {
+            const isEnabled = condition();
+            button.disabled = !isEnabled;
+            button.style.cssText = isEnabled ? '' : 'background-color: #6c757d !important; cursor: not-allowed !important; opacity: 0.6 !important;';
+            button.title = title;
+        }
+    });
+}
+
+function updateProgressBar() {
+    const form = document.getElementById('deviceForm');
+    if (!form) return;
+
+    const requiredFields = form.querySelectorAll('input[required], select[required]');
+    let filledFields = 0, visibleRequiredFields = 0;
+
+    requiredFields.forEach(field => {
+        if (isFieldVisible(field)) {
+            visibleRequiredFields++;
+            if (field.value.trim() !== '' && !validationErrors[field.name || field.id]) {
+                filledFields++;
+            }
+        }
+    });
+
+    const progress = visibleRequiredFields > 0 ? (filledFields / visibleRequiredFields) * 100 : 0;
+    const progressFill = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+
+    if (progressFill) {
+        progressFill.style.width = progress + '%';
+        const errorCount = Object.keys(validationErrors).length;
+        progressFill.style.backgroundColor = errorCount > 0 ? '#dc3545' : progress === 100 ? '#28a745' : '#007bff';
+    }
+
+    if (progressText) {
+        const errorCount = Object.keys(validationErrors).length;
+        if (errorCount > 0) {
+            progressText.textContent = `${errorCount} error${errorCount > 1 ? 's' : ''} to fix`;
+            progressText.style.color = '#dc3545';
+        } else if (progress === 100) {
+            progressText.textContent = 'Form complete - ready to save';
+            progressText.style.color = '#28a745';
+        } else {
+            progressText.textContent = `${Math.round(progress)}% complete`;
+            progressText.style.color = '#007bff';
+        }
+    }
+}
+
+
+function showTab(tabName, event) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    if (event?.target) event.target.classList.add('active');
+    const targetContent = document.getElementById(tabName);
+    if (targetContent) targetContent.classList.add('active');
+}
+
+function selectProtocol(protocol) {
+    currentProtocol = protocol;
+
+    document.querySelectorAll('.protocol-btn').forEach(btn => {
+        btn.classList.toggle('active',
+            (protocol === 'modbus' && btn.textContent.includes('Modbus')) ||
+            (protocol === 'iec' && btn.textContent.includes('IEC'))
+        );
+    });
+
+    const modbusConfig = document.getElementById('modbus-config');
+    const iecConfig = document.getElementById('iec-config');
+    const cidElements = ['cidInputLabel', 'cidFile'];
+
+
+    if (protocol === 'modbus') {
+        modbusConfig?.classList.remove('hidden');
+        iecConfig?.classList.add('hidden');
+        cidElements.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+        updateProtocolSelect(currentModbusVariant === 'tcp' ? 'Modbus TCP' : 'Modbus RTU');
     } else {
         modbusConfig?.classList.add('hidden');
         iecConfig?.classList.remove('hidden');
@@ -504,7 +1511,7 @@ function toggleAdvancedOptions() {
     updateFormButtons();
 }
 
-// Variable functions
+
 function addVariable() {
     if (!isFormComplete('variable')) {
         showAlert('Please complete all variable fields before adding', 'error');
@@ -543,94 +1550,6 @@ function updateVariableTable() {
     variables.forEach(variable => {
         const row = createEditableRow(variable, 'variable', [
             'item_name', 'io_device', 'tag_name', 'address', 'equipment', 'data_type'
-        ]);
-        tbody.appendChild(row);
-    });
-}
-
-// Alarm functions
-function addAlarm() {
-    if (!isFormComplete('alarm')) {
-        showAlert('Please complete all alarm fields before adding', 'error');
-        return;
-    }
-
-    const fields = ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'];
-    const values = fields.map(id => document.getElementById(id).value.trim());
-
-    if (alarms.some(a => a.alarm_name?.toLowerCase() === values[0].toLowerCase())) {
-        showAlert('Alarm name already exists', 'error');
-        return;
-    }
-
-    const alarm = {
-        id: Date.now().toString(),
-        alarm_name: values[0],
-        alarm_type: values[1],
-        category: values[2],
-        alarm_tag: values[3],
-        equipment: values[4],
-        item_name: values[5]
-    };
-
-    alarms.push(alarm);
-    updateAlarmTable();
-    clearForm('alarm');
-    showAlert('Alarm added successfully!', 'success');
-}
-
-function updateAlarmTable() {
-    const tbody = document.getElementById('alarmTableBody');
-    if (!tbody) return;
-
-    tbody.innerHTML = '';
-    alarms.forEach(alarm => {
-        const row = createEditableRow(alarm, 'alarm', [
-            'alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name'
-        ]);
-        tbody.appendChild(row);
-    });
-}
-
-// Trend functions
-function addTrend() {
-    if (!isFormComplete('trend')) {
-        showAlert('Please complete all trend fields before adding', 'error');
-        return;
-    }
-
-    const fields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
-    const values = fields.map(id => document.getElementById(id).value.trim());
-    const timeValue = document.getElementById('trend_time')?.value || '00:00';
-
-    if (trends.some(t => t.tag_description?.toLowerCase() === values[0].toLowerCase())) {
-        showAlert('Tag description already exists', 'error');
-        return;
-    }
-
-    const trend = {
-        id: Date.now().toString(),
-        tag_description: values[0],
-        trend_types: values[1],
-        tag_name: values[2],
-        item_name: values[3],
-        time: timeValue
-    };
-
-    trends.push(trend);
-    updateTrendTable();
-    clearForm('trend');
-    showAlert('Trend added successfully!', 'success');
-}
-
-function updateTrendTable() {
-    const tbody = document.getElementById('trendTableBody');
-    if (!tbody) return;
-
-    tbody.innerHTML = '';
-    trends.forEach(trend => {
-        const row = createEditableRow(trend, 'trend', [
-            'tag_description', 'trend_types', 'tag_name', 'item_name', 'time'
         ]);
         tbody.appendChild(row);
     });
@@ -680,6 +1599,7 @@ function createEditableRow(item, type, fields) {
         row.appendChild(cell);
     });
 
+
     const actionCell = document.createElement('td');
     actionCell.className = 'action-buttons';
     const removeBtn = document.createElement('button');
@@ -713,11 +1633,6 @@ function removeItem(id, type) {
         };
 
         collections[type] = collections[type].filter(i => i.id !== id);
-
-        if (type === 'variable') variables = collections[type];
-        if (type === 'alarm') alarms = collections[type];
-        if (type === 'trend') trends = collections[type];
-
         updateFunctions[type]();
         showAlert(`${type.charAt(0).toUpperCase() + type.slice(1)} removed successfully!`, 'success');
     }
@@ -741,7 +1656,95 @@ function clearForm(type) {
     updateFormButtons();
 }
 
-// Device management functions
+
+function addAlarm() {
+    if (!isFormComplete('alarm')) {
+        showAlert('Please complete all alarm fields before adding', 'error');
+        return;
+    }
+
+    const fields = ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'];
+    const values = fields.map(id => document.getElementById(id).value.trim());
+
+    if (alarms.some(a => a.alarm_name?.toLowerCase() === values[0].toLowerCase())) {
+        showAlert('Alarm name already exists', 'error');
+        return;
+    }
+
+    const alarm = {
+        id: Date.now().toString(),
+        alarm_name: values[0],
+        alarm_type: values[1],
+        category: values[2],
+        alarm_tag: values[3],
+        equipment: values[4],
+        item_name: values[5]
+    };
+
+    alarms.push(alarm);
+    updateAlarmTable();
+    clearForm('alarm');
+    showAlert('Alarm added successfully!', 'success');
+}
+
+function updateAlarmTable() {
+    const tbody = document.getElementById('alarmTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    alarms.forEach(alarm => {
+        const row = createEditableRow(alarm, 'alarm', [
+            'alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name'
+        ]);
+        tbody.appendChild(row);
+    });
+}
+
+
+function addTrend() {
+    if (!isFormComplete('trend')) {
+        showAlert('Please complete all trend fields before adding', 'error');
+        return;
+    }
+
+    const fields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
+    const values = fields.map(id => document.getElementById(id).value.trim());
+    const timeValue = document.getElementById('trend_time')?.value || '00:00';
+
+    if (trends.some(t => t.tag_description?.toLowerCase() === values[0].toLowerCase())) {
+        showAlert('Tag description already exists', 'error');
+        return;
+    }
+
+    const trend = {
+        id: Date.now().toString(),
+        tag_description: values[0],
+        trend_types: values[1],
+        tag_name: values[2],
+        item_name: values[3],
+        time: timeValue
+    };
+
+    trends.push(trend);
+    updateTrendTable();
+    clearForm('trend');
+    showAlert('Trend added successfully!', 'success');
+}
+
+function updateTrendTable() {
+    const tbody = document.getElementById('trendTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    trends.forEach(trend => {
+        const row = createEditableRow(trend, 'trend', [
+            'tag_description', 'trend_types', 'tag_name', 'item_name', 'time'
+        ]);
+        tbody.appendChild(row);
+    });
+}
+
+
 function saveDevice() {
     if (!performCompleteValidation()) {
         showAlert('Please fix all validation errors before saving', 'error');
@@ -782,6 +1785,7 @@ function saveDevice() {
     };
 
     if (currentProtocol === 'modbus') {
+
         const boardNameValue = formData.get('board_name_tcp') ||
                               document.getElementById('board_name_tcp')?.value || '';
 
@@ -843,6 +1847,7 @@ function saveDevice() {
     showAlert('Device saved successfully!', 'success');
     currentDevice = null;
 }
+
 
 function performCompleteValidation() {
     const form = document.getElementById('deviceForm');
@@ -935,6 +1940,7 @@ function loadDevice(deviceId) {
     if (device.protocol === 'modbus') {
         selectModbusVariant(device.modbusVariant || 'tcp');
 
+
         const boardNameEl = document.getElementById('board_name_tcp');
         if (boardNameEl) {
             boardNameEl.value = device.board_name_tcp || device.board_name || '';
@@ -947,6 +1953,7 @@ function loadDevice(deviceId) {
                 if (el) el.value = device[field] || '';
             });
 
+
             const memoryTcpEl = document.getElementById('memory_tcp');
             if (memoryTcpEl) {
                 memoryTcpEl.value = device.memory || 'true';
@@ -957,6 +1964,7 @@ function loadDevice(deviceId) {
                 const el = document.getElementById(field);
                 if (el) el.value = device[field] || '';
             });
+
 
             const memoryRtuEl = document.getElementById('memory_rtu');
             if (memoryRtuEl) {
@@ -1010,132 +2018,107 @@ function updateDeviceCounter() {
     if (counter) counter.textContent = devices.length;
 }
 
-// CSV Generation functions
+
+function generateCSV() {
+    if (devices.length === 0) {
+        showAlert('No devices to export. Please save at least one device first.', 'error');
+        return;
+    }
+
+    showLoading(true);
+    setTimeout(() => {
+        try {
+            generateEquipmentCSV();
+            generateUnitsCSV();
+            generateVariablesCSV();
+            generateAlarmsCSV();
+            generateTrendsCSV();
+            showAlert('All CSV files generated successfully!', 'success');
+        } catch (error) {
+            showAlert('Error generating CSV files: ' + error.message, 'error');
+        } finally {
+            showLoading(false);
+        }
+    }, 1000);
+}
+
 function generateEquipmentCSV() {
     const headers = [
-        'Name', 'Cluster Name', 'Display Name', 'Type', 'Location', 'Page', 'Content', 'Help', 'Comment',
-        'Tag Prefix', 'I/O Device', 'Hidden', 'Area', 'Custom 1', 'Custom 2', 'Custom 3', 'Custom 4',
-        'Custom 5', 'Custom 6', 'Custom 7', 'Custom 8', 'Scheduled', 'Default State', 'Schedule ID',
-        'Device Schedule', 'Parameters', 'Project', 'COMPOSITE', 'TAGGENLINK', 'LINKED', 'EDITCODE', 'REFERENCE'
+        'Name',
+        'Cluster Name',
+        'Display Name',
+        'Type',
+        'Location',
+        'Page',
+        'Content',
+        'Help',
+        'Comment',
+        'Tag Prefix',
+        'I/O Device',
+        'Hidden',
+        'Area',
+        'Custom 1',
+        'Custom 2',
+        'Custom 3',
+        'Custom 4',
+        'Custom 5',
+        'Custom 6',
+        'Custom 7',
+        'Custom 8',
+        'Scheduled',
+        'Default State',
+        'Schedule ID',
+        'Device Schedule',
+        'Parameters',
+        'Project',
+        'COMPOSITE',
+        'TAGGENLINK',
+        'LINKED',
+        'EDITCODE',
+        'REFERENCE'
     ];
 
     const rows = [headers.join(',')];
 
     devices.forEach(device => {
         const row = [
-            `"${device.device_name || ''}"`, `"c1"`, `""`, `"${device.device_type || ''}"`, `""`, `""`, `""`, `""`, `""`,
-            `"${device.tag_prefix || ''}"`, `"${device.io_device || ''}"`, `""`, `""`, `""`, `""`, `""`, `""`,
-            `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `"FUGA_sim_copy"`, `""`, `""`, `""`, `""`, `""`
+            `"${device.device_name || ''}"`,
+            `"c1"`,
+            `""`,
+            `"${device.device_type || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"${device.tag_prefix || ''}"`,
+            `"${device.io_device || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`
         ];
         rows.push(row.join(','));
     });
 
     downloadCSV(rows.join('\n'), 'EQUIP.csv');
-}
-
-function generateUnitsCSV() {
-    const isModbus = devices.some(device => device.protocol === 'modbus');
-
-    const headers = [
-        'Server Name', 'Name', 'Number', 'Address', 'Protocol', 'Port Name', 'Startup Mode', 'Priority',
-        'Memory', 'Read-Only', 'Exclusive', 'Comment', 'Linked', 'Database Type', 'External Database',
-        'Connection String', 'Tag Prefix', 'Automatic Refresh', 'Live Update', 'Log Write', 'Log Read',
-        'Cache', 'Cache Time', 'Background Poll', 'Background Rate', 'Min Update Rate', 'Staleness Period',
-        'Scheduled', 'Time', 'Period', 'Connect Action', 'Disconnect Action', 'Phone Number', 'Caller ID',
-        'Persist', 'Persist Period', 'File Name', 'Project', 'PROTOCOLID', 'LASTUPDATE', 'REMOTEWRIT',
-        'ONBROWSE', 'LASTVARMOD', 'TAGGEN', 'TAGGENTEMP'
-    ];
-    const rows = [headers.join(',')];
-
-    if (isModbus) {
-        let numberCounter = 1;
-        devices.forEach((device) => {
-            if (device.protocol === 'modbus') {
-                let address = '';
-                let portName = '';
-                let comment = '';
-
-                if (device.modbusVariant === 'tcp') {
-                    address = device.device_ip || '';
-                    portName = device.port_name || '';
-                    comment = 'TCP/IP';
-                } else {
-                    address = device.gateway_address || '';
-                    portName = device.port_name_rtu || '';
-                    comment = 'GATEWAY';
-                }
-
-                const row = [
-                    `"IOServer1"`, `"${device.io_device || device.device_name}"`, `"${numberCounter}"`, `"${address}"`,
-                    `"PWRMOD"`, `"${portName}"`, `"Primary"`, `"1"`, `"TRUE"`, `""`, `""`, `""`, `""`, `""`, `""`,
-                    `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`,
-                    `""`, `""`, `""`, `""`, `"TRUE"`, `"0:05:00"`, `""`, `"FUGA_sim_copy"`, `""`, `""`, `""`,
-                    `""`, `""`, `""`, `""`
-                ];
-                rows.push(row.join(','));
-                numberCounter++;
-            }
-        });
-    } else {
-        devices.forEach((device, index) => {
-            if (device.protocol === 'iec') {
-                const address = device.iec_device_ip || '';
-                const protocol = `IEC${device.iec_port || '61850'}N`;
-                const portName = device.access_point || '';
-                const memory = device.memory_iec === 'false' ? 'FALSE' : 'TRUE';
-
-                const row = [
-                    `"IOServer1"`, `"${device.io_device || device.device_name}"`, `"${index + 1}"`, `"${address}"`,
-                    `"${protocol}"`, `"${portName}"`, `"Primary"`, `"1"`, `"${memory}"`, `""`, `""`, `""`, `""`,
-                    `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`,
-                    `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `"FUGA_sim_copy"`, `""`, `""`, `""`,
-                    `""`, `""`, `""`, `""`
-                ];
-                rows.push(row.join(','));
-            }
-        });
-    }
-
-    downloadCSV(rows.join('\n'), 'UNITS.csv');
-}
-
-function generatePortsCSV() {
-    const headers = ['Server Name', 'Port Name', 'Port Number', 'Board Name', 'Baud Rate', 'Data Bits', 'Stop Bits', 'Parity', 'Special Options', 'Comment', 'Project'];
-    const rows = [headers.join(',')];
-
-    devices.forEach(device => {
-        let portNumber = '';
-        let portName = '';
-        let boardName = '';
-        let specialOptions = '';
-
-        if (device.protocol === 'modbus') {
-            if (device.modbusVariant === 'tcp') {
-                portNumber = device.modbus_port || '502';
-                portName = device.port_name || '';
-                boardName = device.board_name || '';
-                specialOptions = 'TCP/IP';
-            } else {
-                portNumber = device.slave_id || '1';
-                portName = device.port_name_rtu || '';
-                boardName = device.board_name_rtu || '';
-                specialOptions = 'TCP/IP';
-            }
-        } else if (device.protocol === 'iec') {
-            portNumber = device.iec_port || '102';
-            portName = device.access_point || '';
-            boardName = device.board_name || '';
-            specialOptions = 'GATEWAY';
-        }
-
-        const row = [
-            `"IOServer1"`, `"${portName}"`, `"${portNumber}"`, `"${boardName}"`, `""`, `""`, `""`, `""`,
-            `"#NAZWA? ${specialOptions}"`, `""`, `"DTU_project"`
-        ];
-        rows.push(row.join(','));
-    });
-
-    downloadCSV(rows.join('\n'), 'PORTS.csv');
 }
 
 function generateVariablesCSV() {
@@ -1145,19 +2128,51 @@ function generateVariablesCSV() {
     }
 
     const headers = [
-        'Equipment', 'Item Name', 'Tag Name', 'Cluster Name', 'I/O Device', 'Data Type', 'Address', 'Comment',
-        'Deadband', 'Eng Units', 'Format', 'Raw Zero Scale', 'Raw Full Scale', 'Eng Zero Scale', 'Eng Full Scale',
-        'Custom 1', 'Custom 2', 'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6', 'Custom 7', 'Custom 8',
-        'Write Roles', 'Historize', 'Project', 'EDITCODE', 'LINKED', 'OID', 'REF1', 'REF2', 'CUSTOM', 'TAGGENLINK', 'Unique ID'
+        'Equipment', 'Item Name', 'Tag Name', 'Cluster Name', 'I/O Device',
+        'Data Type', 'Address', 'Comment', 'Deadband', 'Eng Units', 'Format',
+        'Raw Zero Scale', 'Raw Full Scale', 'Eng Zero Scale', 'Eng Full Scale',
+        'Custom 1', 'Custom 2', 'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6',
+        'Custom 7', 'Custom 8', 'Write Roles', 'Historize', 'Project', 'EDITCODE',
+        'LINKED', 'OID', 'REF1', 'REF2', 'CUSTOM', 'TAGGENLINK', 'Unique ID'
     ];
     const rows = [headers.join(',')];
 
     variables.forEach(variable => {
         const row = [
-            `"${variable.equipment || ''}"`, `"${variable.item_name || ''}"`, `"${variable.tag_name || ''}"`,
-            `"c1"`, `"${variable.io_device || ''}"`, `"${variable.data_type || ''}"`, `"${variable.address || ''}"`,
-            `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`,
-            `""`, `""`, `"FUGA_sim_copy"`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `"${variable.unique_id || ''}"`
+            `"${variable.equipment || ''}"`,
+            `"${variable.item_name || ''}"`,
+            `"${variable.tag_name || ''}"`,
+            `"c1"`,
+            `"${variable.io_device || ''}"`,
+            `"${variable.data_type || ''}"`,
+            `"${variable.address || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"${variable.unique_id || ''}"`
         ];
         rows.push(row.join(','));
     });
@@ -1172,14 +2187,46 @@ function generateAlarmsCSV() {
     }
 
     const headers = [
-        'Cluster Name', 'EQUIPMENT', 'ITEM_NAME', 'ALARM_TAG', 'Variable Tag A', 'ALARM_NAME', 'CATEGORY', 'ALARM_TYPE'
+        'Equipment', 'Item Name', 'Alarm Tag', 'Alarm Name', 'Cluster Name',
+        'Category', 'Alarm Desc', 'Delay', 'Help', 'Comment', 'Variable Tag A', 'Variable Tag B',
+        'Custom 1', 'Custom 2', 'Custom 3', 'Custom 4', 'Custom 5', 'Custom 6',
+        'Custom 7', 'Custom 8', 'Paging', 'Paging Group', 'Area', 'Privilege',
+        'Historize', 'Project', 'SEQUENCE', 'TAGGENLINK', 'EDITCODE', 'LINKED'
     ];
     const rows = [headers.join(',')];
 
     alarms.forEach(alarm => {
         const row = [
-            `"c1"`, `"${alarm.equipment || ''}"`, `"${alarm.item_name || ''}"`, `"${alarm.alarm_tag || ''}"`,
-            `"${alarm.alarm_tag || ''}"`, `"${alarm.alarm_name || ''}"`, `"${alarm.category || ''}"`, `"${alarm.alarm_type || ''}"`
+            `"${alarm.equipment || ''}"`,
+            `"${alarm.item_name || ''}"`,
+            `"${alarm.alarm_tag || ''}"`,
+            `"${alarm.alarm_name || ''}"`,
+            `"c1"`,
+            `"${alarm.category || ''}"`,
+            `"${alarm.alarm_desc || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `"${alarm.alarm_tag || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"${alarm.equipment || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`
         ];
         rows.push(row.join(','));
     });
@@ -1194,10 +2241,12 @@ function generateTrendsCSV() {
     }
 
     const headers = [
-        'Equipment', 'Item Name', 'Tag Name', 'Cluster Name', 'Type', 'Expression', 'Trigger', 'Sample Period',
-        'Eng Units', 'Format', 'Deadband', 'Comment', 'Zero Scale', 'Full Scale', 'File Name', 'No. Files',
-        'Period', 'Time', 'Storage Method', 'Area', 'Privilege', 'Historize', 'Project', 'SPCFLAG', 'LSL',
-        'USL', 'SUBGRPSIZE', 'XDOUBLEBAR', 'RANGE', 'SDEVIATION', 'TAGGENLINK', 'EDITCODE', 'LINKED'
+        'Equipment', 'Item Name', 'Tag Name', 'Cluster Name', 'Type', 'Expression',
+        'Trigger', 'Sample Period', 'Eng Units', 'Format', 'Deadband', 'Comment',
+        'Zero Scale', 'Full Scale', 'File Name', 'No. Files', 'Period', 'Time',
+        'Storage Method', 'Area', 'Privilege', 'Historize', 'Project', 'SPCFLAG',
+        'LSL', 'USL', 'SUBGRPSIZE', 'XDOUBLEBAR', 'RANGE', 'SDEVIATION',
+        'TAGGENLINK', 'EDITCODE', 'LINKED'
     ];
     const rows = [headers.join(',')];
 
@@ -1214,11 +2263,39 @@ function generateTrendsCSV() {
         }
 
         const row = [
-            `"${trend.tag_description || ''}"`, `"${trend.item_name || ''}"`, `"${trend.tag_name || ''}"`,
-            `"c1"`, `"TRN_PERIODIC"`, `"${trend.tag_name || ''}"`, `""`, `"${samplePeriod}"`,
-            `"${trend.eng_units || ''}"`, `"###.#"`, `""`, `"${trend.comment || ''}"`, `""`, `""`, `""`,
-            `"13"`, `"1st"`, `""`, `"Floating Point (8-byte samples)"`, `""`, `""`, `""`, `"FUGA_sim_copy"`,
-            `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`, `""`
+            `"${trend.tag_description || ''}"`,
+            `"${trend.item_name || ''}"`,
+            `"${trend.tag_name || ''}"`,
+            `"c1"`,
+            `"TRN_PERIODIC"`,
+            `"${trend.tag_name || ''}"`,
+            `""`,
+            `"${samplePeriod}"`,
+            `"${trend.eng_units || ''}"`,
+            `"###.#"`,
+            `""`,
+            `"${trend.comment || ''}"`,
+            `""`,
+            `""`,
+            `""`,
+            `"13"`,
+            `"1st"`,
+            `""`,
+            `"Floating Point (8-byte samples)"`,
+            `""`,
+            `""`,
+            `""`,
+            `"FUGA_sim_copy"`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`,
+            `""`
         ];
         rows.push(row.join(','));
     });
@@ -1226,80 +2303,7 @@ function generateTrendsCSV() {
     downloadCSV(rows.join('\n'), 'TRENDS.csv');
 }
 
-function generateIECXML() {
-    if (devices.length === 0) {
-        showAlert('No devices configured. Please save at least one IEC device first.', 'error');
-        return;
-    }
 
-    const iecDevices = devices.filter(d => d.protocol === 'iec');
-    if (iecDevices.length === 0) {
-        showAlert('No IEC devices found. Please configure at least one IEC device.', 'error');
-        return;
-    }
-
-    showLoading(true);
-
-    try {
-        iecDevices.forEach((device) => {
-            const xmlContent = `<?xml version="1.0" encoding="utf-8"?>
-<ScadaDevice xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.schneider-electric.com/SCADA/Drivers/IEC61850/DeviceConfig/v1/">
-  <SCL>${device.scl_file || `[USER]:${device.device_name}_Project\\${device.device_name}.cid`}</SCL>
-  <IED>${device.ied_name || device.device_name}</IED>
-  <LogicalDevice Name="${device.logical_device || 'Relay'}">
-    ${device.urcb ? `<URCB>${device.urcb}</URCB>` : ''}
-    ${device.brcb ? `<BRCB>${device.brcb}</BRCB>` : ''}
-  </LogicalDevice>
-</ScadaDevice>`;
-
-            const blob = new Blob([xmlContent], { type: 'application/xml;charset=utf-8;' });
-            const link = document.createElement('a');
-
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', `${device.device_name || 'IEC_Device'}.xml`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            }
-        });
-
-        showAlert('XML files generated successfully!', 'success');
-    } catch (error) {
-        showAlert('Error generating XML files: ' + error.message, 'error');
-    } finally {
-        showLoading(false);
-    }
-}
-
-function generateAllCSV() {
-    if (devices.length === 0) {
-        showAlert('No devices to export. Please save at least one device first.', 'error');
-        return;
-    }
-
-    showLoading(true);
-    setTimeout(() => {
-        try {
-            generateEquipmentCSV();
-            generateUnitsCSV();
-            generatePortsCSV();
-            generateVariablesCSV();
-            generateAlarmsCSV();
-            generateTrendsCSV();
-            showAlert('All CSV files generated successfully!', 'success');
-        } catch (error) {
-            showAlert('Error generating CSV files: ' + error.message, 'error');
-        } finally {
-            showLoading(false);
-        }
-    }, 1000);
-}
-
-// File loading functions
 function loadCSV(event) {
     const file = event.target.files[0];
     if (!file || !file.name.toLowerCase().endsWith('.csv')) {
@@ -1318,117 +2322,23 @@ function loadCSV(event) {
                 return;
             }
 
-            const headers = parseCSVLine(lines[0]);
-            const isEquipCSV = headers.some(h => ['Name', 'Type', 'Tag Prefix', 'I/O Device'].includes(h.trim()));
-            const isUnitsCSV = headers.some(h => ['Server Name', 'Port Name', 'Port Number', 'Board Name'].includes(h.trim()));
+            const headers = lines[0].split(',').map(h => h.trim());
 
-            let loadedSections = [];
-
-            if (isEquipCSV) {
-                loadEquipmentDataToForm(lines);
-                loadedSections.push('Device Configuration');
-            }
-
-            if (isUnitsCSV) {
-                loadUnitsDataToForm(lines);
-                loadedSections.push('Network Configuration');
-            }
-
-            if (loadedSections.length === 0) {
-                showAlert('CSV format not recognized. Expected EQUIP.csv or UNITS.csv format', 'error');
+            if (headers.includes('ITEM_NAME') && headers.includes('EQUIP_TYPE')) {
+                loadEquipmentFromCSV(lines);
+            } else if (headers.includes('UNIT_NAME') && headers.includes('PROTOCOL')) {
+                loadUnitsFromCSV(lines);
+            } else {
+                showAlert('CSV format not recognized', 'error');
                 return;
             }
 
-            showAlert(`CSV loaded successfully! Filled: ${loadedSections.join(' and ')}`, 'success');
+            showAlert('CSV loaded successfully!', 'success');
         } catch (error) {
             showAlert('Error loading CSV: ' + error.message, 'error');
         }
     };
     reader.readAsText(file);
-}
-
-function loadEquipmentDataToForm(lines) {
-    const headers = parseCSVLine(lines[0]);
-
-    for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
-        if (values.length < 2) continue;
-
-        const rowData = {};
-        headers.forEach((header, index) => {
-            rowData[header.trim()] = values[index] ? values[index].trim() : '';
-        });
-
-        const deviceName = rowData['Name'] || '';
-        const deviceType = rowData['Type'] || 'PV';
-        const tagPrefix = rowData['Tag Prefix'] || deviceName.substring(0, 8).toUpperCase();
-        const ioDevice = rowData['I/O Device'] || `IO_${deviceName}`;
-
-        if (deviceName) {
-            document.getElementById('device_name').value = deviceName;
-            document.getElementById('device_type').value = deviceType;
-            document.getElementById('tag_prefix').value = tagPrefix;
-            document.getElementById('io_device').value = ioDevice;
-            break;
-        }
-    }
-}
-
-function loadUnitsDataToForm(lines) {
-    const headers = parseCSVLine(lines[0]);
-
-    for (let i = 1; i < lines.length; i++) {
-        const values = parseCSVLine(lines[i]);
-        if (values.length < 2) continue;
-
-        const rowData = {};
-        headers.forEach((header, index) => {
-            rowData[header.trim()] = values[index] ? values[index].trim() : '';
-        });
-
-        const portName = rowData['Port Name'] || '';
-        const portNumber = rowData['Port Number'] || '';
-        const boardName = rowData['Board Name'] || '';
-        const specialOpt = rowData['Special Opt'] || '';
-        const comment = rowData['Comment'] || '';
-
-        if (portName && boardName) {
-            let ipAddress = '';
-            let tcpPort = '502';
-
-            if (specialOpt) {
-                const ipMatch = specialOpt.match(/-I([0-9.]+)/);
-                const portMatch = specialOpt.match(/-P(\d+)/);
-
-                if (ipMatch) ipAddress = ipMatch[1];
-                if (portMatch) tcpPort = portMatch[1];
-            }
-
-            if (comment && comment.toUpperCase().includes('TCP')) {
-                selectProtocol('modbus');
-                selectModbusVariant('tcp');
-                document.getElementById('device_ip').value = ipAddress;
-                document.getElementById('modbus_port').value = tcpPort;
-                document.getElementById('port_name').value = portName;
-                document.getElementById('unit_number').value = portNumber || '1';
-                document.getElementById('board_name_tcp').value = boardName;
-                document.getElementById('memory_tcp').value = 'true';
-            } else if (comment && comment.toUpperCase().includes('GATEWAY')) {
-                selectProtocol('modbus');
-                selectModbusVariant('rtu');
-                document.getElementById('gateway_address').value = ipAddress;
-                document.getElementById('slave_id').value = portNumber || '1';
-                document.getElementById('port_name_rtu').value = portName;
-                document.getElementById('board_name_rtu').value = boardName;
-                document.getElementById('memory_rtu').value = 'true';
-                document.getElementById('serial_port').value = 'COM1';
-            }
-            break;
-        }
-    }
-
-    updateFormButtons();
-    updateProgressBar();
 }
 
 function loadVariablesCSV(event) {
@@ -1452,6 +2362,7 @@ function loadVariablesCSV(event) {
             const headers = parseCSVLine(lines[0]);
             let loadedCount = 0;
 
+
             if (variables.length > 0) {
                 if (confirm('This will replace existing variables. Continue?')) {
                     variables = [];
@@ -1459,6 +2370,7 @@ function loadVariablesCSV(event) {
                     return;
                 }
             }
+
 
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
@@ -1470,7 +2382,9 @@ function loadVariablesCSV(event) {
                 const data_type = getValueByHeader(values, headers, ['Data Type', 'DATA_TYPE']) || 'float';
                 const address = getValueByHeader(values, headers, ['Address', 'ADDRESS']);
 
+
                 if (item_name && tag_name) {
+
                     if (!variables.some(v => v.item_name?.toLowerCase() === item_name.toLowerCase())) {
                         const variable = {
                             id: Date.now().toString() + Math.random(),
@@ -1487,6 +2401,7 @@ function loadVariablesCSV(event) {
                     }
                 }
             }
+
 
             updateVariableTable();
             showAlert(`${loadedCount} variables loaded from CSV!`, 'success');
@@ -1518,6 +2433,7 @@ function loadAlarmsCSV(event) {
             const headers = parseCSVLine(lines[0]);
             let loadedCount = 0;
 
+
             if (alarms.length > 0) {
                 if (confirm('This will replace existing alarms. Continue?')) {
                     alarms = [];
@@ -1525,6 +2441,7 @@ function loadAlarmsCSV(event) {
                     return;
                 }
             }
+
 
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
@@ -1536,7 +2453,9 @@ function loadAlarmsCSV(event) {
                 const category = getValueByHeader(values, headers, ['Category', 'CATEGORY']) || 'medium';
                 const alarm_type = getValueByHeader(values, headers, ['Alarm Type', 'ALARM_TYPE']) || 'analog';
 
+
                 if (alarm_name && item_name) {
+
                     if (!alarms.some(a => a.alarm_name?.toLowerCase() === alarm_name.toLowerCase())) {
                         const alarm = {
                             id: Date.now().toString() + Math.random(),
@@ -1553,6 +2472,7 @@ function loadAlarmsCSV(event) {
                     }
                 }
             }
+
 
             updateAlarmTable();
             showAlert(`${loadedCount} alarms loaded from CSV!`, 'success');
@@ -1584,6 +2504,7 @@ function loadTrendsCSV(event) {
             const headers = parseCSVLine(lines[0]);
             let loadedCount = 0;
 
+
             if (trends.length > 0) {
                 if (confirm('This will replace existing trends. Continue?')) {
                     trends = [];
@@ -1591,6 +2512,7 @@ function loadTrendsCSV(event) {
                     return;
                 }
             }
+
 
             for (let i = 1; i < lines.length; i++) {
                 const values = parseCSVLine(lines[i]);
@@ -1601,7 +2523,9 @@ function loadTrendsCSV(event) {
                 const trend_types = getValueByHeader(values, headers, ['Trend Types', 'TREND_TYPES']) || 'periodic';
                 const time = getValueByHeader(values, headers, ['Time', 'TIME']) || '00:00';
 
+
                 if (tag_description && item_name) {
+
                     if (!trends.some(t => t.tag_description?.toLowerCase() === tag_description.toLowerCase())) {
                         const trend = {
                             id: Date.now().toString() + Math.random(),
@@ -1618,6 +2542,7 @@ function loadTrendsCSV(event) {
                 }
             }
 
+
             updateTrendTable();
             showAlert(`${loadedCount} trends loaded from CSV!`, 'success');
         } catch (error) {
@@ -1626,6 +2551,42 @@ function loadTrendsCSV(event) {
     };
     reader.readAsText(file);
 }
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+
+        if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+                current += '"';
+                i++;
+            } else {
+                inQuotes = !inQuotes;
+            }
+        } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+
+    result.push(current.trim());
+    return result.map(val => val.replace(/^"|"$/g, '').replace(/""/g, '"'));
+}
+
+function getValueByHeader(values, headers, possibleNames) {
+    for (let name of possibleNames) {
+        const index = headers.findIndex(h => h.toUpperCase() === name.toUpperCase());
+        if (index !== -1 && values[index]) return values[index];
+    }
+    return '';
+}
+
 
 function loadCID(event) {
     const file = event.target.files[0];
@@ -1669,6 +2630,7 @@ function parseCIDData(xmlDoc) {
         validationErrors = {};
         selectProtocol('iec');
 
+
         const communication = xmlDoc.querySelector('Communication');
         if (communication) {
             const connectedAP = communication.querySelector('ConnectedAP');
@@ -1688,6 +2650,7 @@ function parseCIDData(xmlDoc) {
                 }
             }
         }
+
 
         const ieds = xmlDoc.querySelectorAll('IED');
         if (ieds.length > 0) {
@@ -1722,41 +2685,48 @@ function parseCIDData(xmlDoc) {
     }
 }
 
-// Helper functions for CSV parsing
-function parseCSVLine(line) {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
 
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        const nextChar = line[i + 1];
-
-        if (char === '"') {
-            if (inQuotes && nextChar === '"') {
-                current += '"';
-                i++;
-            } else {
-                inQuotes = !inQuotes;
-            }
-        } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
-            current = '';
-        } else {
-            current += char;
+function loadEquipmentFromCSV(lines) {
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        if (values[0]) {
+            const device = {
+                id: Date.now().toString() + i,
+                device_name: values[0] || '',
+                device_type: values[1] || '',
+                tag_prefix: values[3] || '',
+                io_device: values[4] || '',
+                protocol: 'modbus',
+                modbusVariant: 'tcp',
+                variables: [], alarms: [], trends: []
+            };
+            devices.push(device);
         }
     }
-
-    result.push(current.trim());
-    return result.map(val => val.replace(/^"|"$/g, '').replace(/""/g, '"'));
+    updateDeviceList();
+    updateDeviceCounter();
 }
 
-function getValueByHeader(values, headers, possibleNames) {
-    for (let name of possibleNames) {
-        const index = headers.findIndex(h => h.toUpperCase() === name.toUpperCase());
-        if (index !== -1 && values[index]) return values[index];
+function loadUnitsFromCSV(lines) {
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        if (values[0]) {
+            const device = {
+                id: Date.now().toString() + i,
+                device_name: values[0] || '',
+                device_type: values[1] === 'IED' ? 'IED' : 'PLC',
+                port_name: values[2] || '',
+                device_ip: values[3] || '',
+                protocol_name: values[4] || '',
+                protocol: values[4]?.includes('IEC') ? 'iec' : 'modbus',
+                variables: [], alarms: [], trends: []
+            };
+            devices.push(device);
+        }
     }
-    return '';
+    updateDeviceList();
+    updateDeviceCounter();
 }
 
 function downloadCSV(content, filename) {
@@ -1771,11 +2741,9 @@ function downloadCSV(content, filename) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        URL.revokeObjectURL(url);
     }
 }
 
-// UI Helper functions
 function showAlert(message, type) {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type === 'error' ? 'error' : 'success'}`;
@@ -1800,351 +2768,226 @@ function showLoading(show) {
     }
 }
 
-// Placeholder functions for config generation
-function generateEquipmentConfig() {
-    showAlert('Please configure your device and click "Save Device" first', 'error');
-}
-
-function generateUnitsConfig() {
-    showAlert('Please configure your device and click "Save Device" first', 'error');
-}
-
-// Add generate buttons
-function addGenerateButtons() {
-    const buttonGroup = document.querySelector('.button-group');
-    if (!buttonGroup) return;
-
-    const oldIecBtn = document.getElementById('generateIECBtn');
-    if (oldIecBtn) {
-        oldIecBtn.remove();
+    function loadCSV(event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
     }
 
-    if (!document.getElementById('generateXMLBtn')) {
-        const xmlButton = document.createElement('button');
-        xmlButton.type = 'button';
-        xmlButton.className = 'btn btn-primary';
-        xmlButton.id = 'generateXMLBtn';
-        xmlButton.textContent = 'Generate XML';
-        xmlButton.onclick = generateIECXML;
-        xmlButton.title = 'Generate XML files for IEC devices';
-        buttonGroup.appendChild(xmlButton);
-    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
 
-    const csvButton = document.getElementById('generateCSVBtn');
-    if (csvButton) {
-        csvButton.onclick = generateAllCSV;
-        csvButton.textContent = 'Generate CSV Files';
-        csvButton.title = 'Generate all CSV files (including IEC)';
-    }
-}
+            if (lines.length < 2) {
+                showAlert('CSV file appears to be empty', 'error');
+                return;
+            }
 
-// Initialize on DOM load
-document.addEventListener('DOMContentLoaded', function() {
-    initializeForm();
-    updateDeviceCounter();
-    setupValidation();
-    setupIECValidation();
-    setupFileHandlers();
-    setTimeout(addGenerateButtons, 100);
-});
+            const headers = parseCSVLine(lines[0]);
 
-// Export functions to global scope
-window.showTab = showTab;
-window.selectProtocol = selectProtocol;
-window.selectModbusVariant = selectModbusVariant;
-window.toggleAdvancedOptions = toggleAdvancedOptions;
-window.addVariable = addVariable;
-window.addAlarm = addAlarm;
-window.addTrend = addTrend;
-window.saveDevice = saveDevice;
-window.loadDevice = loadDevice;
-window.removeDevice = removeDevice;
-window.resetForm = resetForm;
-window.generateAllCSV = generateAllCSV;
-window.generateIECXML = generateIECXML;
-window.generateEquipmentConfig = generateEquipmentConfig;
-window.generateUnitsConfig = generateUnitsConfig;FormButtons();
-                if (event !== 'focus') updateProgressBar();
-            });
-        });
-    });
-    setupSubFormValidation();
-    updateFormButtons();
-}
 
-function setupSubFormValidation() {
-    const fieldGroups = [
-        ['item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type'],
-        ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'],
-        ['tag_description', 'trend_types', 'tag_name', 'item_name_trend', 'trend_time']
-    ];
+            const isEquipCSV = headers.some(h =>
+                ['Name', 'ITEM_NAME', 'Type', 'EQUIP_TYPE'].includes(h.trim())
+            );
 
-    fieldGroups.flat().forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            ['input', 'change', 'blur', 'focus'].forEach(event => {
-                field.addEventListener(event, function() {
-                    if (event === 'focus') clearFieldError(this);
-                    else validateField(this);
-                    updateFormButtons();
-                });
-            });
-        }
-    });
-}
+            const isUnitsCSV = headers.some(h =>
+                ['Server Name', 'UNIT_NAME', 'Address', 'Protocol'].includes(h.trim())
+            );
 
-function setupIECValidation() {
-    const iecFields = ['brcb', 'urcb', 'board_name', 'scl_file'];
-
-    iecFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            ['input', 'change', 'blur', 'focus'].forEach(event => {
-                field.addEventListener(event, function() {
-                    if (event === 'focus') {
-                        clearFieldError(this);
-                    } else {
-                        validateFieldIEC(this);
-                        updateFormButtons();
-                    }
-                });
-            });
-        }
-    });
-}
-
-function validateField(field) {
-    const fieldName = field.name || field.id;
-    const value = field.value.trim();
-    const rules = validationRules[fieldName];
-
-    if (!rules || (!isFieldVisible(field) && !isSubFormField(fieldName))) {
-        delete validationErrors[fieldName];
-        clearFieldError(field);
-        return true;
-    }
-
-    let isValid = true;
-    let errorMessage = '';
-
-    if (rules.required && !value) {
-        isValid = false;
-        errorMessage = `${getFieldLabel(field)} is required`;
-    }
-
-    if (value) {
-        if (rules.minLength && value.length < rules.minLength) {
-            isValid = false;
-            errorMessage = `${getFieldLabel(field)} must be at least ${rules.minLength} characters`;
-        }
-        if (rules.maxLength && value.length > rules.maxLength) {
-            isValid = false;
-            errorMessage = `${getFieldLabel(field)} must not exceed ${rules.maxLength} characters`;
-        }
-        if (rules.pattern && !rules.pattern.test(value)) {
-            isValid = false;
-            errorMessage = rules.message || `${getFieldLabel(field)} format is invalid`;
-        }
-        if (rules.min !== undefined || rules.max !== undefined) {
-            const numValue = parseInt(value);
-            if (isNaN(numValue)) {
-                isValid = false;
-                errorMessage = `${getFieldLabel(field)} must be a valid number`;
+            if (isEquipCSV) {
+                loadEquipmentFromCSV(lines);
+            } else if (isUnitsCSV) {
+                loadUnitsFromCSV(lines);
             } else {
-                if (rules.min !== undefined && numValue < rules.min) {
-                    isValid = false;
-                    errorMessage = `${getFieldLabel(field)} must be at least ${rules.min}`;
-                }
-                if (rules.max !== undefined && numValue > rules.max) {
-                    isValid = false;
-                    errorMessage = `${getFieldLabel(field)} must not exceed ${rules.max}`;
-                }
+                showAlert('CSV format not recognized. Expected EQUIP.csv or UNITS.csv format', 'error');
+                return;
             }
+
+            showAlert('CSV loaded and device created successfully!', 'success');
+        } catch (error) {
+            showAlert('Error loading CSV: ' + error.message, 'error');
         }
-    }
-
-    if (!isValid) {
-        validationErrors[fieldName] = errorMessage;
-        showFieldError(field, errorMessage);
-    } else {
-        delete validationErrors[fieldName];
-        clearFieldError(field);
-    }
-
-    return isValid;
-}
-
-function isSubFormField(fieldName) {
-    const subFormFields = [
-        'item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type',
-        'alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm',
-        'tag_description', 'trend_types', 'tag_name', 'item_name_trend', 'trend_time'
-    ];
-    return subFormFields.includes(fieldName);
-}
-
-function isFieldVisible(field) {
-    if (field.offsetParent === null) return false;
-    const fieldName = field.name || field.id;
-
-    if (currentProtocol === 'modbus') {
-        if (fieldName.startsWith('iec_')) return false;
-        if (currentModbusVariant === 'tcp') {
-            return !['gateway_address', 'slave_id', 'port_name_rtu', 'memory_rtu', 'serial_port', 'baud_rate'].includes(fieldName);
-        } else {
-            return !['device_ip', 'modbus_port', 'port_name', 'memory_tcp', 'unit_number'].includes(fieldName);
-        }
-    } else if (currentProtocol === 'iec') {
-        return !['device_ip', 'modbus_port', 'port_name', 'unit_number', 'memory_tcp', 'gateway_address', 'slave_id', 'port_name_rtu', 'memory_rtu', 'serial_port'].includes(fieldName);
-    }
-    return true;
-}
-
-function getFieldLabel(field) {
-    const labels = {
-        device_name: 'Device Name', device_type: 'Device Type', tag_prefix: 'Tag Prefix',
-        io_device: 'I/O Device', device_ip: 'Device IP', modbus_port: 'Modbus Port',
-        iec_device_ip: 'IEC Device IP', item_name: 'Item Name', alarm_name: 'Alarm Name'
     };
-    return labels[field.name || field.id] || (field.name || field.id).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    reader.readAsText(file);
 }
 
-function showFieldError(field, message) {
-    field.classList.add('field-error');
-    const existingError = field.parentNode.querySelector('.error-message');
-    if (existingError) existingError.remove();
+function loadEquipmentFromCSV(lines) {
+    const headers = parseCSVLine(lines[0]);
 
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-    errorDiv.style.cssText = 'color: #dc3545; font-size: 0.8rem; margin-top: 4px;';
-    field.parentNode.insertBefore(errorDiv, field.nextSibling);
-    field.style.cssText = 'border-color: #dc3545 !important; box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;';
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const rowData = {};
+        headers.forEach((header, index) => {
+            rowData[header.trim()] = values[index] ? values[index].trim() : '';
+        });
+
+
+        const deviceName = rowData['Name'] || rowData['ITEM_NAME'] || '';
+        const deviceType = rowData['Type'] || rowData['EQUIP_TYPE'] || 'PV';
+        const tagPrefix = rowData['Tag Prefix'] || deviceName.substring(0, 8).toUpperCase();
+        const ioDevice = rowData['I/O Device'] || `IO_${deviceName}`;
+
+        if (deviceName) {
+
+            resetForm();
+            document.getElementById('device_name').value = deviceName;
+            document.getElementById('device_type').value = deviceType;
+            document.getElementById('tag_prefix').value = tagPrefix;
+            document.getElementById('io_device').value = ioDevice;
+
+
+            selectProtocol('modbus');
+            break;
+        }
+    }
 }
 
-function clearFieldError(field) {
-    field.classList.remove('field-error');
-    const errorMessage = field.parentNode.querySelector('.error-message');
-    if (errorMessage) errorMessage.remove();
-    field.style.cssText = '';
-}
-
-function isFormComplete(type) {
-    let requiredFields;
-    switch (type) {
-        case 'variable':
-            requiredFields = ['item_name', 'io_device_var', 'tag_name_var', 'address', 'equipment_var', 'data_type'];
-            break;
-        case 'alarm':
-            requiredFields = ['alarm_name', 'alarm_type', 'category', 'alarm_tag', 'equipment', 'item_name_alarm'];
-            break;
-        case 'trend':
-            requiredFields = ['tag_description', 'trend_types', 'tag_name', 'item_name_trend'];
-            break;
-        case 'main':
-            requiredFields = getMainFormRequiredFields();
-            break;
-        default:
-            return false;
+function loadCSV(event) {
+    const file = event.target.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+        showAlert('Please select a valid CSV file', 'error');
+        return;
     }
 
-    const allFieldsFilled = requiredFields.every(fieldName => {
-        const field = document.getElementById(fieldName);
-        return field && field.value.trim() !== '';
-    });
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
 
-    const hasErrors = requiredFields.some(fieldName => validationErrors.hasOwnProperty(fieldName));
-    return allFieldsFilled && !hasErrors;
-}
-
-function updateFormButtons() {
-    const buttonConfigs = [
-        { selector: 'button[onclick="saveDevice()"]', condition: () => isFormComplete('main'), title: 'Save device configuration' },
-        { selector: 'button[onclick="generateCSV()"]', condition: () => devices.length > 0, title: 'Generate CSV files' },
-        { selector: 'button[onclick="addVariable()"]', condition: () => isFormComplete('variable'), title: 'Add variable' },
-        { selector: 'button[onclick="addAlarm()"]', condition: () => isFormComplete('alarm'), title: 'Add alarm' },
-        { selector: 'button[onclick="addTrend()"]', condition: () => isFormComplete('trend'), title: 'Add trend' }
-    ];
-
-    buttonConfigs.forEach(({ selector, condition, title }) => {
-        const button = document.querySelector(selector);
-        if (button) {
-            const isEnabled = condition();
-            button.disabled = !isEnabled;
-            button.style.cssText = isEnabled ? '' : 'background-color: #6c757d !important; cursor: not-allowed !important; opacity: 0.6 !important;';
-            button.title = title;
-        }
-    });
-}
-
-function updateProgressBar() {
-    const form = document.getElementById('deviceForm');
-    if (!form) return;
-
-    const requiredFields = form.querySelectorAll('input[required], select[required]');
-    let filledFields = 0, visibleRequiredFields = 0;
-
-    requiredFields.forEach(field => {
-        if (isFieldVisible(field)) {
-            visibleRequiredFields++;
-            if (field.value.trim() !== '' && !validationErrors[field.name || field.id]) {
-                filledFields++;
+            if (lines.length < 2) {
+                showAlert('CSV file appears to be empty', 'error');
+                return;
             }
+
+            const headers = parseCSVLine(lines[0]);
+
+
+            const isEquipCSV = headers.some(h =>
+                ['Name', 'Type', 'Tag Prefix', 'I/O Device'].includes(h.trim())
+            );
+
+
+            const isUnitsCSV = headers.some(h =>
+                ['Server Name', 'Port Name', 'Port Number', 'Board Name'].includes(h.trim())
+            );
+
+            let loadedSections = [];
+
+            if (isEquipCSV) {
+                loadEquipmentDataToForm(lines);
+                loadedSections.push('Device Configuration');
+            }
+
+            if (isUnitsCSV) {
+                loadUnitsDataToForm(lines);
+                loadedSections.push('Network Configuration');
+            }
+
+            if (loadedSections.length === 0) {
+                showAlert('CSV format not recognized. Expected EQUIP.csv or UNITS.csv format', 'error');
+                return;
+            }
+
+            showAlert(`CSV loaded successfully! Filled: ${loadedSections.join(' and ')}`, 'success');
+
+        } catch (error) {
+            showAlert('Error loading CSV: ' + error.message, 'error');
         }
-    });
+    };
+    reader.readAsText(file);
+}
 
-    const progress = visibleRequiredFields > 0 ? (filledFields / visibleRequiredFields) * 100 : 0;
-    const progressFill = document.querySelector('.progress-fill');
-    const progressText = document.querySelector('.progress-text');
+function loadEquipmentDataToForm(lines) {
+    const headers = parseCSVLine(lines[0]);
 
-    if (progressFill) {
-        progressFill.style.width = progress + '%';
-        const errorCount = Object.keys(validationErrors).length;
-        progressFill.style.backgroundColor = errorCount > 0 ? '#dc3545' : progress === 100 ? '#28a745' : '#007bff';
-    }
 
-    if (progressText) {
-        const errorCount = Object.keys(validationErrors).length;
-        if (errorCount > 0) {
-            progressText.textContent = `${errorCount} error${errorCount > 1 ? 's' : ''} to fix`;
-            progressText.style.color = '#dc3545';
-        } else if (progress === 100) {
-            progressText.textContent = 'Form complete - ready to save';
-            progressText.style.color = '#28a745';
-        } else {
-            progressText.textContent = `${Math.round(progress)}% complete`;
-            progressText.style.color = '#007bff';
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const rowData = {};
+        headers.forEach((header, index) => {
+            rowData[header.trim()] = values[index] ? values[index].trim() : '';
+        });
+
+        const deviceName = rowData['Name'] || '';
+        const deviceType = rowData['Type'] || 'PV';
+        const tagPrefix = rowData['Tag Prefix'] || deviceName.substring(0, 8).toUpperCase();
+        const ioDevice = rowData['I/O Device'] || `IO_${deviceName}`;
+
+        if (deviceName) {
+
+            document.getElementById('device_name').value = deviceName;
+            document.getElementById('device_type').value = deviceType;
+            document.getElementById('tag_prefix').value = tagPrefix;
+            document.getElementById('io_device').value = ioDevice;
+            break;
         }
     }
 }
 
-// Tab functions
-function showTab(tabName, event) {
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+function loadUnitsDataToForm(lines) {
+    const headers = parseCSVLine(lines[0]);
 
-    if (event?.target) event.target.classList.add('active');
-    const targetContent = document.getElementById(tabName);
-    if (targetContent) targetContent.classList.add('active');
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length < 2) continue;
+
+        const rowData = {};
+        headers.forEach((header, index) => {
+            rowData[header.trim()] = values[index] ? values[index].trim() : '';
+        });
+
+        const portName = rowData['Port Name'] || '';
+        const portNumber = rowData['Port Number'] || '';
+        const boardName = rowData['Board Name'] || '';
+        const specialOpt = rowData['Special Opt'] || '';
+        const comment = rowData['Comment'] || '';
+
+        if (portName && boardName) {
+
+            let ipAddress = '';
+            let tcpPort = '502';
+
+            if (specialOpt) {
+                const ipMatch = specialOpt.match(/-I([0-9.]+)/);
+                const portMatch = specialOpt.match(/-P(\d+)/);
+
+                if (ipMatch) ipAddress = ipMatch[1];
+                if (portMatch) tcpPort = portMatch[1];
+            }
+
+
+            if (comment && comment.toUpperCase().includes('TCP')) {
+                selectProtocol('modbus');
+                selectModbusVariant('tcp');
+                document.getElementById('device_ip').value = ipAddress;
+                document.getElementById('modbus_port').value = tcpPort;
+                document.getElementById('port_name').value = portName;
+                document.getElementById('unit_number').value = portNumber || '1';
+                document.getElementById('board_name_tcp').value = boardName;
+                document.getElementById('memory_tcp').value = 'true';
+            } else if (comment && comment.toUpperCase().includes('GATEWAY')) {
+                selectProtocol('modbus');
+                selectModbusVariant('rtu');
+                document.getElementById('gateway_address').value = ipAddress;
+                document.getElementById('slave_id').value = portNumber || '1';
+                document.getElementById('port_name_rtu').value = portName;
+                document.getElementById('board_name_rtu').value = boardName;
+                document.getElementById('memory_rtu').value = 'true';
+                document.getElementById('serial_port').value = 'COM1';
+            }
+            break;
+        }
+    }
+
+    updateFormButtons();
+    updateProgressBar();
 }
-
-// Protocol selection
-function selectProtocol(protocol) {
-    currentProtocol = protocol;
-
-    document.querySelectorAll('.protocol-btn').forEach(btn => {
-        btn.classList.toggle('active',
-            (protocol === 'modbus' && btn.textContent.includes('Modbus')) ||
-            (protocol === 'iec' && btn.textContent.includes('IEC'))
-        );
-    });
-
-    const modbusConfig = document.getElementById('modbus-config');
-    const iecConfig = document.getElementById('iec-config');
-    const cidElements = ['cidInputLabel', 'cidFile'];
-
-    if (protocol === 'modbus') {
-        modbusConfig?.classList.remove('hidden');
-        iecConfig?.classList.add('hidden');
-        cidElements.forEach(id => document.getElementById(id)?.classList.add('hidden'));
-        update
