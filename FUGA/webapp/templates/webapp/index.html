@@ -23,6 +23,16 @@
         <div class="header-content">
           <h1>Device Configuration Generator</h1>
 
+
+          <div class="language-switcher">
+            <button class="lang-btn active" data-lang="pl" onclick="switchLanguage('pl')">
+              <span class="flag-icon"></span> PL
+            </button>
+            <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')">
+              <span class="flag-icon"></span> EN
+             </button>
+          </div>
+
           <img src="{% static 'images/schneider_logo.png' %}"
      alt="Schneider Electric - Life Is On"
      class="company-logo"
