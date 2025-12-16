@@ -1,0 +1,410 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FUGA - Microgrid Management Platform | Schneider Electric</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3dcd58 0%, #2db04a 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px 60px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section img {
+            height: 50px;
+            width: auto;
+        }
+
+        .system-title {
+            color: #2c2c2c;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .hero-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-icon svg {
+            width: 45px;
+            height: 45px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .hero-section h1 {
+            font-size: 3.2rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-section h1 strong {
+            font-weight: 700;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 16px;
+            padding: 50px 45px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3dcd58 0%, #2db04a 100%);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .module-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #3dcd58 0%, #2db04a 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .module-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .module-card h2 {
+            font-size: 1.8rem;
+            color: #2c2c2c;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .module-card p {
+            font-size: 1.05rem;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .module-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+
+        .module-features li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .module-features li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #3dcd58;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .module-action {
+            display: inline-flex;
+            align-items: center;
+            color: #3dcd58;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+
+        .module-action::after {
+            content: '→';
+            margin-left: 10px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .module-card:hover .module-action::after {
+            margin-left: 15px;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 30px 60px;
+            color: white;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .footer a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .modules-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 15px 30px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .logo-section img {
+                height: 40px;
+            }
+
+            .system-title {
+                font-size: 1rem;
+            }
+
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-section p {
+                font-size: 1rem;
+            }
+
+            .module-card {
+                padding: 35px 30px;
+            }
+
+            .footer {
+                padding: 25px 30px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-bar">
+        <div class="logo-section">
+            <img src="{% static 'images/schneider_logo.png' %}" alt="Schneider Electric - Life Is On" />
+        </div>
+        <div class="system-title">
+            FUGA Microgrid Management Platform
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="hero-section">
+                <h1><strong>FUGA</strong> Microgrid Hub</h1>
+                <p>
+                    Microgrid management and monitoring system.
+                    Configure devices, visualize data, and optimize energy distribution across your infrastructure.
+                </p>
+            </div>
+
+            <div class="modules-grid">
+
+                <a href="{% url 'webapp:index' %}" class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                                <path d="M6 8h4M6 12h8"/>
+                            </svg>
+                        </div>
+                        <h2>Device Configuration</h2>
+                    </div>
+                    <p>
+                        Comprehensive SCADA device configuration generator for microgrid components.
+                        Create and manage device configurations with support for industry-standard protocols.
+                    </p>
+                    <ul class="module-features">
+                        <li>PV Panels, Wind Turbines, Fuel Turbine, Fuel Cell, BESS Integration</li>
+                        <li>Modbus TCP/RTU Protocol Support</li>
+                        <li>IEC 61850</li>
+                        <li>Automated Configuration Export</li>
+                    </ul>
+                    <span class="module-action">Launch Configuration Tool</span>
+                </a>
+
+
+                <a href="/dashboard/" class="module-card">
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3 3v18h18"/>
+                                <path d="M18 17V9"/>
+                                <path d="M13 17V5"/>
+                                <path d="M8 17v-3"/>
+                            </svg>
+                        </div>
+                        <h2>Analytics Dashboard</h2>
+                    </div>
+                    <p>
+                        Real-time monitoring and analytics platform for microgrid performance.
+                        Visualize energy flows, track consumption patterns, and analyze system efficiency.
+                    </p>
+                    <ul class="module-features">
+                        <li>Live Energy Generation & Consumption</li>
+                        <li>Weather Data Integration</li>
+                        <li>Interactive Performance Charts</li>
+                        <li>Energy Balance Analysis</li>
+                    </ul>
+                    <span class="module-action">Open Dashboard</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <p>© 2025 Schneider Electric. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="https://www.se.com" target="_blank">Schneider Electric</a>
+                <a href="https://www.se.com/ww/en/about-us/legal/data-privacy.jsp" target="_blank">Privacy Policy</a>
+                <a href="https://www.se.com/ww/en/about-us/legal/legal-information" target="_blank">Legal</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

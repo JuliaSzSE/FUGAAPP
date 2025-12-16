@@ -16,6 +16,9 @@ import xml.etree.ElementTree as ET
 from .models import Device, Variable, Alarm, Trend
 from .forms import DeviceForm, VariableForm, AlarmForm, TrendForm
 
+def hub(request):
+    return render(request, 'webapp/hub.html')
+
 
 def index(request):
 

@@ -5,7 +5,11 @@ app_name = 'webapp'
 
 urlpatterns = [
 
-    path('', views.index, name='index'),
+   
+    path('', views.hub, name='hub'),
+
+
+    path('index/', views.index, name='index'),
 
 
     path('api/devices/', views.get_devices, name='get_devices'),
